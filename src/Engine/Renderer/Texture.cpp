@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include <iostream>
-#include "helpers.h"
+#include "../Util/helpers.h"
 
 Texture::Texture()
     : use_linear(true), to_id(0)

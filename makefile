@@ -16,7 +16,10 @@ run: clean all
 	@echo "🚀 Executing..."
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
+#apparentl https://stackoverflow.com/questions/4036191/sources-from-subdirectories-in-makefile/4038459
+#but i couldnt get it to work
+
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(SRC)/*/*.cpp $(SRC)/*/*/*.cpp
 	@echo "🚧 Building..."
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
 

@@ -9,15 +9,15 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Shader.h"
+#include "Engine/Renderer/Shader.h"
 
 //#include <vec/vec.hpp>
 
 /* Window Data */
-const char* WINDOW_NAME = "Gamey Game game Game";
 GLFWwindow *window;
-const int WINDOW_WIDTH = 1080;
-const int WINDOW_HEIGHT = 640;
+const char *WINDOW_NAME = "Gamey Game Game Game";
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
 
 /* Matrices */
 glm::vec3 cam_position = glm::vec3(0.0f, 1.0f, 1.2f);
@@ -28,7 +28,23 @@ glm::mat4 world_matrix = glm::mat4(1.0f);
 glm::mat4 view_matrix = glm::lookAt(cam_position, cam_look_at, cam_up);
 glm::mat4 projection_matrix = glm::perspectiveFov(glm::radians(60.0f), float(WINDOW_WIDTH), float(WINDOW_HEIGHT), 0.1f, 10.0f);
 
-Shader  * shader  = nullptr;
+Shader *shader = nullptr;
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE){
+        glfwSetWindowShouldClose(window, true);
+        }
+}
 
 int init()
 {
@@ -53,7 +69,12 @@ int init()
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    if(glewInit() != GLEW_OK)
+    /* Add callbacks */
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, key_callback);
+
+    if (glewInit() != GLEW_OK)
         throw std::runtime_error("Bad Glew");
 
     /* Set the viewport */
@@ -68,7 +89,7 @@ void resources()
 {
     shader = new Shader("Basic.vert", "Basic.frag");
     shader->apply();
-    
+
     // shader->setUniformMatrix4fv("world",        world_matrix);
     // shader->setUniformMatrix3fv("normalMatrix", glm::inverse(glm::transpose(glm::mat3(world_matrix))));
     // shader->setUniformMatrix4fv("viewProj",     projection_matrix * view_matrix);
@@ -78,7 +99,6 @@ void resources()
     // texture = new Texture();
     // texture->load("res/models/alliance.png");
     // texture->bind();
-
 }
 
 void render(float time)
@@ -93,31 +113,29 @@ void render(float time)
 
     // shader->setUniformMatrix4fv("world", world_matrix);
     // shader->setUniformMatrix3fv("normalMatrix", glm::inverse(glm::transpose(glm::mat3(world_matrix))));
-
-
 }
 
 void update()
 {
     float startTime = static_cast<float>(glfwGetTime());
-    float newTime  = 0.0f;
+    float newTime = 0.0f;
     float gameTime = 0.0f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Update game time value */
-        newTime  = static_cast<float>(glfwGetTime());
+        newTime = static_cast<float>(glfwGetTime());
         gameTime = newTime - startTime;
 
         /* Render here */
         render(gameTime);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
         /* Poll for and process events */
         glfwPollEvents();
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
     }
 }
 

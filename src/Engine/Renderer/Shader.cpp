@@ -3,7 +3,7 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <fstream>
 #include <string>
-#include "helpers.h"
+#include "../Util/helpers.h"
 
 Shader::Shader(const std::string & vertexShaderFilename,
                const std::string & fragmentShaderFilename,
