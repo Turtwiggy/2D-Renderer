@@ -1,3 +1,3 @@
-CALL make
+#CALL make
 
 START build/main.exe

@@ -1,6 +1,12 @@
+
 #include <iostream>
 #include <string>
-using namespace std;
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/freetype/imgui_freetype.h>
+#include <imgui/examples/imgui_impl_glfw.h>
+#include <imgui/examples/imgui_impl_opengl3.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,12 +15,9 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Engine/Renderer/Shader.h"
-
-//#include <vec/vec.hpp>
+#include "Engine/Core.hpp"
 
 /* Window Data */
-GLFWwindow *window;
 const char *WINDOW_NAME = "Gamey Game Game Game";
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -28,26 +31,15 @@ glm::mat4 world_matrix = glm::mat4(1.0f);
 glm::mat4 view_matrix = glm::lookAt(cam_position, cam_look_at, cam_up);
 glm::mat4 projection_matrix = glm::perspectiveFov(glm::radians(60.0f), float(WINDOW_WIDTH), float(WINDOW_HEIGHT), 0.1f, 10.0f);
 
-Shader *shader = nullptr;
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+void glfw_error_callback(int error, const char *description)
 {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+GLFWwindow* init()
 {
-    if (key == GLFW_KEY_ESCAPE){
-        glfwSetWindowShouldClose(window, true);
-        }
-}
+    glfwSetErrorCallback(glfw_error_callback);
 
-int init()
-{
     /* Initialize the library */
     if (!glfwInit())
         throw std::runtime_error("Could not init glfw");
@@ -58,21 +50,16 @@ int init()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
 
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, NULL, NULL);
 
     if (!window)
     {
         glfwTerminate();
-        return -1;
+        ENGINE_CORE_ASSERT(false, "GLFW didn't init!");
     }
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
-
-    /* Add callbacks */
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    //glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetKeyCallback(window, key_callback);
 
     if (glewInit() != GLEW_OK)
         throw std::runtime_error("Bad Glew");
@@ -82,23 +69,7 @@ int init()
 
     glEnable(GL_DEPTH_TEST);
 
-    return true;
-}
-
-void resources()
-{
-    shader = new Shader("Basic.vert", "Basic.frag");
-    shader->apply();
-
-    // shader->setUniformMatrix4fv("world",        world_matrix);
-    // shader->setUniformMatrix3fv("normalMatrix", glm::inverse(glm::transpose(glm::mat3(world_matrix))));
-    // shader->setUniformMatrix4fv("viewProj",     projection_matrix * view_matrix);
-
-    // shader->setUniform3fv("cam_pos", cam_position);
-
-    // texture = new Texture();
-    // texture->load("res/models/alliance.png");
-    // texture->bind();
+    return window;
 }
 
 void render(float time)
@@ -111,44 +82,171 @@ void render(float time)
     /* Draw our scene */
     world_matrix = glm::rotate(glm::mat4(1.0f), time * glm::radians(-90.0f), glm::vec3(0, 1, 0));
 
+    // level.window_pos = {wxpos, wypos};
+    // vec2f screen_absolute_pos = {wxpos, wypos};
+    // auto mpos = (vec2f){io.MousePos.x, io.MousePos.y};
+
     // shader->setUniformMatrix4fv("world", world_matrix);
     // shader->setUniformMatrix3fv("normalMatrix", glm::inverse(glm::transpose(glm::mat3(world_matrix))));
 }
 
-void update()
+void game_logic()
+{
+
+}
+
+void update(GLFWwindow* window)
 {
     float startTime = static_cast<float>(glfwGetTime());
     float newTime = 0.0f;
     float gameTime = 0.0f;
+    int display_w = 0;
+    int display_h = 0;
+    int wxpos = 0;
+    int wypos = 0;
+
+    glfwGetFramebufferSize(window, &display_w, &display_h);
+    glfwGetWindowPos(window, &wxpos, &wypos);
+    ImGuiIO &io = ImGui::GetIO();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        /* Update game time value */
+        printf("Hello\n");
+
+        /* Update game time 
+        
+        value */
         newTime = static_cast<float>(glfwGetTime());
         gameTime = newTime - startTime;
+
+        /* Poll for and process events */
+        glfwPollEvents();
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        printf("Im here\n");
+
+        if (ImGui::IsKeyDown(GLFW_KEY_N))
+        {
+            std::cout << ImGui::GetIO().DeltaTime << std::endl;
+        }
+
+        glfwGetWindowPos(window, &wxpos, &wypos);
+
+        ImGui::Begin("Test");
+
+        if (ImGui::Button("BUTTON"))
+        {
+            printf("james is poo\n");
+        }
+
+        ImGui::End();
+
+        printf("Here2\n");
+
+        //This should include "imgui rendering" and any game logic
+        game_logic();
+
+        ImGui::Render();
+
+        glfwMakeContextCurrent(window);
+        glViewport(0, 0, display_w, display_h);
 
         /* Render here */
         render(gameTime);
 
-        /* Poll for and process events */
-        glfwPollEvents();
+        printf("Here3\n");
+
+        //Imgui actually render
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow *backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
     }
 }
 
-int main(void)
+void init_imgui(bool no_viewports, const char *glsl_version, GLFWwindow* window)
 {
+    ImFontAtlas atlas = {};
+    ImGui::CreateContext(&atlas);
+
+    printf("ImGui create context\n");
+    ImGuiIO &io = ImGui::GetIO();
+
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    if (!no_viewports)
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    //ImGui::SetStyleLinearColor(true);
+
+    ImGui::PushSrgbStyleColor(ImGuiCol_WindowBg, ImVec4(30 / 255., 30 / 255., 30 / 255., 1));
+
+    ImGuiStyle &style = ImGui::GetStyle();
+    style.FrameRounding = 0;
+    style.WindowRounding = 0;
+    style.ChildRounding = 0;
+    style.ChildBorderSize = 0;
+    style.FrameBorderSize = 0;
+    style.WindowBorderSize = 1;
+
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+
+    io.Fonts->Clear();
+    io.Fonts->AddFontDefault();
+    ImGuiFreeType::BuildFontAtlas(&atlas, 0, 1);
+
+    //ImGui::SetStyleLinearColor(true);
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    printf("Init ogl\n");
+}
+
+int main(int argc, char *argv[])
+{
+    bool no_viewports = false;
+
+    if (argc > 1)
+    {
+        for (int i = 1; i < argc; i++)
+        {
+            std::string sarg = argv[i];
+
+            if (sarg == "-noviewports" || sarg == "-noviewport")
+            {
+                no_viewports = true;
+
+                printf("Viewports are disabled\n");
+            }
+        }
+    }
+    
+    GLFWwindow *window = init();
+
+    const char *glsl_version = "#version 130";
+    init_imgui(no_viewports, glsl_version, window);
+
     std::cout << "Hello world!";
 
-    if (!init())
-        return -1;
-
-    resources();
-
-    update();
+    update(window);
 
     glfwTerminate();
 
