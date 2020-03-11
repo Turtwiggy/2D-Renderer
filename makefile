@@ -5,11 +5,11 @@ CXX_DEBUG := -g -Og
 
 TARGET_EXEC = game.exe
 BUILD_DIR ?= ./build
-SRC_DIRS ?= ./src
+SRC_DIRS = src
 
-SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
+# SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
+# OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+# DEPS := $(OBJS:.o=.d)
 
 INCLUDES	:= -Iinclude -Iinclude/imgui
 
@@ -33,7 +33,7 @@ run: clean all
 # apparentl https://stackoverflow.com/questions/4036191/sources-from-subdirectories-in-makefile/4038459
 # but i couldnt get it to work
 
-$(BUILD_DIR)/$(TARGET_EXEC): $(SRC_DIRS)/*.cpp $(SRC_DIRS)/*/*.cpp
+$(BUILD_DIR)/$(TARGET_EXEC): $(SRC_DIRS)/*.cpp $(SRC_DIRS)/**/*.cpp
 	@echo "🚧 Building..."
 	$(CXX) $(CXX_FLAGS) $(INCLUDES) $(IMGUI) $(DEFS) $(LIBS) $^ -o $@
 
