@@ -1,0 +1,1 @@
+- dump libbacktrace.la libbacktrace.a in lib folder in your compiler

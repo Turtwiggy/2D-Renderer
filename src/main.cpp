@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     sett.is_srgb = true;
     sett.viewports = !no_viewports;
 
-    render_window win(sett, "hello");
+    render_window win(sett, "Dwarf and Blade");
 
     camera cam;
     cam.pos = (vec2f){win.get_window_size().x()/2, win.get_window_size().y()/2};
