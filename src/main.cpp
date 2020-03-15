@@ -14,7 +14,6 @@
 #include <toolkit/texture.hpp>
 #include <toolkit/vertex.hpp>
 #include <toolkit/fs_helpers.hpp>
-#include <SFML/Graphics.hpp>
 #include "sprite_renderer.hpp"
 
 int main(int argc, char *argv[])
