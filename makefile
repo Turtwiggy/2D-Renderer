@@ -29,7 +29,7 @@ SOURCES += include/networking/networking.cpp
 SOURCES += include/networking/serialisable.cpp
 SOURCES += include/ndb/db_storage.cpp
 
-DEFS = -DSUBPIXEL_FONT_RENDERING -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSFML_STATIC -DGLEW_STATIC -DGRAPHITE2_STATIC
+DEFS = -DSUBPIXEL_FONT_RENDERING -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSFML_STATIC -DGLEW_STATIC -DGRAPHITE2_STATIC -DNO_OPENCL
 LIBS	:= -l:libssl.a -l:libglfw3.a -l:libglew32.a -lsfml-audio-s -lsfml-system-s -lsfml-window-s -l:libharfbuzz.a -l:libfreetype.a -l:libharfbuzz.a -l:libfreetype.a -l:libgraphite2.a -lopengl32 -l:libflac.a -l:libpng.a -l:libz.a -l:libbz2.a -l:librpcrt4.a -l:libopenal.a -logg -lole32 -ldbgeng -l:libcrypto.a -lbacktrace -lgdi32 -lws2_32 -lopencl -llmdb -lwinmm
 LDFLAGS = -static-libstdc++ -static-libgcc -static
 

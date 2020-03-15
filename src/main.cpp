@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
             if (sarg == "-noviewports" || sarg == "-noviewport")
             {
-                no_viewports = true;
+                no_viewports = true; 
 
                 printf("Viewports are disabled\n");
             }
