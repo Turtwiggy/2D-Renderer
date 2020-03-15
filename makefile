@@ -3,6 +3,8 @@ CXXFLAGS := -std=c++17 -Wall -Wextra -Wformat
 CXXRELEASE := -O2 -s
 CXXDEBUG := -g -Og 
 
+BUILD_PATH = objs
+
 EXE = game.exe
 
 INCLUDES	:= -Iinclude -Iinclude/imgui
@@ -23,18 +25,31 @@ CPPFLAGS = $(CXXFLAGS) $(CXXRELEASE) $(INCLUDES) $(DEFS)
 
 #OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 
-OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
+OBJS := $(addprefix $(BUILD_PATH)/, $(patsubst %.cpp,%.o,$(SOURCES)))
 
-all: $(EXE)
+#OBJS = $(SOURCES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
+
+DEPS = $(OBJS:.o=.d)
+
+all: dirs $(EXE)
 	@echo Build complete for $(EXE)
 
 $(EXE): $(OBJS)
 	$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
-#$(OBJS):$(SOURCES)
-%.o: %.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+-include $(DEPS)
+
+#%.o: %.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MP -MMD -c -o $@ $<
+
+$(BUILD_PATH)/%.o: %.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MP -MMD -c -o $@ $<
 
 clean:
 	@echo "🧹 Clearing..."
 	-rm $(TARGET_EXEC) $(OBJS)
+	
+.PHONY: dirs
+dirs:
+	@mkdir -p $(dir $(OBJS))
+	@mkdir -p $(BUILD_PATH)
