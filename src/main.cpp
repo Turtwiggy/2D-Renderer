@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <imgui/imgui.h>
 
@@ -14,7 +15,7 @@
 #include <toolkit/vertex.hpp>
 #include <toolkit/fs_helpers.hpp>
 #include <SFML/Graphics.hpp>
-#include <vector>
+#include "sprite_renderer.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -43,22 +44,10 @@ int main(int argc, char *argv[])
 
     render_window win(sett, "hello");
 
-    texture spritesheet;
-    
-    std::string spritesheet_name = "res/colored_transparent.png";
-    std::string spritesheet_data = file::read(spritesheet_name, file::mode::BINARY);
+    camera cam;
+    cam.pos = (vec2f){win.get_window_size().x()/2, win.get_window_size().y()/2};
 
-    assert(spritesheet_data.size() > 0);
-
-    sf::Image img;
-    img.loadFromMemory(spritesheet_data.c_str(), spritesheet_data.size());
-
-    texture_settings tex_sett;
-    tex_sett.width = img.getSize().x;
-    tex_sett.height = img.getSize().y;
-    tex_sett.is_srgb = true;
-
-    spritesheet.load_from_memory(tex_sett, img.getPixelsPtr());
+    sprite_renderer sprite_render;
 
     while(!win.should_close())
     {
@@ -72,33 +61,15 @@ int main(int argc, char *argv[])
 
         vec2i win_size = win.get_window_size();
 
-        vec2f rect[] = {{0, 0}, {win_size.x(), 0}, {0, win_size.y()}, {win_size.x(), win_size.y()}};
-        vec2f uvs[] = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
+        sprite_handle dummy;
+        dummy.offset = {0, 1};
 
-        std::vector<vertex> vertices;
-        vertices.resize(6);
+        render_descriptor desc;
+        desc.pos = {15, 35};
 
-        vertices[0].position = rect[0];
-        vertices[0].uv = uvs[0];
-        vertices[1].position = rect[2];
-        vertices[1].uv = uvs[2];
-        vertices[2].position = rect[1];        
-        vertices[2].uv = uvs[1];
-        
-        vertices[3].position = rect[1];
-        vertices[3].uv = uvs[1];
-        vertices[4].position = rect[2];
-        vertices[4].uv = uvs[2];
-        vertices[5].position = rect[3];
-        vertices[5].uv = uvs[3];
+        sprite_render.add(dummy, desc);
 
-        for(auto& i : vertices)
-        {
-            i.colour = (vec4f){1,1,1,1};
-        }
-
-        win.render(vertices, &spritesheet);
-
+        sprite_render.render(win, cam);
         win.display();
     }
 
