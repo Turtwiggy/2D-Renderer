@@ -5,3 +5,9 @@
 	path = include/imgui
 	url = https://github.com/20k/imgui-fork
 	branch = subpixel-font
+[submodule "include/toolkit"]
+	path = include/toolkit
+	url = https://github.com/20k/JGameToolkit
+[submodule "include/networking"]
+	path = include/networking
+	url = https://github.com/20k/clientservernetworking
