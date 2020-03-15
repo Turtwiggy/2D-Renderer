@@ -53,7 +53,12 @@ int main(int argc, char *argv[])
     sf::Image img;
     img.loadFromMemory(spritesheet_data.c_str(), spritesheet_data.size());
 
-    spritesheet.load_from_memory(img.getPixelsPtr(), {img.getSize().x, img.getSize().y});
+    texture_settings tex_sett;
+    tex_sett.width = img.getSize().x;
+    tex_sett.height = img.getSize().y;
+    tex_sett.is_srgb = true;
+
+    spritesheet.load_from_memory(tex_sett, img.getPixelsPtr());
 
     while(!win.should_close())
     {
