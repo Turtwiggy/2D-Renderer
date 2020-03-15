@@ -10,7 +10,7 @@
 
 #include "Engine/Core.hpp"
 #include <toolkit/render_window.hpp>
-
+ 
 
 int main(int argc, char *argv[])
 {
@@ -42,6 +42,13 @@ int main(int argc, char *argv[])
     while(!win.should_close())
     {
         win.poll();
+
+        ImGui::Begin("New window");
+
+        ImGui::Button("I am a button");
+
+        ImGui::End();
+
         win.display();
     }
 
