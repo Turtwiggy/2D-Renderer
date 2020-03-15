@@ -7,7 +7,7 @@ BUILD_PATH = objs
 
 EXE = game.exe
 
-INCLUDES	:= -Iinclude -Iinclude/imgui
+INCLUDES := -Iinclude -Iinclude/imgui
 
 SOURCES = include/imgui/examples/imgui_impl_glfw.cpp 
 SOURCES += include/imgui/examples/imgui_impl_opengl3.cpp 
@@ -38,9 +38,6 @@ $(EXE): $(OBJS)
 	$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 -include $(DEPS)
-
-#%.o: %.cpp
-#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MP -MMD -c -o $@ $<
 
 $(BUILD_PATH)/%.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MP -MMD -c -o $@ $<
