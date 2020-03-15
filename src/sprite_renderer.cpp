@@ -36,30 +36,66 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
     vec2i screen_dimensions = window.get_window_size();
 
-    vec2f window_half_dim = (vec2f){screen_dimensions.x(), screen_dimensions.y()}/2.f;
-
-    vec2f tl_visible = cam.pos - window_half_dim;
-    vec2f br_visible = cam.pos + window_half_dim;
-
-    int x_start = floor(tl_visible.x() / TILE_PIX) - 1;
-    int y_start = floor(tl_visible.y() / TILE_PIX) - 1;
-
-    int x_end = ceil(br_visible.x() / TILE_PIX) + 1;
-    int y_end = ceil(br_visible.y() / TILE_PIX) + 1;
-
-    /*x_start = clamp(x_start, 0, level_size.x());
-    x_end = clamp(x_end, 0, level_size.x());
-    y_start = clamp(y_start, 0, level_size.y());
-    y_end = clamp(y_end, 0, level_size.y());*/
-
-    //auto mouse_tile_opt = screen_to_tile(mpos, screen_dimensions);
+    vec2f tl_visible = cam.screen_to_world(window, {0,0}) - (vec2f){TILE_PIX, TILE_PIX};
+    vec2f br_visible = cam.world_to_screen(window, {screen_dimensions.x(), screen_dimensions.y()}) + (vec2f){TILE_PIX, TILE_PIX};
 
     vec2f uv_scale = {1.f/sprite_sheet.dim.x(), 1.f/sprite_sheet.dim.y()};
 
     for(auto [handle, desc] : next_renderables)
     {
-        
+        if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
+            continue;
+
+        vec2f real_pos = cam.world_to_screen(window, desc.pos);
+        vec2f real_dim = {TILE_PIX, TILE_PIX}; // TODO: SCALE
+
+        vertex tl, tr, br, bl;
+        tl.position = real_pos - real_dim/2.f;
+        tr.position = real_pos + (vec2f){real_dim.x()/2.f, -real_dim.y()/2.f};
+        br.position = real_pos + real_dim/2.f;
+        bl.position = real_pos + (vec2f){-real_dim.x()/2.f, real_dim.y()/2.f};
+
+        vec2i texture_coordinate = handle.offset * (TILE_PIX + TILE_SEP);
+
+        vec2f tltx = {texture_coordinate.x(), texture_coordinate.y()};
+        vec2f trtx = {texture_coordinate.x() + TILE_PIX, texture_coordinate.y()};
+        vec2f brtx = {texture_coordinate.x() + TILE_PIX, texture_coordinate.y() + TILE_PIX};
+        vec2f bltx = {texture_coordinate.x(), texture_coordinate.y() + TILE_PIX};
+
+        tltx = tltx * uv_scale;
+        trtx = trtx * uv_scale;
+        brtx = brtx * uv_scale;
+        bltx = bltx * uv_scale;
+
+        tl.uv = tltx;
+        tr.uv = trtx;
+        br.uv = brtx;
+        bl.uv = bltx;
+
+        float shade = 0.05;
+
+        vec4f base_colour = desc.colour;
+
+        vec4f tl_col = clamp(base_colour*(1 + shade), 0, 1);
+        vec4f tr_col = clamp(base_colour, 0, 1);
+        vec4f br_col = clamp(base_colour*(1 - shade), 0, 1);
+        vec4f bl_col = clamp(base_colour, 0, 1);
+
+        tl.colour = tl_col;
+        tr.colour = tr_col;
+        br.colour = br_col;
+        bl.colour = bl_col;
+
+        vertices.push_back(tl);
+        vertices.push_back(bl);
+        vertices.push_back(tr);
+
+        vertices.push_back(tr);
+        vertices.push_back(bl);
+        vertices.push_back(br);
     }
+
+    window.render(vertices, &sprite_sheet);
 
     next_renderables.clear();
 }

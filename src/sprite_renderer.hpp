@@ -11,8 +11,7 @@ struct camera;
 
 struct sprite_handle
 {
-    int x_offset = 0;
-    int y_offset = 0;
+    vec2i offset;
 };
 
 struct render_descriptor

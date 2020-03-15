@@ -1,7 +1,7 @@
 #include "camera.hpp"
 #include <toolkit/render_window.hpp>
 
-vec2f camera::tile_to_screen(render_window& win, vec2f tile_pos)
+vec2f camera::tile_to_screen(render_window& win, vec2f tile_pos) const
 {
     vec2i screen_dim = win.get_window_size();
 
@@ -12,7 +12,7 @@ vec2f camera::tile_to_screen(render_window& win, vec2f tile_pos)
     return relative;
 }
  
-vec2f camera::screen_to_tile(render_window& win, vec2f screen_pos)
+vec2f camera::screen_to_tile(render_window& win, vec2f screen_pos) const
 {
     vec2i screen_dim = win.get_window_size();
 
@@ -25,7 +25,7 @@ vec2f camera::screen_to_tile(render_window& win, vec2f screen_pos)
     return tile_coord;
 }
 
-vec2f camera::world_to_screen(render_window& win, vec2f world_pos)
+vec2f camera::world_to_screen(render_window& win, vec2f world_pos) const
 {
     vec2i screen_dim = win.get_window_size();
 
@@ -36,7 +36,7 @@ vec2f camera::world_to_screen(render_window& win, vec2f world_pos)
     return relative;
 }
 
-vec2f camera::screen_to_world(render_window& win, vec2f screen_pos)
+vec2f camera::screen_to_world(render_window& win, vec2f screen_pos) const
 {
     vec2i screen_dim = win.get_window_size();
 
