@@ -24,3 +24,25 @@ vec2f camera::screen_to_tile(render_window& win, vec2f screen_pos)
 
     return tile_coord;
 }
+
+vec2f camera::world_to_screen(render_window& win, vec2f world_pos)
+{
+    vec2i screen_dim = win.get_window_size();
+
+    vec2f half_dim = (vec2f){screen_dim.x(), screen_dim.y()}/2.f;
+
+    vec2f relative = world_pos - pos + half_dim;
+
+    return relative;
+}
+
+vec2f camera::screen_to_world(render_window& win, vec2f screen_pos)
+{
+    vec2i screen_dim = win.get_window_size();
+
+    vec2f half_dim = (vec2f){screen_dim.x(), screen_dim.y()}/2.f;
+
+    vec2f absolute = screen_pos - half_dim + pos;
+
+    return absolute;
+}

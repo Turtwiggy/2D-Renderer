@@ -14,6 +14,8 @@ struct camera
 
     vec2f tile_to_screen(render_window& win, vec2f tile_pos);
     vec2f screen_to_tile(render_window& win, vec2f screen_pos);
+    vec2f world_to_screen(render_window& win, vec2f world_pos);
+    vec2f screen_to_world(render_window& win, vec2f screen_pos);
 };
 
 #endif // CAMERA_HPP_INCLUDED
