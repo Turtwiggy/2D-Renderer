@@ -18,6 +18,7 @@ SOURCES += include/imgui/imgui_draw.cpp
 SOURCES += src/main.cpp
 SOURCES += src/sprite_renderer.cpp
 SOURCES += src/camera.cpp
+SOURCES += src/tilemap.cpp
 SOURCES += include/toolkit/base_serialisables.cpp
 SOURCES += include/toolkit/clipboard.cpp
 SOURCES += include/toolkit/clock.cpp
