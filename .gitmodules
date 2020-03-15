@@ -11,3 +11,9 @@
 [submodule "include/networking"]
 	path = include/networking
 	url = https://github.com/20k/clientservernetworking
+[submodule "include/vec"]
+	path = include/vec
+	url = https://github.com/20k/funvectormaths
+[submodule "include/ndb"]
+	path = include/ndb
+	url = https://github.com/20k/ndb
