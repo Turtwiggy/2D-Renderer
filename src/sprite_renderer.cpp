@@ -43,8 +43,8 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
     for(auto [handle, desc] : next_renderables)
     {
-        if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
-            continue;
+        //if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
+        //    continue;
 
         vec2f real_pos = cam.world_to_screen(window, desc.pos);
         vec2f real_dim = {TILE_PIX, TILE_PIX}; // TODO: SCALE
@@ -54,6 +54,11 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         tr.position = real_pos + (vec2f){real_dim.x()/2.f, -real_dim.y()/2.f};
         br.position = real_pos + real_dim/2.f;
         bl.position = real_pos + (vec2f){-real_dim.x()/2.f, real_dim.y()/2.f};
+
+        tl.position = round(tl.position);
+        tr.position = round(tr.position);
+        br.position = round(br.position);
+        bl.position = round(bl.position);
 
         vec2i texture_coordinate = handle.offset * (TILE_PIX + TILE_SEP);
 
