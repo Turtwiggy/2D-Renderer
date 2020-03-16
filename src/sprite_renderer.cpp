@@ -8,7 +8,7 @@
 
 sprite_renderer::sprite_renderer()
 {
-    std::string spritesheet_name = "res/colored_transparent.png";
+    std::string spritesheet_name = "res/monochrome_transparent.png";
     std::string spritesheet_data = file::read(spritesheet_name, file::mode::BINARY);
 
     assert(spritesheet_data.size() > 0);
@@ -74,7 +74,7 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
         float shade = 0.05;
 
-        vec4f base_colour = desc.colour;
+        vec4f base_colour = handle.base_colour * desc.colour;
 
         vec4f tl_col = clamp(base_colour*(1 + shade), 0, 1);
         vec4f tr_col = clamp(base_colour, 0, 1);

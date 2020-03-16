@@ -4,6 +4,8 @@
 #include <vector>
 #include <vec/vec.hpp>
 #include <map>
+#include "sprite_renderer.hpp"
+#include "random.hpp"
 
 namespace ai_info
 {
@@ -14,14 +16,9 @@ namespace ai_info
     };
 }
 
-struct entity
-{
-    ai_info::type ai_type = ai_info::NONE;
-};
-
 namespace tiles
 {
-    enum types
+    enum type
     {
         BASE,
         DIRT,
@@ -69,14 +66,19 @@ namespace level_info
     };
 }
 
-std::map<tiles::types, std::vector<vec2i>>& get_locations();
+std::map<tiles::type, std::vector<vec2i>>& get_locations();
+sprite_handle get_sprite_handle_of(random_state& rng, tiles::type type);
+vec4f get_colour_of(tiles::type type, level_info::types level_type);
 
 struct tilemap
 {
+    vec2i dim;
     // x * y, back to front rendering
-    std::vector<std::vector<entity>> all_entities;
+    std::vector<std::vector<entt::entity>> all_entities;
 
     void create(vec2i dim);
+    void add(entt::entity en, vec2i pos);
+    void render(entt::registry& reg, sprite_renderer& renderer);
 };
 
 #endif

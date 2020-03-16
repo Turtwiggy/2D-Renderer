@@ -7,7 +7,7 @@ BUILD_PATH = objs
 
 EXE = game.exe
 
-INCLUDES := -Iinclude -Iinclude/imgui
+INCLUDES := -Iinclude -Iinclude/imgui -Iinclude/entt/single_include
 
 SOURCES = include/imgui/examples/imgui_impl_glfw.cpp 
 SOURCES += include/imgui/examples/imgui_impl_opengl3.cpp 
@@ -19,6 +19,7 @@ SOURCES += src/main.cpp
 SOURCES += src/sprite_renderer.cpp
 SOURCES += src/camera.cpp
 SOURCES += src/tilemap.cpp
+SOURCES += src/battle_map.cpp
 SOURCES += include/toolkit/base_serialisables.cpp
 SOURCES += include/toolkit/clipboard.cpp
 SOURCES += include/toolkit/clock.cpp

@@ -5,6 +5,7 @@
 #include <vec/vec.hpp>
 #include <toolkit/texture.hpp>
 #include "camera.hpp"
+#include <entt/entt.hpp>
 
 struct render_window;
 struct camera;
@@ -12,6 +13,12 @@ struct camera;
 struct sprite_handle
 {
     vec2i offset;
+    vec4f base_colour = {1,1,1,1};
+};
+
+struct world_transform
+{
+    vec2f position;
 };
 
 struct render_descriptor

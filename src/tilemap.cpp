@@ -1,4 +1,5 @@
 #include "tilemap.hpp"
+#include <vec/vec.hpp>
 
 template<typename T>
 void add_to(T& in, vec2i loc)
@@ -6,14 +7,15 @@ void add_to(T& in, vec2i loc)
     in.push_back(loc);
 }
 
-std::map<tiles::types, std::vector<vec2i>>& get_locations()
+std::map<tiles::type, std::vector<vec2i>>& get_locations()
 {
-    static std::map<tiles::types, std::vector<vec2i>> ret;
+    static std::map<tiles::type, std::vector<vec2i>> ret;
 
     using namespace tiles;
 
     ///consider adding skull and crossbones to dirt
-    add_to(ret[BASE], {0, 0});
+    //add_to(ret[BASE], {0, 0});
+    add_to(ret[BASE], {8, 5});
 
     add_to(ret[DIRT], {1, 0});
     add_to(ret[DIRT], {2, 0});
@@ -125,7 +127,30 @@ std::map<tiles::types, std::vector<vec2i>>& get_locations()
     return ret;
 }
 
-vec4f get_colour_of(tiles::types tile_type, level_info::types level_type)
+sprite_handle get_sprite_handle_of(random_state& rng, tiles::type type)
+{
+    auto& tiles = get_locations();
+
+    auto& which = tiles[type];
+
+    if(which.size() == 0)
+        throw std::runtime_error("No tiles for type " + std::to_string(type));
+
+    int len = which.size();
+
+    int iwhich = (int)rand_det_s(rng.rng, 0, len);
+
+    if(iwhich >= len || iwhich < 0)
+        throw std::runtime_error("Rng is bad");
+
+    sprite_handle handle;
+    handle.offset = which[iwhich];
+    handle.base_colour = get_colour_of(type, level_info::GRASS); //???
+
+    return handle;
+}
+
+vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
 {
     constexpr vec4f barren_col = srgb_to_lin_approx((vec4f){122, 68, 74, 255} / 255.f);
     constexpr vec4f grass_col = srgb_to_lin_approx((vec4f){56, 217, 115, 255} / 255.f);
@@ -180,28 +205,30 @@ vec4f get_colour_of(tiles::types tile_type, level_info::types level_type)
     throw std::runtime_error("Did not find " + std::to_string(tile_type));
 }
 
-vec2i get_tile_of(tiles::types type)
+void tilemap::create(vec2i _dim)
 {
-    auto& tiles = get_locations();
-
-    auto& which = tiles[type];
-
-    if(which.size() == 0)
-        throw std::runtime_error("No tiles for type " + std::to_string(type));
-
-    int len = which.size();
-
-    static std::minstd_rand rng;
-
-    int iwhich = (int)rand_det_s(rng, 0, len);
-
-    if(iwhich >= len || iwhich < 0)
-        throw std::runtime_error("Rng is bad");
-
-    return which[iwhich];
+    dim = _dim;
+    all_entities.resize(dim.x() * dim.y());
 }
 
-void tilemap::create(vec2i dim)
+void tilemap::add(entt::entity en, vec2i pos)
 {
-    all_entities.resize(dim.x() * dim.y());
+    if(pos.x() < 0 || pos.y() < 0 || pos.x() >= dim.x() || pos.y() >= dim.y())
+        throw std::runtime_error("Add out of bounds");
+
+    all_entities[pos.y() * dim.x() + pos.x()].push_back(en);
+}
+
+void tilemap::render(entt::registry& registry, sprite_renderer& renderer)
+{
+    for(auto lst : all_entities)
+    {
+        for(auto en : lst)
+        {
+            sprite_handle& handle = registry.get<sprite_handle>(en);
+            render_descriptor& desc = registry.get<render_descriptor>(en);
+
+            renderer.add(handle, desc);
+        }
+    }
 }

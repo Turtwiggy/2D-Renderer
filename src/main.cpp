@@ -15,6 +15,10 @@
 #include <toolkit/vertex.hpp>
 #include <toolkit/fs_helpers.hpp>
 #include "sprite_renderer.hpp"
+#include <entt/entt.hpp>
+#include "random.hpp"
+#include "tilemap.hpp"
+#include "battle_map.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -48,6 +52,19 @@ int main(int argc, char *argv[])
 
     sprite_renderer sprite_render;
 
+    random_state rng;
+
+    /*sprite_handle dummy;
+    dummy = get_sprite_handle_of(rng, tiles::TREE_1);
+
+    render_descriptor desc;
+    desc.pos = {15, 35};
+    desc.colour = get_colour_of(tiles::TREE_1, level_info::GRASS);*/
+
+    entt::registry registry;
+
+    tilemap dummy_battle = create_battle(registry, rng, {100, 100}, level_info::GRASS);
+
     while(!win.should_close())
     {
         win.poll();
@@ -60,13 +77,7 @@ int main(int argc, char *argv[])
 
         vec2i win_size = win.get_window_size();
 
-        sprite_handle dummy;
-        dummy.offset = {0, 1};
-
-        render_descriptor desc;
-        desc.pos = {15, 35};
-
-        sprite_render.add(dummy, desc);
+        dummy_battle.render(registry, sprite_render);
 
         sprite_render.render(win, cam);
         win.display();
