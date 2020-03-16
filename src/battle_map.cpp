@@ -37,7 +37,7 @@ tilemap create_battle(entt::registry& registry, random_state& rng, vec2i dim, le
             ret.add([y * dim.x() + x].push_back(obj);*/
 
             sprite_handle handle = get_sprite_handle_of(rng, tiles::BASE);
-            handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.8, 0, 1);
+            handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.5, 0, 1);
 
             render_descriptor desc;
             desc.pos = (vec2f){x, y} * TILE_PIX + (vec2f){TILE_PIX/2, TILE_PIX/2};

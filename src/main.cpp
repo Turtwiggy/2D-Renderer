@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     render_settings sett;
     sett.width = 800;
     sett.height = 600;
-    sett.is_srgb = true;
+    sett.is_srgb = false;
     sett.viewports = !no_viewports;
 
     render_window win(sett, "Dwarf and Blade");
