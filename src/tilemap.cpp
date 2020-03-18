@@ -152,8 +152,8 @@ sprite_handle get_sprite_handle_of(random_state& rng, tiles::type type)
 
 vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
 {
-    constexpr vec4f barren_col = srgb_to_lin_approx((vec4f){122, 68, 74, 255} / 255.f);
-    constexpr vec4f grass_col = srgb_to_lin_approx((vec4f){56, 217, 115, 255} / 255.f);
+    vec4f barren_col = srgb_to_lin_approx(vec4f{122, 68, 74, 255} / 255.f);
+    vec4f grass_col = srgb_to_lin_approx(vec4f{56, 217, 115, 255} / 255.f);
 
     if(tile_type == tiles::BRAMBLE || tile_type == tiles::SHRUB || tile_type == tiles::BASE)
     {
@@ -174,9 +174,9 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
        tile_type == tiles::CULTIVATION || tile_type == tiles::CROCODILE)
        return grass_col;
 
-    constexpr vec4f wood_col = srgb_to_lin_approx((vec4f){191, 121, 88, 255} / 255.f);
-    constexpr vec4f building_gray = srgb_to_lin_approx((vec4f){207, 198, 184, 255} / 255.f);
-    constexpr vec4f generic_red = srgb_to_lin_approx((vec4f){230, 72, 46, 255} / 255.f);
+    vec4f wood_col = srgb_to_lin_approx(vec4f{191, 121, 88, 255} / 255.f);
+    vec4f building_gray = srgb_to_lin_approx(vec4f{207, 198, 184, 255} / 255.f);
+    vec4f generic_red = srgb_to_lin_approx(vec4f{230, 72, 46, 255} / 255.f);
 
     if(tile_type == tiles::ROCKS || tile_type == tiles::GRAVE || tile_type == tiles::TILING_WALL)
         return building_gray;

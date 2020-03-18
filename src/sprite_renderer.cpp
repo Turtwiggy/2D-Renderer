@@ -36,8 +36,8 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
     vec2i screen_dimensions = window.get_window_size();
 
-    vec2f tl_visible = cam.screen_to_world(window, {0,0}) - (vec2f){TILE_PIX, TILE_PIX};
-    vec2f br_visible = cam.world_to_screen(window, {screen_dimensions.x(), screen_dimensions.y()}) + (vec2f){TILE_PIX, TILE_PIX};
+    vec2f tl_visible = cam.screen_to_world(window, {0,0}) - vec2f{TILE_PIX, TILE_PIX};
+    vec2f br_visible = cam.world_to_screen(window, {screen_dimensions.x(), screen_dimensions.y()}) + vec2f{TILE_PIX, TILE_PIX};
 
     vec2f uv_scale = {1.f/sprite_sheet.dim.x(), 1.f/sprite_sheet.dim.y()};
 
@@ -51,9 +51,9 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
         vertex tl, tr, br, bl;
         tl.position = real_pos - real_dim/2.f;
-        tr.position = real_pos + (vec2f){real_dim.x()/2.f, -real_dim.y()/2.f};
+        tr.position = real_pos + vec2f{real_dim.x()/2.f, -real_dim.y()/2.f};
         br.position = real_pos + real_dim/2.f;
-        bl.position = real_pos + (vec2f){-real_dim.x()/2.f, real_dim.y()/2.f};
+        bl.position = real_pos + vec2f{-real_dim.x()/2.f, real_dim.y()/2.f};
 
         tl.position = round(tl.position);
         tr.position = round(tr.position);

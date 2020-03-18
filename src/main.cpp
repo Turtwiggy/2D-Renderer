@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     render_window win(sett, "Dwarf and Blade");
 
     camera cam;
-    cam.pos = (vec2f){win.get_window_size().x()/2, win.get_window_size().y()/2};
+    cam.pos = vec2f{win.get_window_size().x()/2, win.get_window_size().y()/2};
 
     sprite_renderer sprite_render;
 
@@ -68,6 +68,19 @@ int main(int argc, char *argv[])
     while(!win.should_close())
     {
         win.poll();
+
+        ImGuiIO io = ImGui::GetIO();
+
+        //Input
+        if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_C)))
+        {
+            auto mpos = vec2f{ io.MousePos.x, io.MousePos.y };
+            std::cout << "mpos: " << mpos << std::endl;
+        }
+
+        //Delta Time
+        if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
+            std::cout << io.DeltaTime << std::endl;
 
         ImGui::Begin("New window");
 

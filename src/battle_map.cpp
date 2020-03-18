@@ -40,7 +40,7 @@ tilemap create_battle(entt::registry& registry, random_state& rng, vec2i dim, le
             handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.5, 0, 1);
 
             render_descriptor desc;
-            desc.pos = (vec2f){x, y} * TILE_PIX + (vec2f){TILE_PIX/2, TILE_PIX/2};
+            desc.pos = vec2f{x, y} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
 
             entt::entity base = registry.create();
 
