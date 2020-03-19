@@ -18,7 +18,7 @@ void particle_system::emit(const particle_props& props)
 
 	particle.active = true;
 	particle.position = props.position;
-	particle.rotation = random * 2.0f * 3.141;
+	particle.rotation = random * 2.0f * 3.141f;
 
 	// Velocity
 	particle.velocity = props.velocity;
@@ -72,7 +72,6 @@ void particle_system::render(sprite_renderer& renderer)
 
 		float life = particle.life_remaining / particle.life_time;
 		vec4f color = slerp(particle.colour_end, particle.colour_begin, life);
-		color.z() = color.z() * life;
 
 		float size = slerp(particle.size_begin, particle.size_end, life);
 

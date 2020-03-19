@@ -59,27 +59,32 @@ int main(int argc, char *argv[])
 
     // Smoke
     particle_props smoke_particle;
-    smoke_particle.sprite = get_sprite_handle_of(rng, tiles::DIRT);
+    smoke_particle.sprite = get_sprite_handle_of(rng, tiles::TREE_1);
     smoke_particle.position = { 400.0f, 400.0f };
-    smoke_particle.velocity = { -2.0f, 0.0f }; smoke_particle.velocity_variation = { 4.0f, 2.0f };
-    smoke_particle.size_begin = 0.35f, smoke_particle.size_end = 0.0f, smoke_particle.size_variation = 0.15f;
+    smoke_particle.velocity = { -2.0f, 0.0f }; 
+    smoke_particle.velocity_variation = { 4.0f, 2.0f };
+    smoke_particle.size_begin = 0.35f;
+    smoke_particle.size_end = 0.0f;
+    smoke_particle.size_variation = 0.15f;
     smoke_particle.colour_begin = { 0.8f, 0.8f, 0.8f, 1.0f };
     smoke_particle.colour_end = { 0.6f, 0.6f, 0.6f, 1.0f };
     smoke_particle.life_time = 4.0f;
 
     // Flames
     particle_props engine_particle;
-    engine_particle.sprite = get_sprite_handle_of(rng, tiles::DIRT);
     engine_particle.position = { 400.0f, 400.0f };
-    engine_particle.velocity = { -10.0f, 0.0f }, engine_particle.velocity_variation = { 3.0f, 1.0f };
-    engine_particle.size_begin = 0.5f, engine_particle.size_end = 0.0f, engine_particle.size_variation = 0.3f;
-    engine_particle.colour_begin = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
-    engine_particle.colour_end = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f , 1.0f };
+    engine_particle.sprite = get_sprite_handle_of(rng, tiles::TREE_1);
+    engine_particle.velocity = { -10.0f, 0.0f };
+    engine_particle.velocity_variation = { 3.0f, 1.0f };
+    engine_particle.size_begin = 0.5f;
+    engine_particle.size_end = 0.0f;
+    engine_particle.size_variation = 0.3f;
+    engine_particle.colour_begin = { 140/255.f, 29/255.f, 7/255.f, 1.f };
+    engine_particle.colour_end = { 1.f, 0.f, 0.f, 0.f };
     engine_particle.life_time = 1.0f;
 
     /*sprite_handle dummy;
     dummy = get_sprite_handle_of(rng, tiles::TREE_1);
-
     render_descriptor desc;
     desc.pos = {15, 35};
     desc.colour = get_colour_of(tiles::TREE_1, level_info::GRASS);*/
@@ -107,7 +112,7 @@ int main(int argc, char *argv[])
         if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
             std::cout << delta_time << std::endl;
 
-        //Emit flames at centre
+        //Emit particle
         ImGui::Begin("Particle Window");
         if (ImGui::Button("Emit particle"))
         {
