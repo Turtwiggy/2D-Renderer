@@ -49,11 +49,23 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         vec2f real_pos = cam.world_to_screen(window, desc.pos);
         vec2f real_dim = {TILE_PIX, TILE_PIX}; // TODO: SCALE
 
+        vec2f origin = real_dim/2.f;
+
+        vec2f tl_local = -origin;
+        vec2f tr_local = -origin + vec2f{real_dim.x(), 0};
+        vec2f br_local = -origin + vec2f{real_dim.x(), real_dim.y()};
+        vec2f bl_local = -origin + vec2f{0, real_dim.y()};
+
+        tl_local = tl_local.rot(desc.angle);
+        tr_local = tr_local.rot(desc.angle);
+        br_local = br_local.rot(desc.angle);
+        bl_local = bl_local.rot(desc.angle);
+
         vertex tl, tr, br, bl;
-        tl.position = real_pos - real_dim/2.f;
-        tr.position = real_pos + vec2f{real_dim.x()/2.f, -real_dim.y()/2.f};
-        br.position = real_pos + real_dim/2.f;
-        bl.position = real_pos + vec2f{-real_dim.x()/2.f, real_dim.y()/2.f};
+        tl.position = tl_local + real_pos;
+        tr.position = tr_local + real_pos;
+        br.position = br_local + real_pos;
+        bl.position = bl_local + real_pos;
 
         tl.position = round(tl.position);
         tr.position = round(tr.position);
