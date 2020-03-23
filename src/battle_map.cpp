@@ -19,9 +19,9 @@ tilemap create_battle(entt::registry& registry, random_state& rng, vec2i dim, le
     tilemap ret;
     ret.create(dim);
 
-    for(int y=0; y < dim.y(); y++)
+    for (int y = 0; y < dim.y(); y++)
     {
-        for(int x=0; x < dim.x(); x++)
+        for (int x = 0; x < dim.x(); x++)
         {
             auto render_type = tiles::BASE;
 
@@ -41,7 +41,7 @@ tilemap create_battle(entt::registry& registry, random_state& rng, vec2i dim, le
             handle.base_colour.w() = 1;
 
             render_descriptor desc;
-            desc.pos = vec2f{x, y} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+            desc.pos = vec2f{ x, y } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
             //desc.angle = rand_det_s(rng.rng, 0.f, 2 * M_PI);
 
             entt::entity base = registry.create();
@@ -49,7 +49,7 @@ tilemap create_battle(entt::registry& registry, random_state& rng, vec2i dim, le
             registry.assign<sprite_handle>(base, handle);
             registry.assign<render_descriptor>(base, desc);
 
-            ret.add(base, {x, y});
+            ret.add(base, { x, y });
         }
     }
 

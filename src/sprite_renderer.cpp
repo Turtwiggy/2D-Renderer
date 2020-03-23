@@ -26,7 +26,7 @@ sprite_renderer::sprite_renderer()
 
 void sprite_renderer::add(const sprite_handle& handle, const render_descriptor& descriptor)
 {
-    next_renderables.push_back({handle, descriptor});
+    next_renderables.push_back({ handle, descriptor });
 }
 
 void sprite_renderer::render(render_window& window, const camera& cam)
@@ -36,25 +36,25 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
     vec2i screen_dimensions = window.get_window_size();
 
-    vec2f tl_visible = cam.screen_to_world(window, {0,0}) - vec2f{TILE_PIX, TILE_PIX};
-    vec2f br_visible = cam.world_to_screen(window, {screen_dimensions.x(), screen_dimensions.y()}) + vec2f{TILE_PIX, TILE_PIX};
+    vec2f tl_visible = cam.screen_to_world(window, { 0,0 }) - vec2f{ TILE_PIX, TILE_PIX };
+    vec2f br_visible = cam.world_to_screen(window, { screen_dimensions.x(), screen_dimensions.y() }) + vec2f{ TILE_PIX, TILE_PIX };
 
-    vec2f uv_scale = {1.f/sprite_sheet.dim.x(), 1.f/sprite_sheet.dim.y()};
+    vec2f uv_scale = { 1.f / sprite_sheet.dim.x(), 1.f / sprite_sheet.dim.y() };
 
-    for(auto [handle, desc] : next_renderables)
+    for (auto [handle, desc] : next_renderables)
     {
         //if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
         //    continue;
 
         vec2f real_pos = cam.world_to_screen(window, desc.pos);
-        vec2f real_dim = {TILE_PIX * desc.size.x(), TILE_PIX * desc.size.y() }; // TODO: SCALE
+        vec2f real_dim = { TILE_PIX * desc.size.x(), TILE_PIX * desc.size.y() }; // TODO: SCALE
 
-        vec2f origin = real_dim/2.f;
+        vec2f origin = real_dim / 2.f;
 
         vec2f tl_local = -origin;
-        vec2f tr_local = -origin + vec2f{real_dim.x(), 0};
-        vec2f br_local = -origin + vec2f{real_dim.x(), real_dim.y()};
-        vec2f bl_local = -origin + vec2f{0, real_dim.y()};
+        vec2f tr_local = -origin + vec2f{ real_dim.x(), 0 };
+        vec2f br_local = -origin + vec2f{ real_dim.x(), real_dim.y() };
+        vec2f bl_local = -origin + vec2f{ 0, real_dim.y() };
 
         tl_local = tl_local.rot(desc.angle);
         tr_local = tr_local.rot(desc.angle);
@@ -74,10 +74,10 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
         vec2i texture_coordinate = handle.offset * (TILE_PIX + TILE_SEP);
 
-        vec2f tltx = {texture_coordinate.x(), texture_coordinate.y()};
-        vec2f trtx = {texture_coordinate.x() + TILE_PIX, texture_coordinate.y()};
-        vec2f brtx = {texture_coordinate.x() + TILE_PIX, texture_coordinate.y() + TILE_PIX};
-        vec2f bltx = {texture_coordinate.x(), texture_coordinate.y() + TILE_PIX};
+        vec2f tltx = { texture_coordinate.x(), texture_coordinate.y() };
+        vec2f trtx = { texture_coordinate.x() + TILE_PIX, texture_coordinate.y() };
+        vec2f brtx = { texture_coordinate.x() + TILE_PIX, texture_coordinate.y() + TILE_PIX };
+        vec2f bltx = { texture_coordinate.x(), texture_coordinate.y() + TILE_PIX };
 
         tltx = tltx * uv_scale;
         trtx = trtx * uv_scale;
@@ -93,9 +93,9 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
         vec4f base_colour = handle.base_colour * desc.colour;
 
-        vec4f tl_col = clamp(base_colour*(1 + shade), 0, 1);
+        vec4f tl_col = clamp(base_colour * (1 + shade), 0, 1);
         vec4f tr_col = clamp(base_colour, 0, 1);
-        vec4f br_col = clamp(base_colour*(1 - shade), 0, 1);
+        vec4f br_col = clamp(base_colour * (1 - shade), 0, 1);
         vec4f bl_col = clamp(base_colour, 0, 1);
 
         tl.colour = tl_col;
