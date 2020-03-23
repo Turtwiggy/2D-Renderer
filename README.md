@@ -1,12 +1,5 @@
-loggin?
-spdlog?
+Dwarf n blade project!
 
+Read [COMPILE.md](./COMPILE.md) on how to build
 
-james
-BOOoST StacktraCE Thanks (DONE)
-Link freetype
-dependacy deployer on pacman
-
-issue: 
-dummybattle currently creates a 100x100 entity tile map,
-where to add unit entities
+<img src="./github-resources/dwarf.png" width="90" height="160">

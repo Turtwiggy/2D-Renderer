@@ -1,13 +1,25 @@
 #include "particle_system.hpp"
 
-#include "tilemap.hpp"
+#include <toolkit/fs_helpers.hpp>
+
+//particle_props load_particle(std::string path)
+//{
+//	std::string particle_source = file::read(path, file::mode::TEXT);
+//
+//	return compile(particle_source);
+//}
+//
+//particle_props compile(std::string source)
+//{
+//	return particle_props();
+//}
 
 particle_system::particle_system()
 {
 	particle_pool.resize(max_particles);
 }
 
-void particle_system::emit(const particle_props& props)
+void particle_system::emit(const particle_settings& props)
 {
 	particle& particle = particle_pool[pool_index];
 
@@ -35,7 +47,7 @@ void particle_system::emit(const particle_props& props)
 
 	// Life
 	particle.life_time = props.life_time;
-	particle.life_remaining = props.life_time;
+	particle.time_active = props.life_time;
 
 	pool_index = --pool_index % particle_pool.size();
 }
@@ -49,15 +61,15 @@ void particle_system::update(float delta_time)
 			continue;
 		}
 
-		if (particle.life_remaining <= 0.0f)
+		if (particle.time_active <= 0.0f)
 		{
 			particle.active = false;
 			continue;
 		}
 
-		particle.life_remaining -= delta_time;
-		particle.position += particle.velocity * delta_time;
-		particle.rotation += 0.01f * delta_time;
+		particle.time_active -= delta_time;
+		particle.position_pixels += particle.velocity_pixels_per_second * delta_time;
+		particle.rotation_degrees += 0.01f * delta_time;
 	}
 }
 
@@ -70,15 +82,20 @@ void particle_system::render(sprite_renderer& renderer)
 			continue;
 		}
 
-		float life = particle.life_remaining / particle.life_time;
-		vec4f color = slerp(particle.colour_end, particle.colour_begin, life);
+		float life = particle.time_active / particle.life_time;
+		vec4f begin_colour =  particle.colour_begin;
+		vec4f color = lerp(particle.colour_end, particle.colour_begin, life);
 
-		float size = slerp(particle.size_begin, particle.size_end, life);
+		float size = lerp(particle.size_begin, particle.size_end, life);
 
-		render_descriptor desc;
+		//update render descriptor
+		render_descriptor desc = particle.desc;
 		desc.colour = color;
-		desc.pos = particle.position;
+		desc.size = vec2f{ 1, 1 } * size;
+		desc.rotation_degrees = 0;
+
+		particle.desc = desc;
 		
-		renderer.add(particle.sprite, desc);
+		renderer.add(particle.sprite, particle.desc);
 	}
 }

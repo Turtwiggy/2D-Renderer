@@ -47,7 +47,7 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         //    continue;
 
         vec2f real_pos = cam.world_to_screen(window, desc.pos);
-        vec2f real_dim = {TILE_PIX, TILE_PIX}; // TODO: SCALE
+        vec2f real_dim = {TILE_PIX * desc.size.x(), TILE_PIX * desc.size.y() }; // TODO: SCALE
 
         vertex tl, tr, br, bl;
         tl.position = real_pos - real_dim/2.f;

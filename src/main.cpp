@@ -57,31 +57,42 @@ int main(int argc, char *argv[])
 
     random_state rng;
 
+    particle p;
+
+
     // Smoke
-    particle_props smoke_particle;
-    smoke_particle.sprite = get_sprite_handle_of(rng, tiles::TREE_1);
-    smoke_particle.position = { 400.0f, 400.0f };
-    smoke_particle.velocity = { -2.0f, 0.0f }; 
-    smoke_particle.velocity_variation = { 4.0f, 2.0f };
-    smoke_particle.size_begin = 0.35f;
-    smoke_particle.size_end = 0.0f;
-    smoke_particle.size_variation = 0.15f;
-    smoke_particle.colour_begin = { 0.8f, 0.8f, 0.8f, 1.0f };
-    smoke_particle.colour_end = { 0.6f, 0.6f, 0.6f, 1.0f };
-    smoke_particle.life_time = 4.0f;
+    particle_settings smoke_particle;
+
+    //smoke_particle.velocity = { -2.0f, 0.0f };
+    //smoke_particle.velocity_variation = { 4.0f, 2.0f };
+    //smoke_particle.size_begin = 0.35f;
+    //smoke_particle.size_end = 0.0f;
+    //smoke_particle.size_variation = 0.15f;
+    //smoke_particle.colour_begin = { 0.8f, 0.8f, 0.8f, 1.0f };
+    //smoke_particle.colour_end = { 0.6f, 0.6f, 0.6f, 1.0f };
+    //smoke_particle.life_time = 4.0f;
+
+    render_descriptor smoke_desc;
+    smoke_desc.pos = { 400.0f, 400.0f };
+    smoke_desc.colour = smoke_particle.colour_begin;
+    smoke_particle.desc = smoke_desc;
+
+    sprite_handle smoke_sprite = get_sprite_handle_of(rng, tiles::TREE_1);
+    smoke_particle.sprite = smoke_sprite;
+
 
     // Flames
-    particle_props engine_particle;
-    engine_particle.position = { 400.0f, 400.0f };
-    engine_particle.sprite = get_sprite_handle_of(rng, tiles::TREE_1);
-    engine_particle.velocity = { -10.0f, 0.0f };
-    engine_particle.velocity_variation = { 3.0f, 1.0f };
-    engine_particle.size_begin = 0.5f;
-    engine_particle.size_end = 0.0f;
-    engine_particle.size_variation = 0.3f;
-    engine_particle.colour_begin = { 140/255.f, 29/255.f, 7/255.f, 1.f };
-    engine_particle.colour_end = { 1.f, 0.f, 0.f, 0.f };
-    engine_particle.life_time = 1.0f;
+    //particle_props fire_particle;
+    //fire_particle.sprite = get_sprite_handle_of(rng, tiles::TREE_1);
+    //fire_particle.position = { 400.0f, 400.0f };
+    //fire_particle.velocity = { -10.0f, 0.0f };
+    //fire_particle.velocity_variation = { 3.0f, 1.0f };
+    //fire_particle.size_begin = 0.5f;
+    //fire_particle.size_end = 0.0f;
+    //fire_particle.size_variation = 0.3f;
+    //fire_particle.colour_begin = { 140/255.f, 29/255.f, 7/255.f, 1.f };
+    //fire_particle.colour_end = { 1.f, 0.f, 0.f, 0.f };
+    //fire_particle.life_time = 1.0f;
 
     /*sprite_handle dummy;
     dummy = get_sprite_handle_of(rng, tiles::TREE_1);
@@ -114,11 +125,12 @@ int main(int argc, char *argv[])
 
         //Emit particle
         ImGui::Begin("Particle Window");
+
         if (ImGui::Button("Emit particle"))
         {
-            std::cout << "emitting particle" << std::endl;
-            particles.emit(engine_particle);
+            particles.emit(fire_particle);
         }
+
         ImGui::End();
 
         ImGui::Begin("New window");
@@ -137,7 +149,6 @@ int main(int argc, char *argv[])
         //registry.assign<sprite_handle>(base, handle);
         //registry.assign<render_descriptor>(base, desc);
         //sprite_render.add(dirt, desc);
-        /* End dummy sprite */
 
         //dummy_battle.render(registry, sprite_render);
 
