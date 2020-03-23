@@ -3,9 +3,11 @@
 HOW TO MSVC 
 1) Download VCPKG
 2) run "vcpkg integrate install"
-3) Download required packages:
+3) make sure you x64 vcpkg https://github.com/microsoft/vcpkg/issues/1254
+4) Download required packages:
 
-Boost
+Boost-beast
+Boost-stacktrace
 ImGui
 Glew
 SFML
