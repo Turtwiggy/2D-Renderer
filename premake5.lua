@@ -2,7 +2,6 @@ workspace "DwarfAndBladeWorkspace"
     architecture "x86_64"
     startproject "DwarfAndBlade"
     characterset "MBCS"
-    buildoptions {"/bigobj"}
 
     configurations
     {
@@ -12,9 +11,13 @@ workspace "DwarfAndBladeWorkspace"
     }
 
     flags
-	{
+    {
         "MultiProcessorCompile",
-	}
+    }
+
+    filter {"toolset:msc"}
+        buildoptions {"/bigobj"}
+
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -108,8 +111,41 @@ project "DwarfAndBlade"
 
     links
     {
-        "opengl32.lib",
+        "opengl32",
     }
+
+    filter {"toolset:gcc"}
+        links
+        {
+            "ssl",
+            "glfw3",
+            "glew32",
+            "sfml-audio",
+            "sfml-graphics",
+            "sfml-system",
+            "sfml-window",
+            "harfbuzz",
+            "freetype",
+            "harfbuzz",
+            "freetype",
+            "graphite2",
+            "opengl32",
+            "flac",
+            "png",
+            "z",
+            "bz2",
+            "rpcrt4",
+            "openal",
+            "ogg",
+            "ole32",
+            "dbgeng",
+            "crypto",
+            "backtrace",
+            "gdi32",
+            "ws2_32",
+            "lmdb",
+            "winmm"
+        }
 
     filter "system:windows"
         systemversion "latest"
