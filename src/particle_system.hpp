@@ -1,44 +1,27 @@
 #pragma once
 
+#include <entt/entt.hpp>
+
 #include "vec/vec.hpp"
 #include "sprite_renderer.hpp"
 #include "random.hpp"
 
-struct particle_settings
-{
-    sprite_handle sprite;
-
-    vec2f velocity_variation;
-    vec4f colour_begin;
-    vec4f colour_end;
-    vec2f size_begin;
-    vec2f size_end;
-    vec1f size_variation;
-    float life_time = 1.f;
-};
-
 struct particle
 {
-    sprite_handle sprite;
-    particle_settings props;
-
-    //State
-    vec2f position = { 400.f, 400.f };
-    vec2f velocity = { -5.f, 0 };
-    vec1f rotation = 0.0f;
-    vec2f size = { 1.f, 1.f };
-
-    float time_active = 0.0f;
-    bool active = false;
+    vec2f velocity;         //(VALIDATE) pixels per second?
+    float time_total;       //seconds
+    float time_left;        //seconds
+    vec2f size_begin;
+    vec2f size_end;
+    vec4f colour_begin;
+    vec4f colour_end;
 };
 
 struct particle_system {
 
 public:
-    particle_system();
 
-    void emit(const particle_settings& props,
-        vec2f position, vec2f velocity, vec2f size, vec1f rotation);
+    void emit(random_state rng);
 
     void update(float delta_time);
 
@@ -46,9 +29,7 @@ public:
 
 private:
 
-    std::vector<particle> particle_pool;
-    uint32_t max_particles = 1000;
-    uint32_t pool_index = max_particles - 1;
+    entt::registry registry;
+    //std::vector<entt::entity> particles; //alternative to registry?
 
-    random_state rnd;
 };

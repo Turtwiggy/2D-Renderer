@@ -53,26 +53,15 @@ int main(int argc, char* argv[])
 
     sprite_renderer sprite_render;
 
-    particle_system particles;
-
     random_state rng;
-
-    particle_settings dummy_particle;
-    sprite_handle random_sprite = get_sprite_handle_of(rng, tiles::TREE_1);
-    dummy_particle.sprite = random_sprite;
-    dummy_particle.velocity_variation = { 3.0f, 1.0f };
-    dummy_particle.size_begin = { 1.f, 1.f };
-    dummy_particle.size_end = { 0.5f, 0.5f };
-    dummy_particle.size_variation = 0.3f;
-    dummy_particle.colour_begin = { 140 / 255.f, 29 / 255.f, 7 / 255.f, 1.f };
-    dummy_particle.colour_end = { 1.f, 0.f, 0.f, 0.f };
-    dummy_particle.life_time = 2.0f;
 
     /*sprite_handle dummy;
     dummy = get_sprite_handle_of(rng, tiles::TREE_1);
     render_descriptor desc;
     desc.pos = {15, 35};
     desc.colour = get_colour_of(tiles::TREE_1, level_info::GRASS);*/
+
+    particle_system particle_sys;
 
     entt::registry registry;
 
@@ -102,13 +91,7 @@ int main(int argc, char* argv[])
 
         if (ImGui::Button("Emit particle"))
         {
-            std::cout << "emitting particle" << std::endl;
-            particles.emit(dummy_particle,
-                { 400.f, 400.f },	//pos
-                { -10.f, 0 },		//vel
-                { 1.f, 1.f },		//size
-                { 0.f }				//rot
-            );
+            particle_sys.emit(rng);
         }
 
         ImGui::End();
@@ -132,8 +115,8 @@ int main(int argc, char* argv[])
 
         dummy_battle.render(registry, sprite_render);
 
-        particles.update(delta_time);
-        particles.render(sprite_render);
+        particle_sys.update(delta_time);
+        particle_sys.render(sprite_render);
 
         sprite_render.render(win, cam);
         win.display();
