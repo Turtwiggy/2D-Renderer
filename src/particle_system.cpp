@@ -2,15 +2,6 @@
 
 #include "tilemap.hpp"
 
-
-//TODO move to vec lib
-template<int N, typename T>
-inline vec<N, T> lerp(const vec<N, T>& v1, const vec<N, T>& v2, float t)
-{
-    return v1 * (1 - t) + v2 * t;
-}
-
-
 void particle_system::emit(random_state rnd)
 {
     auto base = registry.create();
@@ -70,13 +61,13 @@ void particle_system::update(float delta_time)
         desc.angle += angle_this_frame;
 
         //Update colour
-        vec4f lerped_colour = lerp(
+        vec4f lerped_colour = mix(
             p.colour_end,
             p.colour_begin, life);
         desc.colour = lerped_colour;
 
         //Update size
-        vec2f lerped_size = lerp(
+        vec2f lerped_size = mix(
             p.size_end,
             p.size_begin, life);
         desc.size = lerped_size;
