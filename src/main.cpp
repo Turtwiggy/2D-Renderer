@@ -10,16 +10,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Engine/Core.hpp"
+#include "random.hpp"
 #include <toolkit/render_window.hpp>
 #include <toolkit/texture.hpp>
 #include <toolkit/vertex.hpp>
 #include <toolkit/fs_helpers.hpp>
 #include "sprite_renderer.hpp"
+
 #include <entt/entt.hpp>
-#include "random.hpp"
 #include "tilemap.hpp"
 #include "battle_map.hpp"
+
 #include "particle_system.hpp"
+#include "vfx/snow_effect.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -62,6 +65,7 @@ int main(int argc, char* argv[])
     desc.colour = get_colour_of(tiles::TREE_1, level_info::GRASS);*/
 
     particle_system particle_sys;
+    snow_effect snow;
 
     entt::registry registry;
 
@@ -91,28 +95,26 @@ int main(int argc, char* argv[])
 
         ImGui::Button("I am a button");
 
-        if (ImGui::Button("Emit particle"))
+        if (ImGui::Button("Start Snow"))
         {
-            float max_x = rand_det_s(rng.rng, 0.0, 1.0) * sett.width;
-            float max_y = rand_det_s(rng.rng, 0.0, 1.0) * sett.height;
-            std::cout << "emitting (rng): " << "(X):" << max_x << " (Y)" << max_y;
-            particle_sys.emit(rng, { max_x, max_y });
+            std::cout << "start snow" << std::endl;
+            snow.start();
+        }
+
+        if (ImGui::Button("Stop Snow"))
+        {
+            std::cout << "stop snow" << std::endl;
+            snow.stop();
         }
 
         ImGui::End();
 
-        vec2i win_size = win.get_window_size();
 
-        /* Dummy Unit */
-        //base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * dirt.base_colour * 0.5, 0, 1);
-        //render_descriptor desc;
-        //desc.pos = vec2f{ 400.f, 400.f };
-        //entt::entity base = registry.create();
-        //registry.assign<sprite_handle>(base, handle);
-        //registry.assign<render_descriptor>(base, desc);
-        //sprite_render.add(dirt, desc);
+        //Update systems
 
         dummy_battle.render(registry, sprite_render);
+
+        snow.update(delta_time, win, rng, particle_sys);
 
         particle_sys.update(delta_time);
         particle_sys.render(sprite_render);

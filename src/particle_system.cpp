@@ -3,7 +3,11 @@
 #include "tilemap.hpp"
 
 void particle_system::emit(
-    random_state& rnd, vec2f pos)
+    random_state& rnd,
+    vec2f pos,
+    vec2f velocity,
+    vec4f colour_begin,
+    vec4f colour_end )
 {
     auto base = registry.create();
     float random = rand_det_s(rnd.rng, 0.0, 1.0);
@@ -17,13 +21,13 @@ void particle_system::emit(
     //desc.colour = { 1.f, 0.f, 0.f, 1.f };
 
     particle p;
-    p.velocity = { -10.f, 0.f };
+    p.velocity = velocity;
     p.time_left = 2.f;
     p.time_total = p.time_left;
     p.size_begin = { 1.f, 1.f };
     p.size_end = { 0.5f, 0.5f };
-    p.colour_begin = { 140 / 255.f, 29 / 255.f, 7 / 255.f, 1.f };
-    p.colour_end = { 1.f, 0.f, 0.f, 0.f };
+    p.colour_begin = colour_begin;
+    p.colour_end = colour_end;
 
     registry.assign<sprite_handle>(base, handle);
     registry.assign<render_descriptor>(base, desc);

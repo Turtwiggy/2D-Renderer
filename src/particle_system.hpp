@@ -15,14 +15,18 @@ struct particle
     vec2f size_end;
     vec4f colour_begin;
     vec4f colour_end;
-    //float emission_rate;    //particles per second
 };
 
 struct particle_system {
 
 public:
     //emits a single particle at pos
-    void emit(random_state& rng, vec2f pos);
+    void emit(random_state& rng, 
+        vec2f pos, 
+        vec2f velocity, 
+        vec4f start_colour, 
+        vec4f end_colour
+    );
 
     void update(float delta_time);
 
