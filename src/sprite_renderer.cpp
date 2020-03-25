@@ -47,7 +47,7 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         //    continue;
 
         vec2f real_pos = cam.world_to_screen(window, desc.pos);
-        vec2f real_dim = { TILE_PIX * desc.size.x(), TILE_PIX * desc.size.y() }; // TODO: SCALE
+        vec2f real_dim = {TILE_PIX, TILE_PIX};
 
         vec2f origin = real_dim / 2.f;
 
@@ -55,6 +55,11 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         vec2f tr_local = -origin + vec2f{ real_dim.x(), 0 };
         vec2f br_local = -origin + vec2f{ real_dim.x(), real_dim.y() };
         vec2f bl_local = -origin + vec2f{ 0, real_dim.y() };
+
+        tl_local *= desc.scale;
+        tr_local *= desc.scale;
+        br_local *= desc.scale;
+        bl_local *= desc.scale;
 
         tl_local = tl_local.rot(desc.angle);
         tr_local = tr_local.rot(desc.angle);

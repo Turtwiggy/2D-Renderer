@@ -26,7 +26,7 @@ struct render_descriptor
     vec2f pos; //in pixels, centered
     vec4f colour = {1,1,1,1}; //linear colour, everything's fine
     float angle = 0; //in radians, about the origin, which is currently the centre
-    vec2f size;
+    vec2f scale;
 };
 
 struct sprite_renderer

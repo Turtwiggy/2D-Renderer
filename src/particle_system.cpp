@@ -12,7 +12,7 @@ void particle_system::emit(random_state rnd)
     render_descriptor desc;
     desc.pos = { 400.f, 400.f };
     desc.angle = 0;
-    desc.size = { 1.f, 1.f };
+    desc.scale = { 1.f, 1.f };
     desc.colour = { 1.f, 0.f, 0.f, 1.f };
 
     particle p;
@@ -70,7 +70,7 @@ void particle_system::update(float delta_time)
         vec2f lerped_size = mix(
             p.size_end,
             p.size_begin, life);
-        desc.size = lerped_size;
+        desc.scale = lerped_size;
     }
 }
 
