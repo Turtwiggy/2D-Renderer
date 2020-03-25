@@ -23,6 +23,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
+IncludeDir["src"] = "src"
 IncludeDir["include"] = "include"
 IncludeDir["ImGui"] = "include/imgui"
 IncludeDir["entt"]  = "include/entt/single_include"
@@ -32,7 +33,7 @@ SourceFiles = {}
 SourceFiles["ndb"]  = "include/ndb/db_storage.cpp"
 
 ToolkitSourceFiles = {}
-ToolkitSourceFiles["toolkit1"] = "src/battle_map.cpp"
+ToolkitSourceFiles["toolkit1"] = "include/toolkit/texture.cpp"
 ToolkitSourceFiles["toolkit2"] = "include/toolkit/base_serialisables.cpp"
 ToolkitSourceFiles["toolkit3"] = "include/toolkit/clipboard.cpp"
 ToolkitSourceFiles["toolkit4"] = "include/toolkit/clock.cpp"
@@ -40,7 +41,6 @@ ToolkitSourceFiles["toolkit5"] = "include/toolkit/fs_helpers.cpp"
 ToolkitSourceFiles["toolkit6"] = "include/toolkit/opencl.cpp"
 ToolkitSourceFiles["toolkit7"] = "include/toolkit/render_window.cpp"
 ToolkitSourceFiles["toolkit8"] = "include/toolkit/stacktrace.cpp"
-ToolkitSourceFiles["toolkit9"] = "include/toolkit/texture.cpp"
 
 ImguiSourceFiles = {}
 ImguiSourceFiles["imgui1"] = "include/imgui/examples/imgui_impl_glfw.cpp"
@@ -91,7 +91,6 @@ project "DwarfAndBlade"
         "%{ToolkitSourceFiles.toolkit6}",
         "%{ToolkitSourceFiles.toolkit7}",
         "%{ToolkitSourceFiles.toolkit8}",
-        "%{ToolkitSourceFiles.toolkit9}",
         "%{NetworkingSourceFiles.networking1}",
         "%{NetworkingSourceFiles.networking2}",
         "%{NetworkingSourceFiles.networking3}",
@@ -103,7 +102,7 @@ project "DwarfAndBlade"
 
     includedirs
     {
-        "%{prj.name}/src",
+        "./src",
         "%{IncludeDir.include}",	
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.entt}",

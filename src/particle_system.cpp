@@ -2,7 +2,8 @@
 
 #include "tilemap.hpp"
 
-void particle_system::emit(random_state rnd)
+void particle_system::emit(
+    random_state& rnd, vec2f pos)
 {
     auto base = registry.create();
     float random = rand_det_s(rnd.rng, 0.0, 1.0);
@@ -10,10 +11,10 @@ void particle_system::emit(random_state rnd)
     sprite_handle handle = get_sprite_handle_of(rnd, tiles::TREE_1);
 
     render_descriptor desc;
-    desc.pos = { 400.f, 400.f };
+    desc.pos = pos;
     desc.angle = 0;
     desc.scale = { 1.f, 1.f };
-    desc.colour = { 1.f, 0.f, 0.f, 1.f };
+    //desc.colour = { 1.f, 0.f, 0.f, 1.f };
 
     particle p;
     p.velocity = { -10.f, 0.f };

@@ -86,19 +86,18 @@ int main(int argc, char* argv[])
         if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
             std::cout << delta_time << std::endl;
 
-        //Emit particle
-        ImGui::Begin("Particle Window");
-
-        if (ImGui::Button("Emit particle"))
-        {
-            particle_sys.emit(rng);
-        }
-
-        ImGui::End();
-
+        //UI
         ImGui::Begin("New window");
 
         ImGui::Button("I am a button");
+
+        if (ImGui::Button("Emit particle"))
+        {
+            float max_x = rand_det_s(rng.rng, 0.0, 1.0) * sett.width;
+            float max_y = rand_det_s(rng.rng, 0.0, 1.0) * sett.height;
+            std::cout << "emitting (rng): " << "(X):" << max_x << " (Y)" << max_y;
+            particle_sys.emit(rng, { max_x, max_y });
+        }
 
         ImGui::End();
 
