@@ -20,6 +20,7 @@
 #include <entt/entt.hpp>
 #include "tilemap.hpp"
 #include "battle_map.hpp"
+#include "imgui_extentions/bezier_curve_editor.h"
 
 #include "particle_system.hpp"
 #include "vfx/snow_effect.hpp"
@@ -96,19 +97,26 @@ int main(int argc, char* argv[])
         ImGui::Button("I am a button");
 
         if (ImGui::Button("Start Snow"))
-        {
-            std::cout << "start snow" << std::endl;
             snow.start();
-        }
 
         if (ImGui::Button("Stop Snow"))
-        {
-            std::cout << "stop snow" << std::endl;
             snow.stop();
-        }
+
+        static float x = 0.5f;
+        ImGui::SliderFloat("slider float", &x, 0.0f, 1.0f, "ratio = %.3f");
+
+        //These floats control the bezier curve control points
+        static float v[5] = { 0.000f, 0.000f, 1.000f, 1.000f };
+        ImGui::Bezier("linear", v);       
+        float y = ImGui::BezierValue(x, v); // x delta in [0..1] range
+
+        std::cout << "OUT VALUE: " << y << 
+            " v0:" << v[0] << 
+            " v1:" << v[1] << 
+            " v2:" << v[2] << 
+            " v3:" << v[3] <<  std::endl;
 
         ImGui::End();
-
 
         //Update systems
 
