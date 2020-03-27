@@ -69,8 +69,7 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    tilemap dummy_battle = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
-
+    entt::entity dummy_battle = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     while (!win.should_close())
     {
@@ -109,10 +108,10 @@ int main(int argc, char* argv[])
 
         ImGui::End();
 
-
         //Update systems
 
-        dummy_battle.render(registry, sprite_render);
+        tilemap& focused = registry.get<tilemap>(dummy_battle);
+        focused.render(registry, sprite_render);
 
         snow.update(delta_time, win, rng, particle_sys);
 
