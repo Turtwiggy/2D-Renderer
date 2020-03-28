@@ -1,5 +1,3 @@
-#pragma once
-
 // ImGui Bezier widget. @r-lyeh, public domain
 // v1.03: improve grabbing, confine grabbers to area option, adaptive size, presets, preview.
 // v1.02: add BezierValue(); comments; usage
@@ -44,21 +42,30 @@ namespace ImGui
         }
     }
 
-    float BezierValue(float dt01, float P[4]) {
+    float BezierValue(float dt01, float P[4], float first_point[2], float second_point[2]) {
         enum { STEPS = 256 };
-        ImVec2 Q[4] = { { 0, 0 }, { P[0], P[1] }, { P[2], P[3] }, { 1, 1 } };
+        ImVec2 Q[4] =
+        {
+            ImVec2(first_point[0], first_point[1]),
+            { P[0], P[1] },
+            { P[2], P[3] },
+            ImVec2(second_point[0], second_point[1])
+        };
         ImVec2 results[STEPS + 1];
         bezier_table<STEPS>(Q, results);
-        return results[(int)((dt01 < 0 ? 0 : dt01 > 1 ? 1 : dt01) * STEPS)].y;
+
+        float val = results[(int)((dt01 < 0 ? 0 : dt01 > 1 ? 1 : dt01) * STEPS)].y;
+
+        return val;
     }
 
-    int Bezier(const char* label, float P[5]) {
+    int Bezier(const char* label, float P[5], float first_point[2], float second_point[2], float dx01) {
         // visuals
         enum { SMOOTHNESS = 64 }; // curve smoothness: the higher number of segments, the smoother curve
         enum { CURVE_WIDTH = 4 }; // main curved line width
         enum { LINE_WIDTH = 1 }; // handlers: small lines width
         enum { GRAB_RADIUS = 8 }; // handlers: circle radius
-        enum { GRAB_BORDER = 2 }; // handlers: circle border width
+        enum { GRAB_BORDER = 2 }; // handlers: circleer width
         enum { AREA_CONSTRAINED = true }; // should grabbers be constrained to grid area?
         enum { AREA_WIDTH = 128 }; // area width in pixels. 0 for adaptive size (will use max avail width)
 
@@ -145,7 +152,7 @@ namespace ImGui
         if (Window->SkipItems)
             return false;
 
-        // header and spacing
+        // header and spacing bord
         int changed = SliderFloat4(label, P, 0, 1, "%.3f", 1.0f);
         int hovered = IsItemActive() || IsItemHovered(); // IsItemDragged() ?
         Dummy(ImVec2(0, 3));
@@ -180,7 +187,7 @@ namespace ImGui
         }
 
         // eval curve
-        ImVec2 Q[4] = { { 0, 0 }, { P[0], P[1] }, { P[2], P[3] }, { 1, 1 } };
+        ImVec2 Q[4] = { ImVec2(first_point[0], first_point[1]), { P[0], P[1] }, { P[2], P[3] }, ImVec2(second_point[0], second_point[1]) };
         ImVec2 results[SMOOTHNESS + 1];
         bezier_table<SMOOTHNESS>(Q, results);
 
@@ -228,22 +235,28 @@ namespace ImGui
             }
         }
 
-        // draw preview (cycles every 1s)
-        static clock_t epoch = clock();
+        //// draw preview (cycles every 1s)
+        //static clock_t epoch = clock();
         ImVec4 white(GetStyle().Colors[ImGuiCol_Text]);
-        for (int i = 0; i < 3; ++i) {
-            double now = ((clock() - epoch) / (double)CLOCKS_PER_SEC);
-            float delta = ((int)(now * 1000) % 1000) / 1000.f; delta += i / 3.f; if (delta > 1) delta -= 1;
-            int idx = (int)(delta * SMOOTHNESS);
-            float evalx = results[idx].x; // 
-            float evaly = results[idx].y; // ImGui::BezierValue( delta, P );
-            ImVec2 p0 = ImVec2(evalx, 1 - 0) * (bb.Max - bb.Min) + bb.Min;
-            ImVec2 p1 = ImVec2(0, 1 - evaly) * (bb.Max - bb.Min) + bb.Min;
-            ImVec2 p2 = ImVec2(evalx, 1 - evaly) * (bb.Max - bb.Min) + bb.Min;
-            DrawList->AddCircleFilled(p0, GRAB_RADIUS / 2, ImColor(white));
-            DrawList->AddCircleFilled(p1, GRAB_RADIUS / 2, ImColor(white));
-            DrawList->AddCircleFilled(p2, GRAB_RADIUS / 2, ImColor(white));
-        }
+        //for (int i = 0; i < 3; ++i) {
+        //    double now = ((clock() - epoch) / (double)CLOCKS_PER_SEC);
+        //    float delta = ((int)(now * 1000) % 1000) / 1000.f; delta += i / 3.f; if (delta > 1) delta -= 1;
+        //    int idx = (int)(delta * SMOOTHNESS);
+        //    float evalx = results[idx].x; // 
+        //    float evaly = results[idx].y; // ImGui::BezierValue( delta, P );
+        //    ImVec2 p0 = ImVec2(evalx, 1 - 0) * (bb.Max - bb.Min) + bb.Min;
+        //    ImVec2 p1 = ImVec2(0, 1 - evaly) * (bb.Max - bb.Min) + bb.Min;
+        //    ImVec2 p2 = ImVec2(evalx, 1 - evaly) * (bb.Max - bb.Min) + bb.Min;
+        //    DrawList->AddCircleFilled(p0, GRAB_RADIUS / 2, ImColor(white));
+        //    DrawList->AddCircleFilled(p1, GRAB_RADIUS / 2, ImColor(white));
+        //    DrawList->AddCircleFilled(p2, GRAB_RADIUS / 2, ImColor(white));
+        //}
+
+        float dy01 = BezierValue(dx01, P, first_point, second_point);
+
+        //Draw the sampled point
+        ImVec2 p0 = ImVec2(dx01, 1 - dy01) * (bb.Max - bb.Min) + bb.Min;
+        DrawList->AddCircleFilled(p0, GRAB_RADIUS / 2, ImColor(1.f, 0., 0.));
 
         // draw lines and grabbers
         float luma = IsItemActive() || IsItemHovered() ? 0.5f : 1.0f;
@@ -263,6 +276,6 @@ namespace ImGui
     }
 
     void ShowBezierDemo() {
-        { static float v[5] = { 0.950f, 0.050f, 0.795f, 0.035f }; Bezier("easeInExpo", v); }
+        //static float v[5] = { 0.950f, 0.050f, 0.795f, 0.035f }; Bezier("easeInExpo", v, { 0.f, 0.f }, { 1, 1 }, 0, 0);
     }
 }

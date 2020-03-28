@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Engine/Core.hpp"
+#include "core.hpp"
 #include "random.hpp"
 #include <toolkit/render_window.hpp>
 #include <toolkit/texture.hpp>
@@ -20,7 +20,7 @@
 #include <entt/entt.hpp>
 #include "tilemap.hpp"
 #include "battle_map.hpp"
-#include "imgui_extentions/bezier_curve_editor.h"
+#include "Editor/imgui_bezier.hpp"
 
 #include "particle_system.hpp"
 #include "vfx/snow_effect.hpp"
@@ -72,6 +72,11 @@ int main(int argc, char* argv[])
 
     tilemap dummy_battle = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
+    //Bezier
+    float dx = 0.5f;
+    float start_point[2] = { 0.f, 0.f };
+    float end_point[2] = { 1.f, 1.f };
+    static float v[5] = { 0.390f, 0.575f, 0.565f, 1.000f };
 
     while (!win.should_close())
     {
@@ -102,19 +107,20 @@ int main(int argc, char* argv[])
         if (ImGui::Button("Stop Snow"))
             snow.stop();
 
-        static float x = 0.5f;
-        ImGui::SliderFloat("slider float", &x, 0.0f, 1.0f, "ratio = %.3f");
+        ImGui::SliderFloat("Bezier Sample Value", &dx, 0.0f, 1.0f, "ratio = %.3f");
 
-        //These floats control the bezier curve control points
-        static float v[5] = { 0.000f, 0.000f, 1.000f, 1.000f };
-        ImGui::Bezier("linear", v);       
-        float y = ImGui::BezierValue(x, v); // x delta in [0..1] range
+        ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
 
-        std::cout << "OUT VALUE: " << y << 
-            " v0:" << v[0] << 
-            " v1:" << v[1] << 
-            " v2:" << v[2] << 
-            " v3:" << v[3] <<  std::endl;
+        ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
+
+        ImGui::Bezier("easeOutSine", v, start_point, end_point, dx);       // draw
+
+        float y = ImGui::BezierValue(dx, v, start_point, end_point); // x delta in [0..1] range
+        std::cout << "Y: " << y <<
+            " v0:" << v[0] <<
+            " v1:" << v[1] <<
+            " v2:" << v[2] <<
+            " v3:" << v[3] << std::endl;
 
         ImGui::End();
 
