@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
     {
         win.poll();
 
-        ImGuiIO io = ImGui::GetIO();
+        ImGuiIO& io = ImGui::GetIO();
         float delta_time = io.DeltaTime;
 
         //Input
