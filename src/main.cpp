@@ -1,7 +1,7 @@
-
 #include <iostream>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <imgui/imgui.h>
 
@@ -23,6 +23,54 @@
 
 #include "particle_system.hpp"
 #include "vfx/snow_effect.hpp"
+
+#include "entity_common.hpp"
+#include "overworld_map.hpp"
+
+std::optional<entt::entity> scene_selector(entt::registry& registry)
+{
+    std::optional<entt::entity> ret;
+
+    ImGui::Begin("Scenes");
+
+    int idx = 0;
+
+    {
+        auto overworld_view = registry.view<tilemap, overworld_tag>();
+
+        ImGui::Text("Overworld(s):");
+
+        for(auto ent : overworld_view)
+        {
+            if(ImGui::Button(std::to_string(idx).c_str()))
+            {
+                ret = ent;
+            }
+
+            idx++;
+        }
+    }
+
+    {
+        auto battle_view = registry.view<tilemap, battle_tag>();
+
+        ImGui::Text("Battle(s)");
+
+        for(auto ent : battle_view)
+        {
+            if(ImGui::Button(std::to_string(idx).c_str()))
+            {
+                ret = ent;
+            }
+
+            idx++;
+        }
+    }
+
+    ImGui::End();
+
+    return ret;
+}
 
 int main(int argc, char* argv[])
 {
@@ -69,7 +117,8 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    entt::entity dummy_battle = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+    create_overworld(registry, rng, {100, 100});
+    entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     while (!win.should_close())
     {
@@ -110,7 +159,12 @@ int main(int argc, char* argv[])
 
         //Update systems
 
-        tilemap& focused = registry.get<tilemap>(dummy_battle);
+        if(auto val = scene_selector(registry); val.has_value())
+        {
+            focused_tilemap = val.value();
+        }
+
+        tilemap& focused = registry.get<tilemap>(focused_tilemap);
         focused.render(registry, sprite_render);
 
         snow.update(delta_time, win, rng, particle_sys);

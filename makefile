@@ -22,6 +22,7 @@ SOURCES += src/tilemap.cpp
 SOURCES += src/battle_map.cpp
 SOURCES += src/entity_common.cpp
 SOURCES += src/particle_system.cpp
+SOURCES += src/overworld_map.cpp
 SOURCES += include/toolkit/base_serialisables.cpp
 SOURCES += include/toolkit/clipboard.cpp
 SOURCES += include/toolkit/clock.cpp
