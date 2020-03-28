@@ -27,6 +27,8 @@
 #include "entity_common.hpp"
 #include "overworld_map.hpp"
 
+#include <GLFW/glfw3.h>
+
 std::optional<entt::entity> scene_selector(entt::registry& registry)
 {
     std::optional<entt::entity> ret;
@@ -135,8 +137,17 @@ int main(int argc, char* argv[])
         }
 
         //Delta Time
-        if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
+        if (ImGui::IsKeyDown(GLFW_KEY_N))
             std::cout << delta_time << std::endl;
+
+        float dx = ImGui::IsKeyDown(GLFW_KEY_D) - ImGui::IsKeyDown(GLFW_KEY_A);
+        float dy = ImGui::IsKeyDown(GLFW_KEY_S) - ImGui::IsKeyDown(GLFW_KEY_W);
+
+        float dx_dt = dx * delta_time * 400;
+        float dy_dt = dy * delta_time * 400;
+
+        cam.pos.x() += dx_dt;
+        cam.pos.y() += dy_dt;
 
         //UI
         ImGui::Begin("New window");
