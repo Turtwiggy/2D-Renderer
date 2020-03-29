@@ -41,8 +41,10 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[VINE], {2, 2});
     add_to(ret[SHRUB], {0, 2});
 
+    add_to(ret[ROCKS], {5, 2});
+
     add_to(ret[BRAMBLE], {0, 2});
-    add_to(ret[BRAMBLE], {0, 6});
+    add_to(ret[BRAMBLE], {6, 2});
 
     ///top left man is 24, 0
 
