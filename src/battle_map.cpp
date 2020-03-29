@@ -12,8 +12,40 @@ entt::entity create_battle_unit(entt::registry& registry, sprite_handle handle, 
     registry.assign<world_transform>(res, transform);
     registry.assign<battle_unit_info>(res, info);
     registry.assign<battle_tag>(res, battle_tag());
+    registry.assign<render_descriptor>(res, desc);
 
     return res;
+}
+
+void distribute_entities(entt::registry& registry, tilemap& tmap, random_state& rng, vec2i dim, level_info::types type, int percentage, const std::vector<tiles::type>& scenery, float path_cost)
+{
+    for(int y=0; y < dim.y(); y++)
+    {
+        for(int x=0; x < dim.x(); x++)
+        {
+            if(!(rand_det_s(rng.rng, 0, 100) < percentage))
+                continue;
+
+            int random_element = rand_det_s(rng.rng, 0.f, scenery.size());
+
+            random_element = clamp(random_element, 0, (int)scenery.size()-1);
+
+            tiles::type type = scenery[random_element];
+
+            sprite_handle handle = get_sprite_handle_of(rng, type);
+            handle.base_colour.w() = 1;
+
+            world_transform trans;
+            trans.position = vec2f{x, y} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+            collidable coll;
+            coll.cost = path_cost;
+
+            auto base = create_scenery(registry, handle, trans, coll);
+
+            tmap.add(base, {x, y});
+        }
+    }
 }
 
 entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
@@ -27,25 +59,12 @@ entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i di
     {
         for (int x = 0; x < dim.x(); x++)
         {
-            auto render_type = tiles::BASE;
-
-            /*renderable_object robj;
-            robj.tile_id = get_tile_of(render_type);
-            robj.lin_colour = get_colour_of(render_type, type);
-
-            robj.lin_colour = clamp(rand_det_s(rng, 0.7, 1.3) * robj.lin_colour, 0, 1);
-
-            tile_object obj;
-            obj.obj = robj;
-
-            ret.add([y * dim.x() + x].push_back(obj);*/
-
             sprite_handle handle = get_sprite_handle_of(rng, tiles::BASE);
-            handle.base_colour = clamp(rand_det_s(rng.rng, 0.3, 1.7) * handle.base_colour * 0.2, 0, 1);
+            handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.1, 0, 1);
             handle.base_colour.w() = 1;
 
             render_descriptor desc;
-            desc.pos = vec2f{ x, y } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+            desc.pos = vec2f{ x, y } * TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
             //desc.angle = rand_det_s(rng.rng, 0.f, 2 * M_PI);
 
             entt::entity base = registry.create();
@@ -57,6 +76,12 @@ entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i di
             tmap.add(base, { x, y });
         }
     }
+
+    std::vector<tiles::type> decoration = {tiles::GRASS};
+    distribute_entities(registry, tmap, rng, dim, type, 20, decoration, 0);
+
+    std::vector<tiles::type> scenery = {tiles::TREE_1, tiles::TREE_2, tiles::TREE_DENSE, tiles::TREE_ROUND, tiles::ROCKS, tiles::BRAMBLE};
+    distribute_entities(registry, tmap, rng, dim, type, 1, scenery, -1);
 
     registry.assign<tilemap>(res, tmap);
     registry.assign<battle_tag>(res, battle_tag());

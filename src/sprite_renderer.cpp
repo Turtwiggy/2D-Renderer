@@ -37,14 +37,14 @@ void sprite_renderer::render(render_window& window, const camera& cam)
     vec2i screen_dimensions = window.get_window_size();
 
     vec2f tl_visible = cam.screen_to_world(window, { 0,0 }) - vec2f{ TILE_PIX, TILE_PIX };
-    vec2f br_visible = cam.world_to_screen(window, { screen_dimensions.x(), screen_dimensions.y() }) + vec2f{ TILE_PIX, TILE_PIX };
+    vec2f br_visible = cam.screen_to_world(window, { screen_dimensions.x(), screen_dimensions.y() }) + vec2f{ TILE_PIX, TILE_PIX };
 
     vec2f uv_scale = { 1.f / sprite_sheet.dim.x(), 1.f / sprite_sheet.dim.y() };
 
     for (auto [handle, desc] : next_renderables)
     {
-        //if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
-        //    continue;
+        if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
+            continue;
 
         vec2f real_pos = cam.world_to_screen(window, desc.pos);
         vec2f real_dim = {TILE_PIX, TILE_PIX};

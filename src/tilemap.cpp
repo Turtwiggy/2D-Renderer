@@ -41,8 +41,10 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[VINE], {2, 2});
     add_to(ret[SHRUB], {0, 2});
 
+    add_to(ret[ROCKS], {5, 2});
+
     add_to(ret[BRAMBLE], {0, 2});
-    add_to(ret[BRAMBLE], {0, 6});
+    add_to(ret[BRAMBLE], {6, 2});
 
     ///top left man is 24, 0
 
@@ -152,13 +154,16 @@ sprite_handle get_sprite_handle_of(random_state& rng, tiles::type type)
 
 vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
 {
+    vec3f mask_col3 = srgb_to_lin_approx(vec3f{71, 45, 60}/255.f).norm();
+    vec4f mask_col = {mask_col3.x(), mask_col3.y(), mask_col3.z(), 1.f};
+
     vec4f barren_col = srgb_to_lin_approx(vec4f{122, 68, 74, 255} / 255.f);
     vec4f grass_col = srgb_to_lin_approx(vec4f{56, 217, 115, 255} / 255.f);
 
     if(tile_type == tiles::BRAMBLE || tile_type == tiles::SHRUB || tile_type == tiles::BASE)
     {
         if(level_type == level_info::GRASS)
-            return grass_col;
+            return grass_col * mask_col;
         else
             return barren_col;
     }
@@ -167,7 +172,7 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
         return barren_col;
 
     if(tile_type == tiles::GRASS)
-        return grass_col;
+        return grass_col * grass_col;
 
     if(tile_type == tiles::TREE_1 || tile_type == tiles::TREE_2 || tile_type == tiles::TREE_DENSE ||
        tile_type == tiles::TREE_ROUND || tile_type == tiles::CACTUS || tile_type == tiles::VINE ||
@@ -221,14 +226,28 @@ void tilemap::add(entt::entity en, vec2i pos)
 
 void tilemap::render(entt::registry& registry, sprite_renderer& renderer)
 {
-    for(auto lst : all_entities)
+    for(const auto& lst : all_entities)
     {
-        for(auto en : lst)
+        for(int id = 0; id < (int)lst.size(); id++)
         {
+            auto en = lst[id];
+
             sprite_handle& handle = registry.get<sprite_handle>(en);
             render_descriptor& desc = registry.get<render_descriptor>(en);
 
+            vec4f old_col = handle.base_colour;
+
+            vec4f shaded_col = srgb_to_lin_approx(vec4f{0.02, 0.02, 0.02, 1});
+
+            if(id > 0 && id != (int)lst.size() - 1 && lst.size() > 2)
+            {
+                handle.base_colour = mix(shaded_col, handle.base_colour, 0.1);
+                //handle.base_colour.w() *= 0.3;
+            }
+
             renderer.add(handle, desc);
+
+            handle.base_colour = old_col;
         }
     }
 }

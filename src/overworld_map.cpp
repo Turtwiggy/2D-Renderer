@@ -11,6 +11,7 @@ entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handl
     registry.assign<sprite_handle>(res, handle);
     registry.assign<world_transform>(res, transform);
     registry.assign<overworld_tag>(res, overworld_tag());
+    registry.assign<render_descriptor>(res, desc);
 
     return res;
 }
@@ -26,8 +27,6 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     {
         for (int x = 0; x < dim.x(); x++)
         {
-            auto render_type = tiles::BASE;
-
             sprite_handle handle = get_sprite_handle_of(rng, tiles::BASE);
             handle.base_colour = clamp(rand_det_s(rng.rng, 0.5, 1.5) * handle.base_colour * 0.2, 0, 1);
             handle.base_colour.w() = 1;
