@@ -41,7 +41,7 @@ entt::entity create_basic_unit(entt::registry& registry, const team& t, const sp
     return res;
 }
 
-entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform)
+entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform, const collidable& coll)
 {
     entt::entity res = registry.create();
 
@@ -55,6 +55,7 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
     registry.assign<team>(res, t);
     registry.assign<sprite_handle>(res, handle);
     registry.assign<world_transform>(res, transform);
+    registry.assign<collidable>(res, coll);
 
     return res;
 }

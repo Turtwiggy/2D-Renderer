@@ -47,6 +47,6 @@ struct army
 };
 
 entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform, const damageable& damage);
-entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform);
+entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform, const collidable& coll);
 
 #endif // ENTITY_COMMON_HPP_INCLUDED
