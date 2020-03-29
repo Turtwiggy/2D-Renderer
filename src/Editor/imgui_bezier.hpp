@@ -279,7 +279,6 @@ namespace ImGui
         //Draw the sampled point
         float dy01 = results[(int)((dx01 < 0 ? 0 : dx01 > 1 ? 1 : dx01) * SMOOTHNESS)].y;
         ImVec2 py = ImVec2(dx01, 1- dy01) * (bb.Max - bb.Min) + bb.Min;
-        std::cout << "ybefore: " << dy01 << " yafter: " << py.y << std::endl;
         DrawList->AddCircleFilled(py, GRAB_RADIUS / 2, ImColor(1.f, 0.f, 0.f));
 
         // draw lines and grabbers

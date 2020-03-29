@@ -187,15 +187,6 @@ int main(int argc, char* argv[])
         Q[3] = ImVec2{ end_point[0], end_point[1] };
         float y = ImGui::CubicCurve(Q[0], Q[1], Q[2], Q[3], sample_x).y;
 
-        std::cout << "Sampled Y:" << y << "From X: " << sample_x << std::endl;
-        
-        std::cout << 
-            "Point 1: (x)" << start_point[0] << " (y:)" << start_point[1] << '\n' <<
-            "Point 2: (x)" << middle_points[0] << " (y:)" << middle_points[1] << '\n' <<
-            "Point 3: (x)" << middle_points[2] << " (y:)" << middle_points[3] << '\n' <<
-            "Point 4: (x)" << end_point[0] << " (y:)" << end_point[1] << '\n' <<
-            y << std::endl;
-
         ImGui::End();
 
         //Update systems
