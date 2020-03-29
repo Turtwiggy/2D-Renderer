@@ -20,37 +20,69 @@
 
 namespace ImGui
 {
+    //template<int steps>
+    //void bezier_table(ImVec2 P[4], ImVec2 results[steps + 1]) {
+    //    static float C[(steps + 1) * 4], * K = 0;
+    //    if (!K) {
+    //        K = C;
+    //        for (unsigned step = 0; step <= steps; ++step) {
+    //            float t = (float)step / (float)steps;
+    //            C[step * 4 + 0] = (1 - t) * (1 - t) * (1 - t);  // * P0
+    //            C[step * 4 + 1] = 3 * (1 - t) * (1 - t) * t;    // * P1
+    //            C[step * 4 + 2] = 3 * (1 - t) * t * t;          // * P2
+    //            C[step * 4 + 3] = t * t * t;                    // * P3
+    //        }
+    //    }
+    //    for (unsigned step = 0; step <= steps; ++step) {
+    //        ImVec2 point = {
+    //            K[step * 4 + 0] * P[0].x + K[step * 4 + 1] * P[1].x + K[step * 4 + 2] * P[2].x + K[step * 4 + 3] * P[3].x,
+    //            K[step * 4 + 0] * P[0].y + K[step * 4 + 1] * P[1].y + K[step * 4 + 2] * P[2].y + K[step * 4 + 3] * P[3].y
+    //        };
+    //        results[step] = point;
+    //    }
+    //}
+
+    ImVec2 Lerp(ImVec2 a, ImVec2 b, float t)
+    {
+        return a + (b - a) * t;
+    }
+
+    ImVec2 QuadraticCurve(ImVec2 a, ImVec2 b, ImVec2 c, float t)
+    {
+        ImVec2 p0 = Lerp(a, b, t);
+        ImVec2 p1 = Lerp(b, c, t);
+        return Lerp(p0, p1, t);
+    }
+
+    ImVec2 CubicCurve(ImVec2 a, ImVec2 b, ImVec2 c, ImVec2 d, float t)
+    {
+        ImVec2 p0 = QuadraticCurve(a, b, c, t);
+        ImVec2 p1 = QuadraticCurve(b, c, d, t);
+        return Lerp(p0, p1, t);
+    }
+
     template<int steps>
-    void bezier_table(ImVec2 P[4], ImVec2 results[steps + 1]) {
-        static float C[(steps + 1) * 4], * K = 0;
-        if (!K) {
-            K = C;
-            for (unsigned step = 0; step <= steps; ++step) {
-                float t = (float)step / (float)steps;
-                C[step * 4 + 0] = (1 - t) * (1 - t) * (1 - t);   // * P0
-                C[step * 4 + 1] = 3 * (1 - t) * (1 - t) * t; // * P1
-                C[step * 4 + 2] = 3 * (1 - t) * t * t;     // * P2
-                C[step * 4 + 3] = t * t * t;               // * P3
-            }
-        }
-        for (unsigned step = 0; step <= steps; ++step) {
-            ImVec2 point = {
-                K[step * 4 + 0] * P[0].x + K[step * 4 + 1] * P[1].x + K[step * 4 + 2] * P[2].x + K[step * 4 + 3] * P[3].x,
-                K[step * 4 + 0] * P[0].y + K[step * 4 + 1] * P[1].y + K[step * 4 + 2] * P[2].y + K[step * 4 + 3] * P[3].y
-            };
-            results[step] = point;
+    void bezier_table(ImVec2 P[4], ImVec2 results[steps + 1]) 
+    {
+        for (unsigned step = 0; step <= steps; ++step)
+        {
+            float t = (float)step / (float)steps;
+            results[step] = CubicCurve(P[0], P[1], P[2], P[3], t);
         }
     }
 
-    float BezierValue(float dt01, float P[4], float first_point[2], float second_point[2]) {
+    float BezierValue(float dt01, float points[8])
+    {
         enum { STEPS = 256 };
+
         ImVec2 Q[4] =
         {
-            ImVec2(first_point[0], first_point[1]),
-            { P[0], P[1] },
-            { P[2], P[3] },
-            ImVec2(second_point[0], second_point[1])
+            { points[0], points[1] },
+            { points[2], points[3] },
+            { points[4], points[5] },
+            { points[6], points[7] },
         };
+
         ImVec2 results[STEPS + 1];
         bezier_table<STEPS>(Q, results);
 
@@ -59,7 +91,7 @@ namespace ImGui
         return val;
     }
 
-    int Bezier(const char* label, float P[5], float first_point[2], float second_point[2], float dx01) {
+    int Bezier(const char* label, float dx01, float points[9]) {
         // visuals
         enum { SMOOTHNESS = 64 }; // curve smoothness: the higher number of segments, the smoother curve
         enum { CURVE_WIDTH = 4 }; // main curved line width
@@ -69,7 +101,7 @@ namespace ImGui
         enum { AREA_CONSTRAINED = true }; // should grabbers be constrained to grid area?
         enum { AREA_WIDTH = 128 }; // area width in pixels. 0 for adaptive size (will use max avail width)
 
-        // curve presets
+        // curve presets (control point 1, control point 2)
         static struct { const char* name; float points[4]; } presets[] = {
             { "Linear", 0.000f, 0.000f, 1.000f, 1.000f },
 
@@ -114,7 +146,7 @@ namespace ImGui
         bool reload = 0;
         ImGui::PushID(label);
         if (ImGui::ArrowButton("##lt", ImGuiDir_Left)) { // ImGui::ArrowButton(ImGui::GetCurrentWindow()->GetID("##lt"), ImGuiDir_Left, ImVec2(0, 0), 0)
-            if (--P[4] >= 0) reload = 1; else ++P[4];
+            if (--points[8] >= 0) reload = 1; else ++points[8];
         }
         ImGui::SameLine();
 
@@ -124,8 +156,8 @@ namespace ImGui
         if (ImGui::BeginPopup("!Presets")) {
             for (int i = 0; i < IM_ARRAYSIZE(presets); ++i) {
                 if (i == 1 || i == 9 || i == 17) ImGui::Separator();
-                if (ImGui::MenuItem(presets[i].name, NULL, P[4] == i)) {
-                    P[4] = i;
+                if (ImGui::MenuItem(presets[i].name, NULL, points[8] == i)) {
+                    points[8] = i;
                     reload = 1;
                 }
             }
@@ -134,13 +166,13 @@ namespace ImGui
         ImGui::SameLine();
 
         if (ImGui::ArrowButton("##rt", ImGuiDir_Right)) { // ImGui::ArrowButton(ImGui::GetCurrentWindow()->GetID("##rt"), ImGuiDir_Right, ImVec2(0, 0), 0)
-            if (++P[4] < IM_ARRAYSIZE(presets)) reload = 1; else --P[4];
+            if (++points[8] < IM_ARRAYSIZE(presets)) reload = 1; else --points[8];
         }
         ImGui::SameLine();
         ImGui::PopID();
 
         if (reload) {
-            memcpy(P, presets[(int)P[4]].points, sizeof(float) * 4);
+            memcpy(points, presets[(int)points[8]].points, sizeof(float) * 4);
         }
 
         // bezier widget
@@ -153,7 +185,7 @@ namespace ImGui
             return false;
 
         // header and spacing bord
-        int changed = SliderFloat4(label, P, 0, 1, "%.3f", 1.0f);
+        int changed = SliderFloat4(label, points, 0, 1, "%.3f", 1.0f);
         int hovered = IsItemActive() || IsItemHovered(); // IsItemDragged() ?
         Dummy(ImVec2(0, 3));
 
@@ -187,7 +219,13 @@ namespace ImGui
         }
 
         // eval curve
-        ImVec2 Q[4] = { ImVec2(first_point[0], first_point[1]), { P[0], P[1] }, { P[2], P[3] }, ImVec2(second_point[0], second_point[1]) };
+        ImVec2 Q[4] =
+        {
+            { points[0], points[1] },
+            { points[2], points[3] },
+            { points[4], points[5] },
+            { points[6], points[7] },
+        };
         ImVec2 results[SMOOTHNESS + 1];
         bezier_table<SMOOTHNESS>(Q, results);
 
@@ -197,28 +235,30 @@ namespace ImGui
             ImVec2 mouse = GetIO().MousePos, pos[2];
             float distance[2];
 
-            for (int i = 0; i < 2; ++i) {
-                pos[i] = ImVec2(P[i * 2 + 0], 1 - P[i * 2 + 1]) * (bb.Max - bb.Min) + bb.Min;
-                distance[i] = (pos[i].x - mouse.x) * (pos[i].x - mouse.x) + (pos[i].y - mouse.y) * (pos[i].y - mouse.y);
-            }
+            //for (int i = 0; i < 2; ++i) {
+            //    //broken
+            //    //pos[i] = ImVec2(P[i * 2 + 0], 1 - P[i * 2 + 1]) * (bb.Max - bb.Min) + bb.Min;
+            //    pos[i] = ImVec2(P[i * 2 + 0], 1 - P[i * 2 + 1]) * (bb.Max - bb.Min) + bb.Min;
+            //    distance[i] = (pos[i].x - mouse.x) * (pos[i].x - mouse.x) + (pos[i].y - mouse.y) * (pos[i].y - mouse.y);
+            //}
 
-            int selected = distance[0] < distance[1] ? 0 : 1;
-            if (distance[selected] < (4 * GRAB_RADIUS * 4 * GRAB_RADIUS))
-            {
-                SetTooltip("(%4.3f, %4.3f)", P[selected * 2 + 0], P[selected * 2 + 1]);
+            //int selected = distance[0] < distance[1] ? 0 : 1;
+            //if (distance[selected] < (4 * GRAB_RADIUS * 4 * GRAB_RADIUS))
+            //{
+            //    SetTooltip("(%4.3f, %4.3f)", P[selected * 2 + 0], P[selected * 2 + 1]);
 
-                if (/*hovered &&*/ (IsMouseClicked(0) || IsMouseDragging(0))) {
-                    float& px = (P[selected * 2 + 0] += GetIO().MouseDelta.x / Canvas.x);
-                    float& py = (P[selected * 2 + 1] -= GetIO().MouseDelta.y / Canvas.y);
+            //    if (/*hovered &&*/ (IsMouseClicked(0) || IsMouseDragging(0))) {
+            //        float& px = (P[selected * 2 + 0] += GetIO().MouseDelta.x / Canvas.x);
+            //        float& py = (P[selected * 2 + 1] -= GetIO().MouseDelta.y / Canvas.y);
 
-                    if (AREA_CONSTRAINED) {
-                        px = (px < 0 ? 0 : (px > 1 ? 1 : px));
-                        py = (py < 0 ? 0 : (py > 1 ? 1 : py));
-                    }
+            //        if (AREA_CONSTRAINED) {
+            //            px = (px < 0 ? 0 : (px > 1 ? 1 : px));
+            //            py = (py < 0 ? 0 : (py > 1 ? 1 : py));
+            //        }
 
-                    changed = true;
-                }
-            }
+            //        changed = true;
+            //    }
+            //}
         }
 
         // if (hovered || changed) DrawList->PushClipRectFullScreen();
@@ -235,7 +275,7 @@ namespace ImGui
             }
         }
 
-        //// draw preview (cycles every 1s)
+        // draw preview (cycles every 1s)
         //static clock_t epoch = clock();
         ImVec4 white(GetStyle().Colors[ImGuiCol_Text]);
         //for (int i = 0; i < 3; ++i) {
@@ -252,17 +292,17 @@ namespace ImGui
         //    DrawList->AddCircleFilled(p2, GRAB_RADIUS / 2, ImColor(white));
         //}
 
-        float dy01 = BezierValue(dx01, P, first_point, second_point);
+        float dy01 = results[(int)((dx01 < 0 ? 0 : dx01 > 1 ? 1 : dx01) * SMOOTHNESS)].y;
 
         //Draw the sampled point
-        ImVec2 p0 = ImVec2(dx01, 1 - dy01) * (bb.Max - bb.Min) + bb.Min;
-        DrawList->AddCircleFilled(p0, GRAB_RADIUS / 2, ImColor(1.f, 0., 0.));
+        ImVec2 py = ImVec2(dx01, 1 - dy01) * (bb.Max - bb.Min) + bb.Min;
+        DrawList->AddCircleFilled(py, GRAB_RADIUS / 2, ImColor(1.f, 0., 0.));
 
         // draw lines and grabbers
         float luma = IsItemActive() || IsItemHovered() ? 0.5f : 1.0f;
         ImVec4 pink(1.00f, 0.00f, 0.75f, luma), cyan(0.00f, 0.75f, 1.00f, luma);
-        ImVec2 p1 = ImVec2(P[0], 1 - P[1]) * (bb.Max - bb.Min) + bb.Min;
-        ImVec2 p2 = ImVec2(P[2], 1 - P[3]) * (bb.Max - bb.Min) + bb.Min;
+        ImVec2 p1 = ImVec2(points[2], 1 - points[3]) * (bb.Max - bb.Min) + bb.Min;
+        ImVec2 p2 = ImVec2(points[4], 1 - points[5]) * (bb.Max - bb.Min) + bb.Min;
         DrawList->AddLine(ImVec2(bb.Min.x, bb.Max.y), p1, ImColor(white), LINE_WIDTH);
         DrawList->AddLine(ImVec2(bb.Max.x, bb.Min.y), p2, ImColor(white), LINE_WIDTH);
         DrawList->AddCircleFilled(p1, GRAB_RADIUS, ImColor(white));

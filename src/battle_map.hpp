@@ -11,4 +11,4 @@ struct battle_unit_info
 };
 
 entt::entity create_battle_unit(entt::registry& registry, sprite_handle handle, world_transform transform, battle_unit_info info);
-tilemap create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type);
+entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type);

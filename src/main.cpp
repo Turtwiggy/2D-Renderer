@@ -1,7 +1,7 @@
-
 #include <iostream>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <imgui/imgui.h>
 
@@ -18,12 +18,61 @@
 #include "sprite_renderer.hpp"
 
 #include <entt/entt.hpp>
+#include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "battle_map.hpp"
-#include "Editor/imgui_bezier.hpp"
+#include "overworld_map.hpp"
 
+#include "Editor/imgui_bezier.hpp"
 #include "particle_system.hpp"
 #include "vfx/snow_effect.hpp"
+
+#include <GLFW/glfw3.h>
+
+std::optional<entt::entity> scene_selector(entt::registry& registry)
+{
+    std::optional<entt::entity> ret;
+
+    ImGui::Begin("Scenes");
+
+    int idx = 0;
+
+    {
+        auto overworld_view = registry.view<tilemap, overworld_tag>();
+
+        ImGui::Text("Overworld(s):");
+
+        for(auto ent : overworld_view)
+        {
+            if(ImGui::Button(std::to_string(idx).c_str()))
+            {
+                ret = ent;
+            }
+
+            idx++;
+        }
+    }
+
+    {
+        auto battle_view = registry.view<tilemap, battle_tag>();
+
+        ImGui::Text("Battle(s)");
+
+        for(auto ent : battle_view)
+        {
+            if(ImGui::Button(std::to_string(idx).c_str()))
+            {
+                ret = ent;
+            }
+
+            idx++;
+        }
+    }
+
+    ImGui::End();
+
+    return ret;
+}
 
 int main(int argc, char* argv[])
 {
@@ -70,19 +119,22 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    tilemap dummy_battle = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+    create_overworld(registry, rng, {100, 100});
+    entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     //Bezier
-    float dx = 0.5f;
+    float sample_x = 0.5f;
+    //Default liner bezier
     float start_point[2] = { 0.f, 0.f };
+    float control_point_1[2] = { 0.0f, 1.f };
+    float control_point_2[2] = { 1.0f, 0.f };
     float end_point[2] = { 1.f, 1.f };
-    static float v[5] = { 0.390f, 0.575f, 0.565f, 1.000f };
 
     while (!win.should_close())
     {
         win.poll();
 
-        ImGuiIO io = ImGui::GetIO();
+        ImGuiIO& io = ImGui::GetIO();
         float delta_time = io.DeltaTime;
 
         //Input
@@ -93,8 +145,17 @@ int main(int argc, char* argv[])
         }
 
         //Delta Time
-        if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
+        if (ImGui::IsKeyDown(GLFW_KEY_N))
             std::cout << delta_time << std::endl;
+
+        float dx = ImGui::IsKeyDown(GLFW_KEY_D) - ImGui::IsKeyDown(GLFW_KEY_A);
+        float dy = ImGui::IsKeyDown(GLFW_KEY_S) - ImGui::IsKeyDown(GLFW_KEY_W);
+
+        float dx_dt = dx * delta_time * 400;
+        float dy_dt = dy * delta_time * 400;
+
+        cam.pos.x() += dx_dt;
+        cam.pos.y() += dy_dt;
 
         //UI
         ImGui::Begin("New window");
@@ -107,26 +168,38 @@ int main(int argc, char* argv[])
         if (ImGui::Button("Stop Snow"))
             snow.stop();
 
-        ImGui::SliderFloat("Bezier Sample Value", &dx, 0.0f, 1.0f, "ratio = %.3f");
+        ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
 
-        ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
+        ImGui::SliderFloat2("Bezier Start Point", control_point_1, 0.f, 1.f, "ratio = %.3f");
 
-        ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
+        ImGui::SliderFloat2("Bezier End Point", control_point_2, 0.f, 1.f, "ratio = %.3f");
 
-        ImGui::Bezier("easeOutSine", v, start_point, end_point, dx);       // draw
+        float* points[8];
+        points[0] = &start_point[0];
+        points[1] = &start_point[1];
+        points[2] = &control_point_1[0];
+        points[3] = &control_point_1[1];
+        points[4] = &control_point_2[0];
+        points[5] = &control_point_2[1];
+        points[6] = &end_point[0];
+        points[7] = &end_point[1];
 
-        float y = ImGui::BezierValue(dx, v, start_point, end_point); // x delta in [0..1] range
-        std::cout << "Y: " << y <<
-            " v0:" << v[0] <<
-            " v1:" << v[1] <<
-            " v2:" << v[2] <<
-            " v3:" << v[3] << std::endl;
+        ImGui::Bezier("Bezier Control", sample_x, *points);     // draw
+
+        float y = ImGui::BezierValue(sample_x, *points);     // x delta in [0..1] range
+        std::cout << "Sampled Y:" << y << std::endl;
 
         ImGui::End();
 
         //Update systems
 
-        dummy_battle.render(registry, sprite_render);
+        if(auto val = scene_selector(registry); val.has_value())
+        {
+            focused_tilemap = val.value();
+        }
+
+        tilemap& focused = registry.get<tilemap>(focused_tilemap);
+        focused.render(registry, sprite_render);
 
         snow.update(delta_time, win, rng, particle_sys);
 
