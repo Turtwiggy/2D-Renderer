@@ -123,16 +123,20 @@ int main(int argc, char* argv[])
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     //Bezier
-    float sample_x = 0.5f;
-    //Default liner bezier
-    float start_point[2] = { 0.f, 0.f };
-    float control_point_1[2] = { 0.0f, 1.f };
-    float control_point_2[2] = { 1.0f, 0.f };
-    float end_point[2] = { 1.f, 1.f };
+    static float sample_x = 0.5f;
+    static float start_point[2] = { 0.f, 0.f };
+    static float middle_points[5] = { 0.390f, 0.575f, 0.565f, 1.000f };
+    static float end_point[2] = { 1.f, 1.f };
 
     while (!win.should_close())
     {
         win.poll();
+
+        //hack to hold the console
+        if (ImGui::IsKeyDown(GLFW_KEY_C)) {
+            win.display();
+            continue;
+        }
 
         ImGuiIO& io = ImGui::GetIO();
         float delta_time = io.DeltaTime;
@@ -169,25 +173,28 @@ int main(int argc, char* argv[])
             snow.stop();
 
         ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
+        ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
+        ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
 
-        ImGui::SliderFloat2("Bezier Start Point", control_point_1, 0.f, 1.f, "ratio = %.3f");
+        //Draw Bezier Curve
+        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);    
 
-        ImGui::SliderFloat2("Bezier End Point", control_point_2, 0.f, 1.f, "ratio = %.3f");
+        //Query Bezier Curve (returns 0..1)
+        ImVec2 Q[4];
+        Q[0] = ImVec2{ start_point[0], start_point[1] };
+        Q[1] = ImVec2{ middle_points[0], middle_points[1] };
+        Q[2] = ImVec2{ middle_points[2], middle_points[3] };
+        Q[3] = ImVec2{ end_point[0], end_point[1] };
+        float y = ImGui::CubicCurve(Q[0], Q[1], Q[2], Q[3], sample_x).y;
 
-        float* points[8];
-        points[0] = &start_point[0];
-        points[1] = &start_point[1];
-        points[2] = &control_point_1[0];
-        points[3] = &control_point_1[1];
-        points[4] = &control_point_2[0];
-        points[5] = &control_point_2[1];
-        points[6] = &end_point[0];
-        points[7] = &end_point[1];
-
-        ImGui::Bezier("Bezier Control", sample_x, *points);     // draw
-
-        float y = ImGui::BezierValue(sample_x, *points);     // x delta in [0..1] range
-        std::cout << "Sampled Y:" << y << std::endl;
+        std::cout << "Sampled Y:" << y << "From X: " << sample_x << std::endl;
+        
+        std::cout << 
+            "Point 1: (x)" << start_point[0] << " (y:)" << start_point[1] << '\n' <<
+            "Point 2: (x)" << middle_points[0] << " (y:)" << middle_points[1] << '\n' <<
+            "Point 3: (x)" << middle_points[2] << " (y:)" << middle_points[3] << '\n' <<
+            "Point 4: (x)" << end_point[0] << " (y:)" << end_point[1] << '\n' <<
+            y << std::endl;
 
         ImGui::End();
 
