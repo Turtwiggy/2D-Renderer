@@ -36,7 +36,7 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[TREE_ROUND], {4, 2});
 
     add_to(ret[CACTUS], {6, 1});
-    add_to(ret[CACTUS], {7, 1});
+    add_to(ret[DENSE_CACTUS], {7, 1});
 
     add_to(ret[VINE], {2, 2});
     add_to(ret[SHRUB], {0, 2});
@@ -125,6 +125,25 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[CULTIVATION], {15, 6});
     add_to(ret[CULTIVATION], {16, 6});
     add_to(ret[CULTIVATION], {17, 6});
+
+    add_to(ret[HOUSE_1], {0, 19});
+    add_to(ret[HOUSE_2], {1, 19});
+    add_to(ret[HOUSE_3], {0, 20});
+    add_to(ret[HOUSE_4], {1, 20});
+
+    add_to(ret[TENT], {6, 20});
+    add_to(ret[FANCY_TENT], {7, 20});
+
+    add_to(ret[TOWER_THIN], {2, 19});
+    add_to(ret[TOWER_MEDIUM], {3, 19});
+    add_to(ret[TOWER_THICK], {4, 19});
+
+    add_to(ret[CASTLE_1], {5, 19});
+    add_to(ret[CASTLE_2], {6, 19});
+
+    add_to(ret[PYRAMID], {2, 20});
+    add_to(ret[CHURCH], {3, 20});
+
 
     return ret;
 }
