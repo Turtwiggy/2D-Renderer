@@ -133,6 +133,7 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
 
     add_to(ret[TENT], {6, 20});
     add_to(ret[FANCY_TENT], {7, 20});
+    add_to(ret[CAPITAL_TENT], {7, 20});
 
     add_to(ret[TOWER_THIN], {2, 19});
     add_to(ret[TOWER_MEDIUM], {3, 19});

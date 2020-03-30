@@ -63,6 +63,7 @@ namespace tiles
 
         TENT,
         FANCY_TENT,
+        CAPITAL_TENT, //not sure, big fancy thing
 
         TOWER_THIN,
         TOWER_MEDIUM,
