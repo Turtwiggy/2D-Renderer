@@ -21,6 +21,7 @@ namespace tiles
     enum type
     {
         BASE,
+        WATER,
         DIRT,
         GRASS,
         TREE_1,

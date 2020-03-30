@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
     }
 
     render_settings sett;
-    sett.width = 800;
-    sett.height = 600;
+    sett.width = 1400;
+    sett.height = 1000;
     sett.is_srgb = false;
     sett.viewports = !no_viewports;
 
@@ -119,8 +119,14 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    create_overworld(registry, rng, {100, 100});
+    entt::entity overworld = create_overworld(registry, rng, {128, 128});
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+
+    #ifdef TEST_OVERWORLD
+    focused_tilemap = overworld;
+
+    cam.pos = {32 * TILE_PIX, 32 * TILE_PIX};
+    #endif // TEST_OVERWORLD
 
     while (!win.should_close())
     {
