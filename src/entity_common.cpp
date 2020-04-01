@@ -59,3 +59,19 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
 
     return res;
 }
+
+
+entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform)
+{
+    entt::entity res = registry.create();
+
+    render_descriptor desc;
+    desc.pos = transform.position;
+
+    registry.assign<render_descriptor>(res, desc);
+    registry.assign<team>(res, t);
+    registry.assign<sprite_handle>(res, handle);
+    registry.assign<world_transform>(res, transform);
+
+    return res;
+}

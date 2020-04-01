@@ -132,9 +132,15 @@ struct noise_data
     }
 };
 
-sprite_handle get_tile_from_density(random_state& rng, float fraction)
+entt::entity create_tile_from_density(entt::registry& registry, random_state& rng, noise_data& noise, vec2i pos, vec2i dim)
 {
+    vec2f fpos = {pos.x(), pos.y()};
+    fpos = fpos / vec2f{dim.x(), dim.y()};
+
+    float fraction = noise.sample(fpos * 100);
+
     sprite_handle han;
+    collidable coll;
 
     vec4f beach = srgb_to_lin_approx(vec4f{255, 218, 180, 255}/255.f);
     vec4f grass_col = srgb_to_lin_approx(vec4f{56, 217, 115, 255} / 255.f);
@@ -152,6 +158,8 @@ sprite_handle get_tile_from_density(random_state& rng, float fraction)
         mfrac = (mfrac + 1) / 2;
 
         han.base_colour.w() *= mfrac;
+
+        coll.cost = -1;
     }
     /*else
     {
@@ -177,6 +185,8 @@ sprite_handle get_tile_from_density(random_state& rng, float fraction)
 
         han.base_colour = mix(water, beach, ffrac);
 
+        coll.cost = 2;
+
         //han.base_colour.w() *= ffrac;
     }
     else if(fraction < grass_to_beach)
@@ -189,6 +199,8 @@ sprite_handle get_tile_from_density(random_state& rng, float fraction)
         gcol.w() *= fraction;
 
         han.base_colour = mix(beach, gcol, ffrac);
+
+        coll.cost = 2;
     }
     else
     {
@@ -199,6 +211,8 @@ sprite_handle get_tile_from_density(random_state& rng, float fraction)
         ffrac = (ffrac + mov) / (1 + mov);
 
         han.base_colour.w() *= (fraction + mov) / (mov + 1);
+
+        coll.cost = 1;
     }
 
     /*else
@@ -208,7 +222,16 @@ sprite_handle get_tile_from_density(random_state& rng, float fraction)
         han.base_colour = srgb_to_lin_approx(vec4f{122, 68, 74, 255} / 255.f);
     }*/
 
-    return han;
+    render_descriptor desc;
+    desc.pos = vec2f{pos.x(), pos.y()} * TILE_PIX + vec2f{TILE_PIX / 2, TILE_PIX / 2};
+
+    entt::entity base = registry.create();
+
+    registry.assign<sprite_handle>(base, han);
+    registry.assign<render_descriptor>(base, desc);
+    registry.assign<overworld_tag>(base, overworld_tag());
+
+    return base;
 }
 
 entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i dim)
@@ -228,26 +251,16 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         {
             //sprite_handle handle = get_sprite_handle_of(rng, tiles::BASE);
 
-            vec2f fpos = {x, y};
-            fpos = fpos / (vec2f){dim.x(), dim.y()};
-
-            sprite_handle handle = get_tile_from_density(rng, noise.sample(fpos * 100));
+            //sprite_handle handle = get_tile_from_density(rng, );
 
             //handle.base_colour = clamp(rand_det_s(rng.rng, 0.5, 1.5) * handle.base_colour * 0.2, 0, 1);
             //handle.base_colour *= noise.sample({x, y});
 
             //handle.base_colour.w() = 1;
 
-            render_descriptor desc;
-            desc.pos = vec2f{ x, y } * TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+            auto base = create_tile_from_density(registry, rng, noise, {x, y}, dim);
 
-            entt::entity base = registry.create();
-
-            registry.assign<sprite_handle>(base, handle);
-            registry.assign<render_descriptor>(base, desc);
-            registry.assign<overworld_tag>(base, overworld_tag());
-
-            tmap.add(base, { x, y });
+            tmap.add(base, {x, y});
         }
     }
 

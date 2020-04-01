@@ -41,7 +41,7 @@ struct damageable
 struct battle_tag{};
 struct overworld_tag{};
 
-struct army
+struct unit_group
 {
     std::vector<entt::entity> entities;
 };
@@ -49,6 +49,6 @@ struct army
 entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform, const damageable& damage);
 entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform, const collidable& coll);
 
-entt::entity create_army(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform);
+entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform);
 
 #endif // ENTITY_COMMON_HPP_INCLUDED
