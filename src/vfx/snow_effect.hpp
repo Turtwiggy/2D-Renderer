@@ -1,6 +1,8 @@
 #pragma once
 
 #include <toolkit/render_window.hpp>
+#include <vector>
+#include <entt/entt.hpp>
 
 #include "random.hpp"
 #include "particle_system.hpp"
@@ -19,6 +21,8 @@ struct snow_effect {
 private:
     bool active = false;
 
-    float time_between_particles = 0.3f;
+    float time_between_particles = 0.1f;
     float time_left_before_new_particle = time_between_particles;
+
+    std::vector<entt::entity> particles;
 };

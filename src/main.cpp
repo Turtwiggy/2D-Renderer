@@ -188,19 +188,22 @@ int main(int argc, char* argv[])
         ImGui::End();
 
         //Update systems
+
         if (auto val = scene_selector(registry); val.has_value())
         {
             focused_tilemap = val.value();
         }
 
+        //map
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
-        focused.render(registry, sprite_render);
+        //focused.render(registry, sprite_render);
 
+        //vfx
         snow.update(delta_time, win, rng, particle_sys);
-
         particle_sys.update(delta_time);
         particle_sys.render(sprite_render);
 
+        //renderer
         sprite_render.render(win, cam);
         win.display();
     }

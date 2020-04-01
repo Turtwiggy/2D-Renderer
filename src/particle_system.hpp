@@ -8,33 +8,22 @@
 
 struct particle
 {
-    vec2f velocity;         //world-units per second
-    float time_total;       //seconds
-    float time_left;        //seconds
-    vec2f size_begin;
-    vec2f size_end;
-    vec4f colour_begin;
-    vec4f colour_end;
+    render_descriptor desc;
+    sprite_handle sprite;
+
+    vec2f velocity = { 0.f, 0.f };  //world-units per second
+    float time_total = 1.f;         //seconds
+    float time_left = 1.f;          //seconds
 };
 
-struct particle_system {
-
+struct particle_system 
+{
 public:
-    //emits a single particle at pos
-    void emit(random_state& rng, 
-        vec2f pos, 
-        vec2f velocity, 
-        vec4f start_colour, 
-        vec4f end_colour
-    );
+    entt::entity emit(particle& p);
 
     void update(float delta_time);
-
     void render(sprite_renderer& renderer);
 
 private:
-
     entt::registry registry;
-    //std::vector<entt::entity> particles; //alternative to registry?
-
 };
