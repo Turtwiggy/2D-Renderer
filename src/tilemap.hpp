@@ -21,6 +21,7 @@ namespace tiles
     enum type
     {
         BASE,
+        WATER,
         DIRT,
         GRASS,
         TREE_1,
@@ -28,6 +29,7 @@ namespace tiles
         TREE_DENSE,
         TREE_ROUND,
         CACTUS,
+        DENSE_CACTUS,
         VINE,
         SHRUB,
         ROCKS,
@@ -53,6 +55,27 @@ namespace tiles
         WOOD_FENCE_HALF,
         TILING_WALL,
         CULTIVATION,
+
+        //medieval houses in increasing height
+        HOUSE_1,
+        HOUSE_2,
+        HOUSE_3,
+        HOUSE_4,
+
+        TENT,
+        FANCY_TENT,
+        CAPITAL_TENT, //not sure, big fancy thing
+
+        TOWER_THIN,
+        TOWER_MEDIUM,
+        TOWER_THICK,
+
+        //variations on the same style
+        CASTLE_1,
+        CASTLE_2,
+
+        PYRAMID,
+        CHURCH,
     };
 }
 

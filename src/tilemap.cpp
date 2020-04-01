@@ -16,6 +16,7 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     ///consider adding skull and crossbones to dirt
     //add_to(ret[BASE], {0, 0});
     add_to(ret[BASE], {8, 5});
+    add_to(ret[WATER], {8, 5});
 
     add_to(ret[DIRT], {1, 0});
     add_to(ret[DIRT], {2, 0});
@@ -36,7 +37,7 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[TREE_ROUND], {4, 2});
 
     add_to(ret[CACTUS], {6, 1});
-    add_to(ret[CACTUS], {7, 1});
+    add_to(ret[DENSE_CACTUS], {7, 1});
 
     add_to(ret[VINE], {2, 2});
     add_to(ret[SHRUB], {0, 2});
@@ -126,6 +127,26 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[CULTIVATION], {16, 6});
     add_to(ret[CULTIVATION], {17, 6});
 
+    add_to(ret[HOUSE_1], {0, 19});
+    add_to(ret[HOUSE_2], {1, 19});
+    add_to(ret[HOUSE_3], {0, 20});
+    add_to(ret[HOUSE_4], {1, 20});
+
+    add_to(ret[TENT], {6, 20});
+    add_to(ret[FANCY_TENT], {7, 20});
+    add_to(ret[CAPITAL_TENT], {8, 20});
+
+    add_to(ret[TOWER_THIN], {2, 19});
+    add_to(ret[TOWER_MEDIUM], {3, 19});
+    add_to(ret[TOWER_THICK], {4, 19});
+
+    add_to(ret[CASTLE_1], {5, 19});
+    add_to(ret[CASTLE_2], {6, 19});
+
+    add_to(ret[PYRAMID], {2, 20});
+    add_to(ret[CHURCH], {3, 20});
+
+
     return ret;
 }
 
@@ -159,6 +180,11 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
 
     vec4f barren_col = srgb_to_lin_approx(vec4f{122, 68, 74, 255} / 255.f);
     vec4f grass_col = srgb_to_lin_approx(vec4f{56, 217, 115, 255} / 255.f);
+
+    vec4f blue_col = srgb_to_lin_approx(vec4f{60, 172, 215, 255}/255.f);
+
+    if(tile_type == tiles::WATER)
+        return blue_col;
 
     if(tile_type == tiles::BRAMBLE || tile_type == tiles::SHRUB || tile_type == tiles::BASE)
     {

@@ -80,7 +80,7 @@ entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i di
     std::vector<tiles::type> decoration = {tiles::GRASS};
     distribute_entities(registry, tmap, rng, dim, type, 20, decoration, 0);
 
-    std::vector<tiles::type> scenery = {tiles::TREE_1, tiles::TREE_2, tiles::TREE_DENSE, tiles::TREE_ROUND, tiles::ROCKS, tiles::BRAMBLE};
+    std::vector<tiles::type> scenery = {tiles::TREE_1, tiles::TREE_2, tiles::TREE_ROUND, tiles::ROCKS, tiles::BRAMBLE};
     distribute_entities(registry, tmap, rng, dim, type, 1, scenery, -1);
 
     registry.assign<tilemap>(res, tmap);
