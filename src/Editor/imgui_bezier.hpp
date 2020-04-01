@@ -51,7 +51,6 @@ namespace ImGui
     float BezierValue(vec2f P[4], float t)
     {
         vec2f val = EvaluateCubic(P[0], P[1], P[2], P[3], t).y();
-        std::cout << "CubicCurve calculated at: " << val.y() << '\n';
         return val.y();
     }
 
@@ -177,7 +176,6 @@ namespace ImGui
             //DrawList->AddCircleFilled(p0, GRAB_RADIUS / 2, ImColor(white));
             //DrawList->AddCircleFilled(p1, GRAB_RADIUS / 2, ImColor(white));
             DrawList->AddCircleFilled(p2, GRAB_RADIUS / 2, ImColor(white));
-            std::cout << "point over time! " << " x:" << p2.x << " y:" << p2.y << std::endl;
             continue;
         }
 
