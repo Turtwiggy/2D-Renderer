@@ -42,9 +42,9 @@ std::optional<entt::entity> scene_selector(entt::registry& registry)
 
         ImGui::Text("Overworld(s):");
 
-        for(auto ent : overworld_view)
+        for (auto ent : overworld_view)
         {
-            if(ImGui::Button(std::to_string(idx).c_str()))
+            if (ImGui::Button(std::to_string(idx).c_str()))
             {
                 ret = ent;
             }
@@ -58,9 +58,9 @@ std::optional<entt::entity> scene_selector(entt::registry& registry)
 
         ImGui::Text("Battle(s)");
 
-        for(auto ent : battle_view)
+        for (auto ent : battle_view)
         {
-            if(ImGui::Button(std::to_string(idx).c_str()))
+            if (ImGui::Button(std::to_string(idx).c_str()))
             {
                 ret = ent;
             }
@@ -119,14 +119,14 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    create_overworld(registry, rng, {100, 100});
+    create_overworld(registry, rng, { 100, 100 });
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     //Bezier
     static float sample_x = 0.5f;
     static float start_point[2] = { 0.f, 0.f };
-    static float middle_points[5] = { 0.390f, 0.575f, 0.565f, 1.000f };
-    static float end_point[2] = { 1.f, 1.f };
+    static float middle_points[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
+    static float end_point[2] = { 1.f, 0.f };
 
     while (!win.should_close())
     {
@@ -152,6 +152,7 @@ int main(int argc, char* argv[])
         if (ImGui::IsKeyDown(GLFW_KEY_N))
             std::cout << delta_time << std::endl;
 
+        //Camera
         float dx = ImGui::IsKeyDown(GLFW_KEY_D) - ImGui::IsKeyDown(GLFW_KEY_A);
         float dy = ImGui::IsKeyDown(GLFW_KEY_S) - ImGui::IsKeyDown(GLFW_KEY_W);
 
@@ -172,26 +173,16 @@ int main(int argc, char* argv[])
         if (ImGui::Button("Stop Snow"))
             snow.stop();
 
+        //Draw Bezier Curve
         ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
         ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
         ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
-
-        //Draw Bezier Curve
         ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);    
-
-        //Query Bezier Curve (returns 0..1)
-        ImVec2 Q[4];
-        Q[0] = ImVec2{ start_point[0], start_point[1] };
-        Q[1] = ImVec2{ middle_points[0], middle_points[1] };
-        Q[2] = ImVec2{ middle_points[2], middle_points[3] };
-        Q[3] = ImVec2{ end_point[0], end_point[1] };
-        float y = ImGui::CubicCurve(Q[0], Q[1], Q[2], Q[3], sample_x).y;
 
         ImGui::End();
 
         //Update systems
-
-        if(auto val = scene_selector(registry); val.has_value())
+        if (auto val = scene_selector(registry); val.has_value())
         {
             focused_tilemap = val.value();
         }
