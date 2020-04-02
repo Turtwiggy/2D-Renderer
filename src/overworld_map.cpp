@@ -272,6 +272,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
 void debug_overworld(entt::registry& registry, entt::entity en, random_state& rng)
 {
+    int root_id = 0;
+
     tilemap& tmap = registry.get<tilemap>(en);
 
     vec2i half = tmap.dim/2;
@@ -279,7 +281,27 @@ void debug_overworld(entt::registry& registry, entt::entity en, random_state& rn
     world_transform transform;
     transform.position = vec2f{half.x(), half.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
 
-    entt::entity army = create_overworld_unit(registry, get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR), transform);
+    team base_team;
+    base_team.type = team::NUMERIC;
+    base_team.t = root_id;
+
+    entt::entity army = create_unit_group(registry, base_team, get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR), transform);
+
+    int unit_count = 10;
+
+    for(int i=0; i < unit_count; i++)
+    {
+        world_transform trans;
+        trans.position = vec2f{half.x(), half.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+        damageable damage;
+
+        entt::entity en = create_basic_unit(registry, base_team, get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR), trans, damage);
+
+        unit_group& ugroup = registry.get<unit_group>(army);
+
+        ugroup.entities.push_back(en);
+    }
 
     tmap.add(army, half);
 }

@@ -73,5 +73,9 @@ entt::entity create_unit_group(entt::registry& registry, const team& t, const sp
     registry.assign<sprite_handle>(res, handle);
     registry.assign<world_transform>(res, transform);
 
+    unit_group ugroup;
+
+    registry.assign<unit_group>(res, ugroup);
+
     return res;
 }
