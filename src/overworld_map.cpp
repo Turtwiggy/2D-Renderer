@@ -279,7 +279,11 @@ entt::entity create_dummy_army_at(entt::registry& registry, random_state& rng, v
     base_team.type = team::NUMERIC;
     base_team.t = team_id;
 
-    entt::entity army = create_unit_group(registry, base_team, get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR), transform);
+    sprite_handle handle = get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR);
+
+    handle.base_colour *= team::colours.at(team_id);
+
+    entt::entity army = create_unit_group(registry, base_team, handle, transform);
 
     int unit_count = 10;
 
@@ -307,7 +311,7 @@ void debug_overworld(entt::registry& registry, entt::entity en, random_state& rn
     vec2i half = tmap.dim/2;
 
     entt::entity army1 = create_dummy_army_at(registry, rng, half, 0);
-    entt::entity army2 = create_dummy_army_at(registry, rng, {half.x()+1, half.y()}, 0);
+    entt::entity army2 = create_dummy_army_at(registry, rng, {half.x()+1, half.y()}, 1);
 
     tmap.add(army1, half);
     tmap.add(army2, {half.x()+1, half.y()});

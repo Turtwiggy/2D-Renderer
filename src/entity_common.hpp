@@ -23,8 +23,20 @@ struct team
     };
 
     team_type type = NUMERIC;
-
     int t = 0;
+
+    static inline std::vector<vec4f> colours
+    {
+        srgb_to_lin_approx(vec4f{0x77/255.f, 0xdd/255.f, 0x77/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xff/255.f, 0x69/255.f, 0x61/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xff/255.f, 0x96/255.f, 0x4f/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0x89/255.f, 0xcf/255.f, 0xf0/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xfd/255.f, 0xfd/255.f, 0x96/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xf4/255.f, 0xbf/255.f, 0xff/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xf4/255.f, 0x9a/255.f, 0xc2/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xf4/255.f, 0x9a/255.f, 0xc2/255.f, 1}),
+        srgb_to_lin_approx(vec4f{0xbe/255.f, 0xfd/255.f, 0x73/255.f, 1}),
+    };
 };
 
 struct damageable
