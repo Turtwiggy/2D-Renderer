@@ -8,7 +8,7 @@
 // [ref] http://easings.net/es#easeInSine
 //
 // Usage:
-// {  static float v[5] = { 0.390f, 0.575f, 0.565f, 1.000f }; 
+// {  static float v[5] = { 0.390f, 0.575f, 0.565f, 1.000f };
 //    ImGui::Bezier( "easeOutSine", v );       // draw
 //    float y = ImGui::BezierValue( 0.5f, v ); // x delta in [0..1] range
 // }
@@ -109,10 +109,10 @@ namespace ImGui
 
         // eval curve
         vec2f Q[4] = {
-            { start_point[0], start_point[1] }, 
-            { middle_points[0], middle_points[1] }, 
+            { start_point[0], start_point[1] },
+            { middle_points[0], middle_points[1] },
             { middle_points[2], middle_points[3] },
-            { end_point[0], end_point[1] } 
+            { end_point[0], end_point[1] }
         };
         vec2f results[SMOOTHNESS + 1];
         bezier_table<SMOOTHNESS>(Q, results);
@@ -168,7 +168,7 @@ namespace ImGui
             double now = ((clock() - epoch) / (double)CLOCKS_PER_SEC);
             float delta = ((int)(now * 1000) % 1000) / 1000.f; delta += i / 3.f; if (delta > 1) delta -= 1;
             int idx = (int)(delta * SMOOTHNESS);
-            float evalx = results[idx].x(); // 
+            float evalx = results[idx].x(); //
             float evaly = results[idx].y(); // ImGui::BezierValue( delta, P );
             ImVec2 p0 = ImVec2(evalx, 1 - 0) * (bb.Max - bb.Min) + bb.Min;
             ImVec2 p1 = ImVec2(0, 1 - evaly) * (bb.Max - bb.Min) + bb.Min;
@@ -180,9 +180,23 @@ namespace ImGui
         }
 
         //Draw the sampled point
-        float dy01 = BezierValue(Q, dt);
+        /*float dy01 = BezierValue(Q, dt);
         ImVec2 py = ImVec2(dt, 1- dy01) * (bb.Max - bb.Min) + bb.Min;
-        DrawList->AddCircleFilled(py, GRAB_RADIUS / 2, ImColor(1.f, 0.f, 0.f));
+        DrawList->AddCircleFilled(py, GRAB_RADIUS / 2, ImColor(1.f, 0.f, 0.f));*/
+
+        // Draw sampled point 2.0
+        int didx = dt * SMOOTHNESS;
+
+        if(didx >= SMOOTHNESS)
+            didx = SMOOTHNESS-1;
+
+        if(didx < 0)
+            didx = 0;
+
+        float devalx = results[didx].x();
+        float devaly = results[didx].y();
+
+        DrawList->AddCircleFilled(ImVec2(devalx, 1 - devaly) * (bb.Max - bb.Min) + bb.Min, GRAB_RADIUS / 2, ImColor(1.f, 0.f, 0.f));
 
         // draw lines and grabbers
         float luma = IsItemActive() || IsItemHovered() ? 0.5f : 1.0f;

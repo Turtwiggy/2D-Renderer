@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
         ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
         ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
         ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
-        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);    
+        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);
 
         ImGui::End();
 
