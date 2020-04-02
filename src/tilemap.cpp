@@ -59,10 +59,18 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[CIVILIAN], {31, 3});
     add_to(ret[CIVILIAN], {30, 4});
     add_to(ret[CIVILIAN], {31, 4});
-    ///top left scorpion is 25, 5
+    ///top left scorpion is 24, 5
 
     add_to(ret[SOLDIER], {26, 4});
     add_to(ret[SOLDIER], {30, 9});
+
+    add_to(ret[SOLDIER_BASIC], {25, 0});
+    add_to(ret[SOLDIER_SPEAR], {26, 0});
+    add_to(ret[SOLDIER_BASIC_SHIELD], {27, 0});
+    add_to(ret[SOLDIER_ADVANCED], {28, 0});
+    add_to(ret[SOLDIER_ADVANCED_SPEAR], {29, 0});
+    add_to(ret[SOLDIER_TOUGH], {30, 0});
+    add_to(ret[SOLDIER_BEST], {31, 0});
 
     add_to(ret[GROUND_BUG], {28, 5});
     add_to(ret[GROUND_BUG], {29, 5});
@@ -218,7 +226,7 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
     if(tile_type == tiles::SEA_ANIMAL)
         return building_gray;
 
-    if(tile_type == tiles::CIVILIAN || tile_type == tiles::SOLDIER ||
+    if(tile_type == tiles::CIVILIAN || (tile_type >= tiles::SOLDIER && tile_type <= tiles::SOLDIER_BEST) ||
        tile_type == tiles::GROUND_BUG || tile_type == tiles::FLYING_BUG || tile_type == tiles::ARMOURED_BUG || tile_type == tiles::SMALL_PINCHY)
         return building_gray;
 

@@ -122,6 +122,8 @@ int main(int argc, char* argv[])
     entt::entity overworld = create_overworld(registry, rng, {64, 64});
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
+    debug_overworld(registry, overworld, rng);
+
     #ifdef TEST_OVERWORLD
     focused_tilemap = overworld;
 

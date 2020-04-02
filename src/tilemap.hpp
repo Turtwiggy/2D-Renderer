@@ -36,6 +36,15 @@ namespace tiles
         BRAMBLE,
         CIVILIAN,
         SOLDIER,
+
+        SOLDIER_BASIC,
+        SOLDIER_SPEAR,
+        SOLDIER_BASIC_SHIELD,
+        SOLDIER_ADVANCED,
+        SOLDIER_ADVANCED_SPEAR,
+        SOLDIER_TOUGH,
+        SOLDIER_BEST,
+
         GROUND_BUG,
         FLYING_BUG,
         ARMOURED_BUG,

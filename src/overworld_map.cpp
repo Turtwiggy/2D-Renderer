@@ -269,3 +269,17 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
     return res;
 }
+
+void debug_overworld(entt::registry& registry, entt::entity en, random_state& rng)
+{
+    tilemap& tmap = registry.get<tilemap>(en);
+
+    vec2i half = tmap.dim/2;
+
+    world_transform transform;
+    transform.position = vec2f{half.x(), half.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+    entt::entity army = create_overworld_unit(registry, get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR), transform);
+
+    tmap.add(army, half);
+}

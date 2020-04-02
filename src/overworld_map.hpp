@@ -6,5 +6,6 @@
 
 entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handle, world_transform transform);
 entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i dim);
+void debug_overworld(entt::registry& registry, entt::entity en, random_state& rng);
 
 #endif // OVERWORLD_MAP_HPP_INCLUDED
