@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Engine/Core.hpp"
+#include "core.hpp"
 #include "random.hpp"
 #include <toolkit/render_window.hpp>
 #include <toolkit/texture.hpp>
@@ -18,14 +18,14 @@
 #include "sprite_renderer.hpp"
 
 #include <entt/entt.hpp>
+#include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "battle_map.hpp"
+#include "overworld_map.hpp"
 
+#include "Editor/imgui_bezier.hpp"
 #include "particle_system.hpp"
 #include "vfx/snow_effect.hpp"
-
-#include "entity_common.hpp"
-#include "overworld_map.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -42,9 +42,9 @@ std::optional<entt::entity> scene_selector(entt::registry& registry)
 
         ImGui::Text("Overworld(s):");
 
-        for(auto ent : overworld_view)
+        for (auto ent : overworld_view)
         {
-            if(ImGui::Button(std::to_string(idx).c_str()))
+            if (ImGui::Button(std::to_string(idx).c_str()))
             {
                 ret = ent;
             }
@@ -58,9 +58,9 @@ std::optional<entt::entity> scene_selector(entt::registry& registry)
 
         ImGui::Text("Battle(s)");
 
-        for(auto ent : battle_view)
+        for (auto ent : battle_view)
         {
-            if(ImGui::Button(std::to_string(idx).c_str()))
+            if (ImGui::Button(std::to_string(idx).c_str()))
             {
                 ret = ent;
             }
@@ -119,6 +119,12 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
+    //Bezier
+    static float sample_x = 0.5f;
+    static float start_point[2] = { 0.f, 0.f };
+    static float middle_points[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
+    static float end_point[2] = { 1.f, 0.f };
+
     entt::entity overworld = create_overworld(registry, rng, {64, 64});
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
@@ -134,6 +140,12 @@ int main(int argc, char* argv[])
     {
         win.poll();
 
+        //hack to hold the console
+        if (ImGui::IsKeyDown(GLFW_KEY_C)) {
+            win.display();
+            continue;
+        }
+
         ImGuiIO& io = ImGui::GetIO();
         float delta_time = io.DeltaTime;
 
@@ -148,6 +160,7 @@ int main(int argc, char* argv[])
         if (ImGui::IsKeyDown(GLFW_KEY_N))
             std::cout << delta_time << std::endl;
 
+        //Camera
         float dx = ImGui::IsKeyDown(GLFW_KEY_D) - ImGui::IsKeyDown(GLFW_KEY_A);
         float dy = ImGui::IsKeyDown(GLFW_KEY_S) - ImGui::IsKeyDown(GLFW_KEY_W);
 
@@ -163,22 +176,21 @@ int main(int argc, char* argv[])
         ImGui::Button("I am a button");
 
         if (ImGui::Button("Start Snow"))
-        {
-            std::cout << "start snow" << std::endl;
             snow.start();
-        }
 
         if (ImGui::Button("Stop Snow"))
-        {
-            std::cout << "stop snow" << std::endl;
             snow.stop();
-        }
+
+        //Draw Bezier Curve
+        ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
+        ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
+        ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
+        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);    
 
         ImGui::End();
 
         //Update systems
-
-        if(auto val = scene_selector(registry); val.has_value())
+        if (auto val = scene_selector(registry); val.has_value())
         {
             focused_tilemap = val.value();
         }
