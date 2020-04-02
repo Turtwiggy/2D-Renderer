@@ -253,6 +253,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
             //sprite_handle handle = get_tile_from_density(rng, );
 
+
             //handle.base_colour = clamp(rand_det_s(rng.rng, 0.5, 1.5) * handle.base_colour * 0.2, 0, 1);
             //handle.base_colour *= noise.sample({x, y});
 
