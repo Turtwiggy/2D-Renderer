@@ -74,6 +74,86 @@ std::optional<entt::entity> scene_selector(entt::registry& registry)
     return ret;
 }
 
+void battle_starter(entt::registry& registry)
+{
+    ImGui::Begin("Potential Battles");
+
+    {
+        auto overworld_view = registry.view<tilemap, overworld_tag>();
+
+        int idx = 0;
+
+        for (auto ent : overworld_view)
+        {
+            tilemap& tmap = registry.get<tilemap>(ent);
+
+            for(int y=0; y < tmap.dim.y(); y++)
+            {
+                for(int x=0; x < tmap.dim.x(); x++)
+                {
+                    std::vector<entt::entity> root;
+                    std::vector<entt::entity> others;
+
+                    for(auto en2 : tmap.all_entities[y * tmap.dim.x() + x])
+                    {
+                        if(!registry.has<unit_group>(en2))
+                            continue;
+
+                        root.push_back(en2);
+                    }
+
+                    if(root.size() == 0)
+                        continue;
+
+                    ///only check right, and down tiles
+                    for(int dy = 0; dy <= 1; dy++)
+                    {
+                        for(int dx = 0; dx <= 1; dx++)
+                        {
+                            if(dx == 0 && dy == 0)
+                                continue;
+
+                            if(abs(dx) == abs(dy))
+                                continue;
+
+                            int ox = dx + x;
+                            int oy = dy + y;
+
+                            if(ox < 0 || oy < 0 || ox >= tmap.dim.x() || oy >= tmap.dim.y())
+                                continue;
+
+                            for(auto en2 : tmap.all_entities[oy * tmap.dim.x() + ox])
+                            {
+                                if(!registry.has<unit_group>(en2))
+                                    continue;
+
+                                others.push_back(en2);
+                            }
+                        }
+                    }
+
+                    for(int i=0; i < (int)root.size(); i++)
+                    {
+                        for(int j=0; j < (int)others.size(); j++)
+                        {
+                            ImGui::Text(("Txt? " + std::to_string(i) + " yep " + std::to_string(j)).c_str());
+                        }
+                    }
+                }
+            }
+
+            /*if (ImGui::Button(std::to_string(idx).c_str()))
+            {
+                printf("Hi\n");
+            }
+
+            idx++;*/
+        }
+    }
+
+    ImGui::End();
+}
+
 int main(int argc, char* argv[])
 {
     bool no_viewports = false;
@@ -127,6 +207,8 @@ int main(int argc, char* argv[])
 
     entt::entity overworld = create_overworld(registry, rng, {64, 64});
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+
+    debug_overworld(registry, overworld, rng);
 
     #ifdef TEST_OVERWORLD
     focused_tilemap = overworld;
@@ -183,7 +265,7 @@ int main(int argc, char* argv[])
         ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
         ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
         ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
-        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);    
+        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);
 
         ImGui::End();
 
@@ -195,8 +277,10 @@ int main(int argc, char* argv[])
         }
 
         //map
+        battle_starter(registry);
+
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
-        //focused.render(registry, sprite_render);
+        focused.render(registry, sprite_render);
 
         //vfx
         snow.update(delta_time, win, rng, particle_sys);
