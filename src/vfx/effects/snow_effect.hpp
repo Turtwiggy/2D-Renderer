@@ -41,6 +41,8 @@ namespace vfx {
         vec2f size_begin{ 1.f, 1.f };
         vec2f size_end{ 0.25f, 0.25f };
         float particle_time_total = 4.f;
+        vec4f colour_end = vec4f{ 0.f, 0.f, 1.f, 0.f };
+        vec4f colour_start = vec4f{ 1.f, 0.f, 0.f, 1.f };
 
         //Note: maximum particles on the screen is:
         //particles_per_second * particle_time_total

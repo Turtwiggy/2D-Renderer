@@ -16,7 +16,7 @@ workspace "DwarfAndBladeWorkspace"
     }
 
     filter {"toolset:msc"}
-        buildoptions {"/bigobj"}
+        buildoptions {"/bigobj", "/permissive-"}
 
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"

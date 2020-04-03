@@ -234,10 +234,10 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
     vec4f white_col = srgb_to_lin_approx(vec4f{ 255, 255, 255, 255 } / 255.f);
 
     if (tile_type == tiles::EFFECT_1 || tile_type == tiles::EFFECT_2 || tile_type == tiles::EFFECT_3 ||
-        tile_type == tiles::EFFECT_2 || tile_type == tiles::EFFECT_3 || tile_type == tiles::EFFECT_4 ||
-        tile_type == tiles::EFFECT_5 || tile_type == tiles::EFFECT_6 || tile_type == tiles::EFFECT_7 ||
-        tile_type == tiles::EFFECT_8 || tile_type == tiles::EFFECT_9 || tile_type == tiles::EFFECT_10 ||
-        tile_type == tiles::EFFECT_11 || tile_type == tiles::EFFECT_12 || tile_type == tiles::EFFECT_13)
+        tile_type == tiles::EFFECT_4 || tile_type == tiles::EFFECT_5 || tile_type == tiles::EFFECT_6 ||
+        tile_type == tiles::EFFECT_7 || tile_type == tiles::EFFECT_8 || tile_type == tiles::EFFECT_9 ||
+        tile_type == tiles::EFFECT_10 || tile_type == tiles::EFFECT_11 || tile_type == tiles::EFFECT_12 ||
+        tile_type == tiles::EFFECT_13)
         return white_col;
 
     if(tile_type == tiles::ROCKS || tile_type == tiles::GRAVE || tile_type == tiles::TILING_WALL)
