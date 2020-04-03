@@ -135,6 +135,21 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations()
     add_to(ret[CULTIVATION], {16, 6});
     add_to(ret[CULTIVATION], {17, 6});
 
+    //24,11 slash effect
+    add_to(ret[EFFECT_1], {24, 11 });
+    add_to(ret[EFFECT_2], {25, 11 });
+    add_to(ret[EFFECT_3], {26, 11});
+    add_to(ret[EFFECT_4], {27, 11});
+    add_to(ret[EFFECT_5], {28, 11});
+    add_to(ret[EFFECT_6], {29, 11});
+    add_to(ret[EFFECT_7], {30, 11});
+    add_to(ret[EFFECT_8], {31, 11});
+    add_to(ret[EFFECT_9], {27, 12});
+    add_to(ret[EFFECT_10], {28, 12});
+    add_to(ret[EFFECT_11], {29, 12});
+    add_to(ret[EFFECT_12], {30, 12});
+    add_to(ret[EFFECT_13], {31, 12});
+
     add_to(ret[HOUSE_1], {0, 19});
     add_to(ret[HOUSE_2], {1, 19});
     add_to(ret[HOUSE_3], {0, 20});
@@ -183,39 +198,47 @@ sprite_handle get_sprite_handle_of(random_state& rng, tiles::type type)
 
 vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
 {
-    vec3f mask_col3 = srgb_to_lin_approx(vec3f{71, 45, 60}/255.f).norm();
-    vec4f mask_col = {mask_col3.x(), mask_col3.y(), mask_col3.z(), 1.f};
+    vec3f mask_col3 = srgb_to_lin_approx(vec3f{ 71, 45, 60 } / 255.f).norm();
+    vec4f mask_col = { mask_col3.x(), mask_col3.y(), mask_col3.z(), 1.f };
 
-    vec4f barren_col = srgb_to_lin_approx(vec4f{122, 68, 74, 255} / 255.f);
-    vec4f grass_col = srgb_to_lin_approx(vec4f{56, 217, 115, 255} / 255.f);
+    vec4f barren_col = srgb_to_lin_approx(vec4f{ 122, 68, 74, 255 } / 255.f);
+    vec4f grass_col = srgb_to_lin_approx(vec4f{ 56, 217, 115, 255 } / 255.f);
 
-    vec4f blue_col = srgb_to_lin_approx(vec4f{60, 172, 215, 255}/255.f);
+    vec4f blue_col = srgb_to_lin_approx(vec4f{ 60, 172, 215, 255 } / 255.f);
 
-    if(tile_type == tiles::WATER)
+    if (tile_type == tiles::WATER)
         return blue_col;
 
-    if(tile_type == tiles::BRAMBLE || tile_type == tiles::SHRUB || tile_type == tiles::BASE)
+    if (tile_type == tiles::BRAMBLE || tile_type == tiles::SHRUB || tile_type == tiles::BASE)
     {
-        if(level_type == level_info::GRASS)
+        if (level_type == level_info::GRASS)
             return grass_col * mask_col;
         else
             return barren_col;
     }
 
-    if(tile_type == tiles::DIRT)
+    if (tile_type == tiles::DIRT)
         return barren_col;
 
-    if(tile_type == tiles::GRASS)
+    if (tile_type == tiles::GRASS)
         return grass_col * grass_col;
 
-    if(tile_type == tiles::TREE_1 || tile_type == tiles::TREE_2 || tile_type == tiles::TREE_DENSE ||
-       tile_type == tiles::TREE_ROUND || tile_type == tiles::CACTUS || tile_type == tiles::VINE ||
-       tile_type == tiles::CULTIVATION || tile_type == tiles::CROCODILE)
-       return grass_col;
+    if (tile_type == tiles::TREE_1 || tile_type == tiles::TREE_2 || tile_type == tiles::TREE_DENSE ||
+        tile_type == tiles::TREE_ROUND || tile_type == tiles::CACTUS || tile_type == tiles::VINE ||
+        tile_type == tiles::CULTIVATION || tile_type == tiles::CROCODILE)
+        return grass_col;
 
-    vec4f wood_col = srgb_to_lin_approx(vec4f{191, 121, 88, 255} / 255.f);
-    vec4f building_gray = srgb_to_lin_approx(vec4f{207, 198, 184, 255} / 255.f);
-    vec4f generic_red = srgb_to_lin_approx(vec4f{230, 72, 46, 255} / 255.f);
+    vec4f wood_col = srgb_to_lin_approx(vec4f{ 191, 121, 88, 255 } / 255.f);
+    vec4f building_gray = srgb_to_lin_approx(vec4f{ 207, 198, 184, 255 } / 255.f);
+    vec4f generic_red = srgb_to_lin_approx(vec4f{ 230, 72, 46, 255 } / 255.f);
+    vec4f white_col = srgb_to_lin_approx(vec4f{ 255, 255, 255, 255 });
+
+    if (tile_type == tiles::EFFECT_1 || tile_type == tiles::EFFECT_2 || tile_type == tiles::EFFECT_3 ||
+        tile_type == tiles::EFFECT_2 || tile_type == tiles::EFFECT_3 || tile_type == tiles::EFFECT_4 ||
+        tile_type == tiles::EFFECT_5 || tile_type == tiles::EFFECT_6 || tile_type == tiles::EFFECT_7 ||
+        tile_type == tiles::EFFECT_8 || tile_type == tiles::EFFECT_9 || tile_type == tiles::EFFECT_10 ||
+        tile_type == tiles::EFFECT_11 || tile_type == tiles::EFFECT_12 || tile_type == tiles::EFFECT_13)
+        return white_col;
 
     if(tile_type == tiles::ROCKS || tile_type == tiles::GRAVE || tile_type == tiles::TILING_WALL)
         return building_gray;
