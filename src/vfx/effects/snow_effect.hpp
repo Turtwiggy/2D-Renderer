@@ -15,22 +15,22 @@ namespace vfx {
 
     protected:
 
-        void snow_effect::spawn_particle_check(
+        void spawn_particle_check(
             float delta_time,
             particle_system& particle_sys,
             render_window& win,
             random_state& rng) override;
 
-        void snow_effect::spawn_particle(
+        void spawn_particle(
             render_window& win,
             random_state& rng,
             particle_system& particle_sys);
 
-        void snow_effect::update_all_particles(
+        void update_all_particles(
             float delta_time,
             particle_system& particle_sys);
 
-        void snow_effect::snow_effect_editor();
+        void snow_effect_editor();
 
         //Visual information
         particle_type type = particle_type::SNOW;

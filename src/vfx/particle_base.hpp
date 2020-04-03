@@ -25,14 +25,14 @@ namespace vfx {
         };
 
         // if a particle should spawn
-        virtual void particle_base::spawn_particle_check(
+        virtual void spawn_particle_check(
             float delta_time,
             particle_system& particle_sys,
             render_window& win,
             random_state& rng) = 0;
 
         // update all particles movement
-        virtual void particle_base::update_all_particles(
+        virtual void update_all_particles(
             float delta_time,
             particle_system& particle_sys) = 0;
 
