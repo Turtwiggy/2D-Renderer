@@ -1,6 +1,5 @@
 #include "snow_effect.hpp"
 
-#include "tilemap.hpp"
 #include "sprite_renderer.hpp"
 
 void snow_effect::start()
@@ -47,20 +46,22 @@ void snow_effect::spawn_snow_particle(
     float max_y = rand_det_s(rng.rng, 0.0, 1.0) * win_size.y();
 
     particle p;
-    p.sprite = get_sprite_handle_of(rng, tiles::TREE_1);
+    p.sprite = get_sprite_handle_of(rng, particle_sprite);
     p.type = my_type;
     p.time_total = 4.0f;
     p.time_left = p.time_total;
 
-    //set initial info
     render_descriptor desc;
     desc.pos = { max_x, max_y };
+    desc.colour = colour_begin;
     p.desc = desc;
 
     particle_sys.emit(p);
 }
 
-void snow_effect::update_snow_particles(float delta_time, particle_system& particle_sys)
+void snow_effect::update_snow_particles(
+    float delta_time, 
+    particle_system& particle_sys)
 {
     entt::registry& reg = particle_sys.get_particle_registry();
 
@@ -77,13 +78,6 @@ void snow_effect::update_snow_particles(float delta_time, particle_system& parti
 
         //goes from 1 to 0
         float life = p.time_left / p.time_total;
-
-        //data
-        vec2f velocity = { -50.f, -50.f };
-        vec4f colour_begin{ 140 / 255.f, 29 / 255.f, 7 / 255.f, 0.8f };
-        vec4f colour_end{ 1.f, 0.f, 0.f, 0.f };
-        vec2f size_begin{ 1.f, 1.f };
-        vec2f size_end{ 0.5f, 0.5f };
 
         render_descriptor desc = p.desc;
 

@@ -24,7 +24,7 @@
 #include "overworld_map.hpp"
 
 #include "Editor/imgui_bezier.hpp"
-#include "particle_system.hpp"
+#include "vfx/particle_system.hpp"
 #include "vfx/snow_effect.hpp"
 
 #include <GLFW/glfw3.h>

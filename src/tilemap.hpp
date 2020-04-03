@@ -65,6 +65,21 @@ namespace tiles
         TILING_WALL,
         CULTIVATION,
 
+        //effects
+        EFFECT_1,       //swipe
+        EFFECT_2,       //curved swipe
+        EFFECT_3,       //slash claws
+        EFFECT_4,       
+        EFFECT_5,       //fire
+        EFFECT_6,       //fireball
+        EFFECT_7,       //
+        EFFECT_8,       //stationary fire
+        EFFECT_9,       
+        EFFECT_10,      //snow?
+        EFFECT_11,      //snow?
+        EFFECT_12,      //snow?
+        EFFECT_13,      //snow?
+
         //medieval houses in increasing height
         HOUSE_1,
         HOUSE_2,
