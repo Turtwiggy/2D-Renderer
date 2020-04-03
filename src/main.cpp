@@ -154,6 +154,19 @@ void battle_starter(entt::registry& registry)
     ImGui::End();
 }
 
+void animation_menu(snow_effect& snow)
+{
+    ImGui::Begin("Effects");
+
+    if (ImGui::Button("Start Snow"))
+        snow.start();
+
+    if (ImGui::Button("Pause Snow"))
+        snow.stop();
+
+    ImGui::End();
+}
+
 int main(int argc, char* argv[])
 {
     bool no_viewports = false;
@@ -199,17 +212,12 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    //Bezier
-    static float sample_x = 0.5f;
-    static float start_point[2] = { 0.f, 0.f };
-    static float middle_points[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
-    static float end_point[2] = { 1.f, 0.f };
-
     entt::entity overworld = create_overworld(registry, rng, {64, 64});
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     debug_overworld(registry, overworld, rng);
 
+    #define TEST_OVERWORLD
     #ifdef TEST_OVERWORLD
     focused_tilemap = overworld;
 
@@ -251,21 +259,11 @@ int main(int argc, char* argv[])
         cam.pos.y() += dy_dt;
 
         //UI
+        animation_menu(snow);
+
         ImGui::Begin("New window");
 
         ImGui::Button("I am a button");
-
-        if (ImGui::Button("Start Snow"))
-            snow.start();
-
-        if (ImGui::Button("Stop Snow"))
-            snow.stop();
-
-        //Draw Bezier Curve
-        ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
-        ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
-        ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
-        ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);
 
         ImGui::End();
 
@@ -278,6 +276,7 @@ int main(int argc, char* argv[])
 
         //map
         battle_starter(registry);
+
 
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
         focused.render(registry, sprite_render);

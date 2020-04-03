@@ -6,23 +6,30 @@
 #include "sprite_renderer.hpp"
 #include "random.hpp"
 
+enum particle_type
+{
+    SNOW,
+    SPARK
+};
+
 struct particle
 {
     render_descriptor desc;
     sprite_handle sprite;
+    particle_type type;
 
-    vec2f velocity = { 0.f, 0.f };  //world-units per second
     float time_total = 1.f;         //seconds
     float time_left = 1.f;          //seconds
 };
 
-struct particle_system 
+struct particle_system
 {
 public:
-    entt::entity emit(particle& p);
-
+    void emit(particle& p);
     void update(float delta_time);
     void render(sprite_renderer& renderer);
+
+    entt::registry& get_particle_registry() { return registry; }
 
 private:
     entt::registry registry;

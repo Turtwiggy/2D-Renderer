@@ -7,11 +7,18 @@
 // [ref] http://robnapier.net/faster-bezier
 // [ref] http://easings.net/es#easeInSine
 //
-// Usage:
-// {  static float v[5] = { 0.390f, 0.575f, 0.565f, 1.000f };
-//    ImGui::Bezier( "easeOutSine", v );       // draw
-//    float y = ImGui::BezierValue( 0.5f, v ); // x delta in [0..1] range
-// }
+
+////Bezier Usage:
+//static float sample_x = 0.5f;
+//static float start_point[2] = { 0.f, 0.f };
+//static float middle_points[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
+//static float end_point[2] = { 1.f, 0.f };
+//
+////In Update Function:
+//ImGui::SliderFloat("Bezier Sample Value", &sample_x, 0.0f, 1.0f, "ratio = %.3f");
+//ImGui::SliderFloat2("Bezier Start Point", start_point, 0.f, 1.f, "ratio = %.3f");
+//ImGui::SliderFloat2("Bezier End Point", end_point, 0.f, 1.f, "ratio = %.3f");
+//ImGui::Bezier("Bezier Control", sample_x, middle_points, start_point, end_point);
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
