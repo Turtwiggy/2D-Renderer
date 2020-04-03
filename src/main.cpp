@@ -25,7 +25,7 @@
 
 #include "Editor/imgui_bezier.hpp"
 #include "vfx/particle_system.hpp"
-#include "vfx/snow_effect.hpp"
+#include "vfx/effects/snow_effect.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -282,7 +282,6 @@ int main(int argc, char* argv[])
 
         //vfx
         snow.update(delta_time, win, rng, particle_sys);
-        particle_sys.update(delta_time);
         particle_sys.render(sprite_render);
 
         //renderer

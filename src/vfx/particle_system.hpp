@@ -20,15 +20,14 @@ namespace vfx {
         sprite_handle sprite;
         particle_type type;
 
-        float time_total = 1.f;         //seconds
-        float time_left = 1.f;          //seconds
+        float time_total;         //seconds
+        float time_left;          //seconds
     };
 
     struct particle_system
     {
     public:
         void emit(particle& p);
-        void update(float delta_time);
         void render(sprite_renderer& renderer);
 
         entt::registry& get_particle_registry() { return registry; }

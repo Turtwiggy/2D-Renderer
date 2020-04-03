@@ -3,7 +3,7 @@
 #include <toolkit/render_window.hpp>
 
 #include "random.hpp"
-#include "particle_system.hpp"
+#include "vfx/particle_system.hpp"
 
 //A "one off" effect
 
