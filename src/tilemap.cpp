@@ -231,7 +231,7 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
     vec4f wood_col = srgb_to_lin_approx(vec4f{ 191, 121, 88, 255 } / 255.f);
     vec4f building_gray = srgb_to_lin_approx(vec4f{ 207, 198, 184, 255 } / 255.f);
     vec4f generic_red = srgb_to_lin_approx(vec4f{ 230, 72, 46, 255 } / 255.f);
-    vec4f white_col = srgb_to_lin_approx(vec4f{ 255, 255, 255, 255 });
+    vec4f white_col = srgb_to_lin_approx(vec4f{ 255, 255, 255, 255 } / 255.f);
 
     if (tile_type == tiles::EFFECT_1 || tile_type == tiles::EFFECT_2 || tile_type == tiles::EFFECT_3 ||
         tile_type == tiles::EFFECT_2 || tile_type == tiles::EFFECT_3 || tile_type == tiles::EFFECT_4 ||
