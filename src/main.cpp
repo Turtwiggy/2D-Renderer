@@ -136,7 +136,10 @@ void battle_starter(entt::registry& registry)
                     {
                         for(int j=0; j < (int)others.size(); j++)
                         {
-                            ImGui::Text(("Txt? " + std::to_string(i) + " yep " + std::to_string(j)).c_str());
+                            if(ImGui::Button(("Txt? " + std::to_string(i) + " yep " + std::to_string(j)).c_str()))
+                            {
+                                start_battle(registry, {root[i], others[j]});
+                            }
                         }
                     }
                 }

@@ -265,6 +265,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         }
     }
 
+    float faction_radius = dim.x() * 0.8;
+
     registry.assign<tilemap>(res, tmap);
     registry.assign<overworld_tag>(res, overworld_tag());
 
@@ -316,4 +318,11 @@ void debug_overworld(entt::registry& registry, entt::entity en, random_state& rn
 
     tmap.add(army1, half);
     tmap.add(army2, {half.x()+1, half.y()});
+}
+
+entt::entity start_battle(entt::registry& registry, const std::vector<entt::entity>& armies)
+{
+    entt::entity ret = registry.create();
+
+    return ret;
 }
