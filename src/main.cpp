@@ -154,7 +154,7 @@ void battle_starter(entt::registry& registry)
     ImGui::End();
 }
 
-void animation_menu(snow_effect& snow)
+void animation_menu(vfx::snow_effect& snow)
 {
     ImGui::Begin("Effects");
 
@@ -207,8 +207,8 @@ int main(int argc, char* argv[])
     desc.pos = {15, 35};
     desc.colour = get_colour_of(tiles::TREE_1, level_info::GRASS);*/
 
-    particle_system particle_sys;
-    snow_effect snow;
+    vfx::particle_system particle_sys;
+    vfx::snow_effect snow;
 
     entt::registry registry;
 
@@ -217,7 +217,6 @@ int main(int argc, char* argv[])
 
     debug_overworld(registry, overworld, rng);
 
-    #define TEST_OVERWORLD
     #ifdef TEST_OVERWORLD
     focused_tilemap = overworld;
 

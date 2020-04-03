@@ -1,37 +1,41 @@
 #include "particle_system.hpp"
 
-void particle_system::emit(particle& p)
-{
-    auto base = registry.create();
+namespace vfx {
 
-    registry.assign<particle>(base, p);
-}
-
-void particle_system::update(float delta_time)
-{
-    auto view = registry.view<particle>();
-
-    for (auto ent : view)
+    void particle_system::emit(particle& p)
     {
-        auto& p = view.get<particle>(ent);
+        auto base = registry.create();
 
-        p.time_left -= delta_time;
+        registry.assign<particle>(base, p);
+    }
 
-        if (p.time_left <= 0.0f)
+    void particle_system::update(float delta_time)
+    {
+        auto view = registry.view<particle>();
+
+        for (auto ent : view)
         {
-            registry.destroy(ent);
+            auto& p = view.get<particle>(ent);
+
+            p.time_left -= delta_time;
+
+            if (p.time_left <= 0.0f)
+            {
+                registry.destroy(ent);
+            }
         }
     }
-}
 
-void particle_system::render(sprite_renderer& renderer)
-{
-    auto view = registry.view<particle>();
-
-    for (auto ent : view)
+    void particle_system::render(sprite_renderer& renderer)
     {
-        auto& p = view.get<particle>(ent);
+        auto view = registry.view<particle>();
 
-        renderer.add(p.sprite, p.desc);
+        for (auto ent : view)
+        {
+            auto& p = view.get<particle>(ent);
+
+            renderer.add(p.sprite, p.desc);
+        }
     }
+
 }

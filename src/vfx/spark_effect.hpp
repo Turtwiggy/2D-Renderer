@@ -7,18 +7,22 @@
 
 //A "one off" effect
 
-struct spark_effect {
+namespace vfx {
 
-    void start(
-        render_window& win,
-        random_state& rng, 
-        particle_system& particle_sys,
-        vec2f position);
+    struct spark_effect {
 
-    void update(float delta_time);
+        void start(
+            render_window& win,
+            random_state& rng,
+            particle_system& particle_sys,
+            vec2f position);
 
-private:
+        void update(float delta_time);
 
-    float time_left = 4.f;
+    private:
 
-};
+        float time_left = 4.f;
+
+    };
+
+}

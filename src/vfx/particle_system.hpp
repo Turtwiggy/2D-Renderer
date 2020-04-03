@@ -6,31 +6,35 @@
 #include "sprite_renderer.hpp"
 #include "random.hpp"
 
-enum particle_type
-{
-    SNOW,
-    SPARK
-};
+namespace vfx {
 
-struct particle
-{
-    render_descriptor desc;
-    sprite_handle sprite;
-    particle_type type;
+    enum particle_type
+    {
+        SNOW,
+        SPARK
+    };
 
-    float time_total = 1.f;         //seconds
-    float time_left = 1.f;          //seconds
-};
+    struct particle
+    {
+        render_descriptor desc;
+        sprite_handle sprite;
+        particle_type type;
 
-struct particle_system
-{
-public:
-    void emit(particle& p);
-    void update(float delta_time);
-    void render(sprite_renderer& renderer);
+        float time_total = 1.f;         //seconds
+        float time_left = 1.f;          //seconds
+    };
 
-    entt::registry& get_particle_registry() { return registry; }
+    struct particle_system
+    {
+    public:
+        void emit(particle& p);
+        void update(float delta_time);
+        void render(sprite_renderer& renderer);
 
-private:
-    entt::registry registry;
-};
+        entt::registry& get_particle_registry() { return registry; }
+
+    private:
+        entt::registry registry;
+    };
+
+}
