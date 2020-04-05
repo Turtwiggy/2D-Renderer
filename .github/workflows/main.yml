@@ -27,10 +27,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
-    #Install linux deps for: glfw3
+    #Install linux deps for: glfw3, sfml
     - name: Install Linux dependencies
       if: "contains( matrix.os, 'ubuntu')"
-      run: sudo apt-get install libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev
+      run: | 
+        sudo apt-get install libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev
+        sudo apt-get install libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
@@ -70,19 +72,17 @@ jobs:
 
     - name: (Windows) Build project
       if: "contains( matrix.os, 'windows')"
-      run: |
-        echo "msbuild path: ${{ steps.setup_msbuild.outputs.msbuildPath }}"
-        msbuild .\DwarfAndBladeWorkspace.sln /p:Configuration=Release /p:Platform=x64
+      run: msbuild .\DwarfAndBladeWorkspace.sln /p:Configuration=Release /p:Platform=x64
 
     - name: (Windows) Copy Resources File
       if: "contains( matrix.os, 'windows')"
-      run: xcopy ${{ github.workspace }}/res ${{ steps.setup_msbuild.outputs.msbuildPath }} /s /e
+      run: xcopy ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\ /s /e
 
     - name: (Windows) Upload artifact
       if: "contains( matrix.os, 'windows')"
       uses: actions/upload-artifact@v1
       with:
-        name: ResInsight
-        path: ${{ steps.setup_msbuild.outputs.msbuildPath }}
+        name: DwarfAndBlade-Windows-x64
+        path: ${{ runner.workspace }}/DwarfAndBlade-Executables/
               
     #TODO: actions for linux
