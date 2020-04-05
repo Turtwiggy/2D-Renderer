@@ -99,7 +99,7 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
 
         closed_set.insert(current_sys);
 
-        std::vector<T> flinks;
+        std::vector<std::pair<T, int>> flinks;
         flinks.reserve(4);
 
         auto check_apply = [&](vec2i offset)
@@ -108,6 +108,8 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
                 return;
 
             auto& found = tmap.all_entities[offset.y() * tmap.dim.x() + offset.x()];
+
+            int cost = 0;
 
             for(entt::entity& i : found)
             {
@@ -121,9 +123,11 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
 
                 if(coll.cost == -1)
                     return;
+
+                cost = std::max(cost, coll.cost);
             }
 
-            flinks.push_back(offset);
+            flinks.push_back({offset, cost});
         };
 
         check_apply(current_sys + vec2i{-1, 0});
@@ -135,13 +139,13 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
         check_apply(current_sys + vec2i{1, 1});
         check_apply(current_sys + vec2i{-1, 1});
 
-        for(const T& next_sys : flinks)
+        for(auto& [next_sys, cost] : flinks)
         {
             if(closed_set.find(next_sys) != closed_set.end())
                 continue;
 
             auto looking_gscore = g_score.find(next_sys);
-            float found_gscore = g_score[current_sys] + sqrtf((next_sys - current_sys).squared_length());
+            float found_gscore = g_score[current_sys] + sqrtf((next_sys - current_sys).squared_length()) + cost;
 
             float testing_gscore = FLT_MAX;
 
