@@ -16,6 +16,21 @@ entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handl
     return res;
 }
 
+entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const world_transform& transform)
+{
+    entt::entity res = registry.create();
+
+    render_descriptor desc;
+    desc.pos = transform.position;
+
+    registry.assign<sprite_handle>(res, handle);
+    registry.assign<world_transform>(res, transform);
+    registry.assign<overworld_tag>(res, overworld_tag());
+    registry.assign<render_descriptor>(res, desc);
+
+    return res;
+}
+
 std::vector<float> generate_noise(random_state& rng, vec2i dim)
 {
     std::vector<float> ret;
@@ -185,7 +200,7 @@ entt::entity create_tile_from_density(entt::registry& registry, random_state& rn
 
         han.base_colour = mix(water, beach, ffrac);
 
-        coll.cost = 2;
+        coll.cost = 3;
 
         //han.base_colour.w() *= ffrac;
     }
@@ -230,8 +245,32 @@ entt::entity create_tile_from_density(entt::registry& registry, random_state& rn
     registry.assign<sprite_handle>(base, han);
     registry.assign<render_descriptor>(base, desc);
     registry.assign<overworld_tag>(base, overworld_tag());
+    registry.assign<collidable>(base, coll);
 
     return base;
+}
+
+bool is_valid_castle_spawn(entt::registry& registry, tilemap& tmap, vec2f fpos)
+{
+    fpos = round(fpos);
+
+    vec2i ipos = {fpos.x(), fpos.y()};
+
+    if(ipos.x() < 0 || ipos.y() < 0 || ipos.x() >= tmap.dim.x() || ipos.y() >= tmap.dim.y())
+        return false;
+
+    for(entt::entity en : tmap.all_entities[ipos.y() * tmap.dim.x() + ipos.x()])
+    {
+        if(!registry.has<collidable>(en))
+            continue;
+
+        collidable& coll = registry.get<collidable>(en);
+
+        if(!(coll.cost == 1))
+            return false;
+    }
+
+    return true;
 }
 
 entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i dim)
@@ -243,29 +282,94 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
     noise_data noise(rng, {100, 100});
 
-    int factions = 5;
-
     for (int y = 0; y < dim.y(); y++)
     {
         for (int x = 0; x < dim.x(); x++)
         {
-            //sprite_handle handle = get_sprite_handle_of(rng, tiles::BASE);
-
-            //sprite_handle handle = get_tile_from_density(rng, );
-
-
-            //handle.base_colour = clamp(rand_det_s(rng.rng, 0.5, 1.5) * handle.base_colour * 0.2, 0, 1);
-            //handle.base_colour *= noise.sample({x, y});
-
-            //handle.base_colour.w() = 1;
-
             auto base = create_tile_from_density(registry, rng, noise, {x, y}, dim);
 
             tmap.add(base, {x, y});
         }
     }
 
-    float faction_radius = dim.x() * 0.8;
+    int factions = 5;
+
+    float faction_radius = (dim.x() * 0.6) * 5.f / factions;
+
+    {
+        std::vector<vec2f> current_pos;
+
+        current_pos.push_back({dim.x()/2.f, dim.y()/2.f});
+
+        for(int i=0; i < factions - 1; i++)
+        {
+            float fx = rand_det_s(rng.rng, -5, 5);
+            float fy = rand_det_s(rng.rng, -5, 5);
+
+            vec2f fin_pos = {dim.x()/2.f + fx, dim.y()/2.f + fy};
+
+            if(!is_valid_castle_spawn(registry, tmap, fin_pos))
+                continue;
+
+            current_pos.push_back(fin_pos);
+        }
+
+        int iterations = 8000;
+
+        for(int i=0; i < iterations; i++)
+        {
+            for(int fid = 0; fid < (int)current_pos.size(); fid++)
+            {
+                if(fid == 0)
+                    continue;
+
+                vec2f force = {0,0};
+                vec2f my_pos = current_pos[fid];
+
+                for(int oid = 0; oid < (int)current_pos.size(); oid++)
+                {
+                    if(oid == fid)
+                        continue;
+
+                    vec2f their_pos = current_pos[oid];
+
+                    vec2f diff = my_pos - their_pos;
+
+                    float len = diff.length();
+
+                    if(len > faction_radius)
+                        continue;
+
+                    float move_frac = (faction_radius - len);
+
+                    force += (move_frac * diff) * 0.01;
+                }
+
+                if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
+                    continue;
+
+                current_pos[fid] += force;
+
+                current_pos[fid] = clamp(current_pos[fid], vec2f{0,0}, vec2f{dim.x()-1, dim.y()-1});
+            }
+        }
+
+        for(auto& i : current_pos)
+        {
+            vec2f rounded = round(i);
+
+            vec2i integer = {rounded.x(), rounded.y()};
+
+            world_transform trans;
+            trans.position = rounded * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+            entt::entity en = create_overworld_building(registry, get_sprite_handle_of(rng, tiles::CASTLE_1), trans);
+
+            tmap.add(en, integer);
+
+            printf("End %i %i\n", integer.x(), integer.y());
+        }
+    }
 
     registry.assign<tilemap>(res, tmap);
     registry.assign<overworld_tag>(res, overworld_tag());
@@ -313,11 +417,11 @@ void debug_overworld(entt::registry& registry, entt::entity en, random_state& rn
 
     vec2i half = tmap.dim/2;
 
-    entt::entity army1 = create_dummy_army_at(registry, rng, half, 0);
-    entt::entity army2 = create_dummy_army_at(registry, rng, {half.x()+1, half.y()}, 1);
+    entt::entity army1 = create_dummy_army_at(registry, rng, {half.x(), half.y() - 1}, 0);
+    entt::entity army2 = create_dummy_army_at(registry, rng, {half.x()+1, half.y() - 1}, 1);
 
-    tmap.add(army1, half);
-    tmap.add(army2, {half.x()+1, half.y()});
+    tmap.add(army1, {half.x(), half.y() - 1});
+    tmap.add(army2, {half.x()+1, half.y() - 1});
 }
 
 entt::entity start_battle(entt::registry& registry, const std::vector<entt::entity>& armies)
