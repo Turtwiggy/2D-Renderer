@@ -62,27 +62,27 @@ jobs:
       run: vcpkg integrate install
 
     #Build with MSVC 
-    - name: (Windows) Generate Dwarf and Blade Visual Studio Proj Files 
+    - name: (Windows-MSVC) Generate Dwarf and Blade Visual Studio Proj Files 
       if: "contains( matrix.os, 'windows')"
       run: '${{ github.workspace }}/build.bat'
 
-    - name: (Windows) Add msbuild
+    - name: (Windows-MSVC) Add msbuild
       if: "contains( matrix.os, 'windows')"
       uses: microsoft/setup-msbuild@v1.0.0
 
-    - name: (Windows) Build project
+    - name: (Windows-MSVC) Build project
       if: "contains( matrix.os, 'windows')"
       run: msbuild .\DwarfAndBladeWorkspace.sln /p:Configuration=Release /p:Platform=x64
 
-    - name: (Windows) Copy Resources File
+    - name: (Windows-MSVC) Copy Resources File
       if: "contains( matrix.os, 'windows')"
       run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
 
-    - name: (Windows) Upload 64x artifact
+    - name: (Windows-MSVC) Upload 64x artifact
       if: "contains( matrix.os, 'windows')"
       uses: actions/upload-artifact@v1
       with:
-        name: DwarfAndBlade-Windows-x64
+        name: DwarfAndBlade-Windows-x64-MSVC
         path: .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
               
     #TODO: actions for linux/gcc
