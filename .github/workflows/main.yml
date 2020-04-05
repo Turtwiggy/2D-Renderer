@@ -26,6 +26,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+
+    #Install linux deps for: glfw3
+    - name: Install Linux dependencies
+      if: "contains( matrix.os, 'ubuntu')"
+      run: sudo apt-get install libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev
+
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
       with:
@@ -38,6 +44,7 @@ jobs:
         path: ${{ github.workspace }}/include/vcpkg/
         # The key will be different each time a different version of vcpkg is used, or different ports are installed.
         key: ${{ hashFiles( format('{0}/{1}', github.workspace, matrix.vcpkg-response-file )) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
+    
     # Download, build vcpkg, install requested ports. If content is restored by the previous step,
     # it is a no-op. 
     - name: Run vcpkg
@@ -48,3 +55,32 @@ jobs:
         vcpkgArguments: '@${{ github.workspace }}/${{ matrix.vcpkg-response-file }}'
        # Location of the vcpkg as submodule of the repository.
         vcpkgDirectory: '${{ github.workspace }}/include/vcpkg'
+
+    -name: Integrate VCPKG
+      run: vcpkg integrate install
+
+    #Build with MSVC 
+    -name: Generate Dwarf and Blade Visual Studio Proj Files (Windows)
+      if: "contains( matrix.os, 'windows')"
+      run: '${{ github.workspace }}/build.bat'
+
+    -name: Build proj from command line (Windows)
+      if: "contains( matrix.os, 'windows')"
+      uses: microsoft/setup-msbuild@v1.0.0
+      run: |
+        echo "msbuild path: ${{ steps.setup_msbuild.outputs.msbuildPath }}"
+        msbuild .\DwarfAndBladeWorkspace.sln /p:Configuration=Release /p:Platform=x64
+
+    -name: Copy Resources File
+      if: "contains( matrix.os, 'windows')"
+      run: xcopy ${{ github.workspace }}/res ${{ steps.setup_msbuild.outputs.msbuildPath }} /s /e
+
+    # (Windows) upload artifact
+    - name: Upload artifact
+      if: "contains( matrix.os, 'windows')"
+      uses: actions/upload-artifact@v1
+      with:
+        name: ResInsight
+        path: ${{ steps.setup_msbuild.outputs.msbuildPath }}
+              
+    #TODO: actions for linux
