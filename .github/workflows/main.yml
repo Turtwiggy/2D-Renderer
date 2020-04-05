@@ -28,7 +28,7 @@ jobs:
     steps:
 
     #Install linux deps for: glfw3, sfml
-    - name: Install Linux dependencies
+    - name: Install Linux dependencies for vcpkg
       if: "contains( matrix.os, 'ubuntu')"
       run: | 
         sudo apt-get install libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev
@@ -76,7 +76,7 @@ jobs:
 
     - name: (Windows) Copy Resources File
       if: "contains( matrix.os, 'windows')"
-      run: xcopy ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\ /s /e
+      run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
 
     - name: (Windows) Upload artifact
       if: "contains( matrix.os, 'windows')"
@@ -85,4 +85,4 @@ jobs:
         name: DwarfAndBlade-Windows-x64
         path: ${{ runner.workspace }}/DwarfAndBlade-Executables/
               
-    #TODO: actions for linux
+    #TODO: actions for linux/gcc
