@@ -78,11 +78,11 @@ jobs:
       if: "contains( matrix.os, 'windows')"
       run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
 
-    - name: (Windows) Upload artifact
+    - name: (Windows) Upload 64x artifact
       if: "contains( matrix.os, 'windows')"
       uses: actions/upload-artifact@v1
       with:
         name: DwarfAndBlade-Windows-x64
-        path: ${{ runner.workspace }}/DwarfAndBlade-Executables/
+        path: .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
               
     #TODO: actions for linux/gcc
