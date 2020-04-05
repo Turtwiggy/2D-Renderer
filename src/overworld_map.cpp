@@ -342,7 +342,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
                     float move_frac = (faction_radius - len);
 
-                    force += (move_frac * diff) * 0.01;
+                    force += (move_frac * diff).norm() * 0.01;
                 }
 
                 if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
