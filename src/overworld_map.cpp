@@ -1,5 +1,6 @@
 #include "overworld_map.hpp"
 #include "entity_common.hpp"
+#include "pathfinding.hpp"
 
 entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handle, world_transform transform)
 {
@@ -270,7 +271,9 @@ bool is_valid_castle_spawn(entt::registry& registry, tilemap& tmap, vec2f fpos)
             return false;
     }
 
-    return true;
+    return a_star(registry, tmap, tmap.dim/2, vec2i{fpos.x(), fpos.y()}).has_value();
+
+    //return true;
 }
 
 entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i dim)
@@ -296,79 +299,76 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
     float faction_radius = (dim.x() * 0.6) * 5.f / factions;
 
+    float rwidth = dim.x() * 0.6/2;
+
+    std::vector<vec2f> current_pos;
+
+    current_pos.push_back({dim.x()/2.f, dim.y()/2.f});
+
+    for(int i=0; i < factions - 1; i++)
     {
-        std::vector<vec2f> current_pos;
+        float rangle = ((float)i / factions) * 2 * M_PI;
 
-        current_pos.push_back({dim.x()/2.f, dim.y()/2.f});
+        vec2f pos = vec2f{1, 0}.rot(rangle) + vec2f{dim.x(), dim.y()}/2.f;
 
-        for(int i=0; i < factions - 1; i++)
+        current_pos.push_back(pos);
+    }
+
+
+    int iterations = 80;
+
+    for(int i=0; i < iterations; i++)
+    {
+        for(int fid = 0; fid < (int)current_pos.size(); fid++)
         {
-            float fx = rand_det_s(rng.rng, -5, 5);
-            float fy = rand_det_s(rng.rng, -5, 5);
-
-            vec2f fin_pos = {dim.x()/2.f + fx, dim.y()/2.f + fy};
-
-            if(!is_valid_castle_spawn(registry, tmap, fin_pos))
+            if(fid == 0)
                 continue;
 
-            current_pos.push_back(fin_pos);
-        }
+            vec2f force = {0,0};
+            vec2f my_pos = current_pos[fid];
 
-        int iterations = 8000;
-
-        for(int i=0; i < iterations; i++)
-        {
-            for(int fid = 0; fid < (int)current_pos.size(); fid++)
+            for(int oid = 0; oid < (int)current_pos.size(); oid++)
             {
-                if(fid == 0)
+                if(oid == fid)
                     continue;
 
-                vec2f force = {0,0};
-                vec2f my_pos = current_pos[fid];
+                vec2f their_pos = current_pos[oid];
 
-                for(int oid = 0; oid < (int)current_pos.size(); oid++)
-                {
-                    if(oid == fid)
-                        continue;
+                vec2f diff = my_pos - their_pos;
 
-                    vec2f their_pos = current_pos[oid];
+                float len = diff.length();
 
-                    vec2f diff = my_pos - their_pos;
-
-                    float len = diff.length();
-
-                    if(len > faction_radius)
-                        continue;
-
-                    float move_frac = (faction_radius - len);
-
-                    force += (move_frac * diff).norm() * 0.01;
-                }
-
-                if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
+                if(len > faction_radius)
                     continue;
 
-                current_pos[fid] += force;
+                float move_frac = (faction_radius - len);
 
-                current_pos[fid] = clamp(current_pos[fid], vec2f{0,0}, vec2f{dim.x()-1, dim.y()-1});
+                force += (move_frac * diff).norm() * 5.f / (float)iterations;
             }
+
+            if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
+                continue;
+
+            current_pos[fid] += force;
+
+            current_pos[fid] = clamp(current_pos[fid], vec2f{0,0}, vec2f{dim.x()-1, dim.y()-1});
         }
+    }
 
-        for(auto& i : current_pos)
-        {
-            vec2f rounded = round(i);
+    for(auto& i : current_pos)
+    {
+        vec2f rounded = round(i);
 
-            vec2i integer = {rounded.x(), rounded.y()};
+        vec2i integer = {rounded.x(), rounded.y()};
 
-            world_transform trans;
-            trans.position = rounded * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+        world_transform trans;
+        trans.position = rounded * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
 
-            entt::entity en = create_overworld_building(registry, get_sprite_handle_of(rng, tiles::CASTLE_1), trans);
+        entt::entity en = create_overworld_building(registry, get_sprite_handle_of(rng, tiles::CASTLE_1), trans);
 
-            tmap.add(en, integer);
+        tmap.add(en, integer);
 
-            printf("End %i %i\n", integer.x(), integer.y());
-        }
+        printf("End %i %i\n", integer.x(), integer.y());
     }
 
     registry.assign<tilemap>(res, tmap);
