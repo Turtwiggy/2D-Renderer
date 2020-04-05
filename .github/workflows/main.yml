@@ -37,8 +37,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/include/vcpkg/
         # The key will be different each time a different version of vcpkg is used, or different ports are installed.
-        key: ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
-
+        key: ${{ hashFiles( format('{0}/{1}', github.workspace, matrix.vcpkg-response-file )) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
     # Download, build vcpkg, install requested ports. If content is restored by the previous step,
     # it is a no-op. 
     - name: Run vcpkg
@@ -46,6 +45,6 @@ jobs:
       id: runvcpkg
       with:
        # Response file stored in source control, it provides the list of ports and triplet(s).
-        vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
+        vcpkgArguments: '@${{ github.workspace }}/${{ matrix.vcpkg-response-file }}'
        # Location of the vcpkg as submodule of the repository.
         vcpkgDirectory: '${{ github.workspace }}/include/vcpkg'
