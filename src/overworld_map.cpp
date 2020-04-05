@@ -343,7 +343,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
                 float move_frac = (faction_radius - len);
 
-                force += (move_frac * diff).norm() * 5.f / (float)iterations;
+                force += (move_frac * diff).norm() * 5.f * (dim.x() / 64.f) / (float)iterations;
             }
 
             if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
@@ -355,16 +355,24 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         }
     }
 
-    for(auto& i : current_pos)
+    //for(auto& i : current_pos)
+
+    for(int idx = 0; idx < (int)current_pos.size(); idx++)
     {
-        vec2f rounded = round(i);
+        vec2f ipos = current_pos[idx];
+
+        vec2f rounded = round(ipos);
 
         vec2i integer = {rounded.x(), rounded.y()};
 
         world_transform trans;
         trans.position = rounded * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
 
-        entt::entity en = create_overworld_building(registry, get_sprite_handle_of(rng, tiles::CASTLE_1), trans);
+        sprite_handle handle = get_sprite_handle_of(rng, tiles::CASTLE_1);
+
+        handle.base_colour *= team::colours.at(idx);
+
+        entt::entity en = create_overworld_building(registry, handle, trans);
 
         tmap.add(en, integer);
 
