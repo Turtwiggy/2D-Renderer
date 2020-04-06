@@ -431,6 +431,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     //for(auto& i : current_pos)
 
     std::vector<vec2f> all_positions;
+    std::vector<int> all_teams;
 
     for(int idx = 0; idx < (int)current_pos.size(); idx++)
     {
@@ -454,6 +455,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         printf("End %i %i\n", integer.x(), integer.y());
 
         all_positions.push_back(rounded);
+        all_teams.push_back(idx);
     }
 
     // Generate secondary castles
@@ -512,6 +514,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
                 {
                     all_positions.push_back({adjusted.value().x(), adjusted.value().y()});
+                    all_teams.push_back(idx);
 
                     world_transform trans;
                     trans.position = vec2f{adjusted.value().x(), adjusted.value().y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
@@ -598,12 +601,28 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
         for(auto& potential_spot : spawnable_towns)
         {
+            float min_dist = FLT_MAX;
+            int min_team = -1;
+
+            for(int i=0; i < (int)all_positions.size(); i++)
+            {
+                vec2f diff = (all_positions[i] - potential_spot).length();
+
+                if(diff.length() < min_dist)
+                {
+                    min_dist = diff.length();
+                    min_team = all_teams[i];
+                }
+            }
+
+            int team = min_team;
+
             world_transform trans;
             trans.position = vec2f{potential_spot.x(), potential_spot.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
 
             sprite_handle handle = get_sprite_handle_of(rng, tiles::HOUSE_1);
 
-            //handle.base_colour *= team::colours.at(idx);
+            handle.base_colour *= team::colours.at(team);
 
             entt::entity en = create_overworld_building(registry, handle, trans);
 
