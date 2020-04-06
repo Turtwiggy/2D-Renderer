@@ -47,36 +47,27 @@ std::optional<T> any_of_a_in_b(const std::vector<T>& a, const std::vector<T>& b)
 
 ///this function was originally designed for an arbitrary linked graph and could be made significantly faster
 template<typename T>
-std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const std::vector<T>& start_vec, const std::vector<T>& fin_vec, int cap = -1)
+std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, vec2i start, vec2i fin, int cap = -1)
 {
     std::vector<T> ret;
 
-    if(fin_vec.size() == 0)
-        return ret;
-
-    if(auto val = any_of_a_in_b(start_vec, fin_vec); val.has_value())
+    if(start == fin)
     {
-        return {*val};
+        return {start};
     }
 
     std::set<T> closed_set;
-    std::vector<T> open_set = start_vec;
+    std::vector<T> open_set = {start};
 
     std::map<T, T> came_from;
 
     std::map<T, float> g_score;
 
-    for(auto& i : start_vec)
-    {
-        g_score[i] = 0.f;
-    }
+    g_score[start] = 0.f;
 
     std::deque<std::pair<T, float>> sorted;
 
-    for(auto& i : start_vec)
-    {
-        sorted.push_back(std::pair(i, 0.f));
-    }
+    sorted.push_back({start, 0.f});
 
     int num_explored = 0;
 
@@ -86,13 +77,8 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
 
         sorted.pop_front();
 
-        for(auto& i : fin_vec)
-        {
-            if(current_sys == i)
-            {
-                return reconstruct_path(came_from, current_sys);
-            }
-        }
+        if(current_sys == fin)
+            return reconstruct_path(came_from, current_sys);
 
         if(closed_set.find(current_sys) != closed_set.end())
             continue;
@@ -100,7 +86,7 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
         closed_set.insert(current_sys);
 
         std::vector<std::pair<T, int>> flinks;
-        flinks.reserve(4);
+        flinks.reserve(8);
 
         auto check_apply = [&](vec2i offset)
         {
@@ -161,15 +147,15 @@ std::vector<T> get_shortest_path(entt::registry& registry, tilemap& tmap, const 
 
             g_score[next_sys] = found_gscore;
 
-            //sorted.push_back({next_sys, found_gscore + heuristic(ctx, next_sys, fin)});
-            sorted.push_back({next_sys, found_gscore});
+            sorted.push_back({next_sys, found_gscore + heuristic(next_sys, fin)});
+            //sorted.push_back({next_sys, found_gscore});
 
             for(auto& i : sorted)
             {
                 if(i.first == next_sys)
                 {
-                    //i.second = found_gscore + heuristic(ctx, next_sys, fin);
-                    i.second = found_gscore;
+                    i.second = found_gscore + heuristic(next_sys, fin);
+                    //i.second = found_gscore;
                     break;
                 }
             }

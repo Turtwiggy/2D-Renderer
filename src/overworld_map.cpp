@@ -336,7 +336,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
     for(int i=0; i < factions - 1; i++)
     {
-        float rangle = ((float)i / factions) * 2 * M_PI;
+        float rangle = ((float)i / (factions - 1)) * 2 * M_PI;
 
         vec2f pos = vec2f{1, 0}.rot(rangle) + vec2f{dim.x(), dim.y()}/2.f;
 
@@ -344,7 +344,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     }
 
 
-    int iterations = 10;
+    int iterations = 15;
 
     for(int i=0; i < iterations; i++)
     {
@@ -367,8 +367,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
                 float len = diff.length();
 
-                if(len > faction_radius)
-                    continue;
+                //if(len > faction_radius)
+                //    continue;
 
                 float move_frac = (faction_radius - len);
 
@@ -393,6 +393,30 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
             current_pos[fid] = clamp(current_pos[fid], vec2f{0,0}, vec2f{dim.x()-1, dim.y()-1});
         }
     }
+
+    /*for(int fid = 1; fid < (int)current_pos.size(); fid++)
+    {
+        vec2f my_pos = current_pos[fid];
+
+        vec2f fcentre = {centre.x(), centre.y()};
+
+        vec2f diff = my_pos - fcentre;
+
+        my_pos = diff.norm() * faction_radius/2.f + fcentre;
+
+        printf("SFPos %f %f\n", my_pos.x(), my_pos.y());
+
+        auto next_pos = square_search(registry, tmap, {my_pos.x(), my_pos.y()}, 40, is_valid_castle_spawn);
+
+        if(!next_pos.has_value())
+            throw std::runtime_error("Could not place root castle ");
+
+        vec2f fpos = {next_pos.value().x(), next_pos.value().y()};
+
+        printf("Got pos %f %f\n", fpos.x(), fpos.y());
+
+        current_pos[fid] = fpos;
+    }*/
 
     //for(auto& i : current_pos)
 
@@ -485,6 +509,15 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
                     tmap.add(en, adjusted.value());
                 }
             }
+        }
+    }
+
+    {
+        int towns = 100;
+
+        for(int i=0; i < towns; i++)
+        {
+
         }
     }
 
