@@ -342,7 +342,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     }
 
 
-    int iterations = 80;
+    int iterations = 10;
 
     for(int i=0; i < iterations; i++)
     {
