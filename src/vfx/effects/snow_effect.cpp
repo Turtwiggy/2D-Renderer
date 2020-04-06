@@ -64,8 +64,6 @@ namespace vfx {
         particle_sys.emit(p);
     }
 
-
-
     void snow_effect::update_all_particles(float delta_time, particle_system& particle_sys)
     {
         snow_effect_editor();
@@ -112,6 +110,5 @@ namespace vfx {
             p.desc = desc;
         }
     }
-
 }
 

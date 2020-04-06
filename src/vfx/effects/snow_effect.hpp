@@ -13,6 +13,21 @@ namespace vfx {
 
     struct snow_effect : vfx::particle_base {
 
+    public:
+
+        void editor()
+        {
+            ImGui::Begin("Effects");
+
+            if (ImGui::Button("Start Snow"))
+                start();
+
+            if (ImGui::Button("Pause Snow"))
+                stop();
+
+            ImGui::End();
+        }
+
     protected:
 
         void spawn_particle_check(

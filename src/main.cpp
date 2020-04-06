@@ -159,15 +159,16 @@ void battle_starter(entt::registry& registry)
     ImGui::End();
 }
 
-void animation_menu(vfx::snow_effect& snow)
+void battle_editor(entt::registry& registry, random_state& rng, float xy[2])
 {
-    ImGui::Begin("Effects");
+    ImGui::Begin("Battle Editor");
 
-    if (ImGui::Button("Start Snow"))
-        snow.start();
+    ImGui::SliderFloat2("Battle Size", xy, 0, 500);
 
-    if (ImGui::Button("Pause Snow"))
-        snow.stop();
+    if (ImGui::Button("Generate Battle"))
+    {
+        battle_map::create_battle(registry, rng, { xy[0], xy[1] }, level_info::GRASS);
+    }
 
     ImGui::End();
 }
@@ -218,7 +219,11 @@ int main(int argc, char* argv[])
     entt::registry registry;
 
     entt::entity overworld = create_overworld(registry, rng, {150, 150});
-    entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+    entt::entity default_battle = battle_map::create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+    entt::entity& focused_tilemap = overworld;
+
+    //battle editor variables
+    float battle_xy[2] = { 50, 50 };
 
     debug_overworld(registry, overworld, rng);
 
@@ -241,11 +246,11 @@ int main(int argc, char* argv[])
             mpos = mpos - vec2f{win_pos.x(), win_pos.y()};
         }
 
-        //hack to hold the console
-        if (ImGui::IsKeyDown(GLFW_KEY_C)) {
-            win.display();
-            continue;
-        }
+        ////hack to hold the console
+        //if (ImGui::IsKeyDown(GLFW_KEY_C)) {
+        //    win.display();
+        //    continue;
+        //}
 
         ImGuiIO& io = ImGui::GetIO();
         float delta_time = io.DeltaTime;
@@ -283,16 +288,9 @@ int main(int argc, char* argv[])
         cam.translate({dx_dt, dy_dt});
 
         //UI
-        animation_menu(snow);
-
-        ImGui::Begin("New window");
-
-        ImGui::Button("I am a button");
-
-        ImGui::End();
+        battle_editor(registry, rng, battle_xy);
 
         //Update systems
-
         if (auto val = scene_selector(registry); val.has_value())
         {
             focused_tilemap = val.value();
@@ -305,7 +303,9 @@ int main(int argc, char* argv[])
         focused.render(registry, win, cam, sprite_render, mpos);
 
         //vfx
+        snow.editor();
         snow.update(delta_time, win, rng, particle_sys);
+
         particle_sys.render(sprite_render);
 
         //renderer
