@@ -49,7 +49,7 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
             continue;
 
-        vec2f real_pos = cam.world_to_screen(window, round(desc.pos));
+        vec2f real_pos = cam.world_to_screen(window, desc.pos);
         vec2f real_dim = vec2f{TILE_PIX, TILE_PIX} * camera_scale;
 
         vec2f origin = real_dim / 2.f;
