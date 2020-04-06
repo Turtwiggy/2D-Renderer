@@ -276,6 +276,33 @@ bool is_valid_castle_spawn(entt::registry& registry, tilemap& tmap, vec2f fpos)
     //return true;
 }
 
+template<typename T>
+std::optional<vec2i> square_search(entt::registry& registry, tilemap& tmap, vec2i start_pos, int max_distance, const T& is_valid)
+{
+    int bound = 0;
+    int inner_bound = 0;
+
+    while(bound <= max_distance)
+    {
+        for(int y=-bound; y<=bound; y++)
+        {
+            for(int x=-bound; x <= bound; x++)
+            {
+                if(std::max(abs(x), abs(y)) < inner_bound)
+                    continue;
+
+                if(is_valid(registry, tmap, vec2f{x + start_pos.x(), y + start_pos.y()}))
+                    return vec2i{x, y} + start_pos;
+            }
+        }
+
+        bound++;
+        inner_bound++;
+    }
+
+    return std::nullopt;
+}
+
 entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i dim)
 {
     entt::entity res = registry.create();
@@ -347,7 +374,17 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
             }
 
             if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
+            {
+                vec2i ipos = {current_pos[fid].x() + force.x(), current_pos[fid].y() + force.y()};
+
+                auto compromise = square_search(registry, tmap, ipos, 2, is_valid_castle_spawn);
+
+                if(!compromise.has_value())
+                    continue;
+
+                current_pos[fid] = {compromise.value().x(), compromise.value().y()};
                 continue;
+            }
 
             current_pos[fid] += force;
 
