@@ -429,6 +429,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
     //for(auto& i : current_pos)
 
+    std::vector<vec2f> all_positions;
+
     for(int idx = 0; idx < (int)current_pos.size(); idx++)
     {
         vec2f ipos = current_pos[idx];
@@ -449,6 +451,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         tmap.add(en, integer);
 
         printf("End %i %i\n", integer.x(), integer.y());
+
+        all_positions.push_back(rounded);
     }
 
     // Generate secondary castles
@@ -506,6 +510,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
                     throw std::runtime_error("Could not situate secondary caste");
 
                 {
+                    all_positions.push_back({adjusted.value().x(), adjusted.value().y()});
+
                     world_transform trans;
                     trans.position = vec2f{adjusted.value().x(), adjusted.value().y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
 
@@ -522,11 +528,84 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     }
 
     {
-        int towns = 100;
+        int towns = 1000;
+
+        std::vector<vec2f> spawnable_towns;
 
         for(int i=0; i < towns; i++)
         {
+            float min_dist = faction_radius / 10;
 
+            vec2f diff = {rand_det_s(rng.rng, -faction_radius, faction_radius), rand_det_s(rng.rng, -faction_radius, faction_radius)};
+            vec2f potential_spot = round(diff + fcentre);
+
+            if(!is_valid_castle_spawn(registry, tmap, potential_spot))
+                continue;
+
+            bool is_valid = true;
+
+            for(auto& i : all_positions)
+            {
+                float len = (potential_spot - i).length();
+
+                if(len < faction_radius / 20)
+                {
+                    is_valid = false;
+                    break;
+                }
+            }
+
+            for(auto& i : spawnable_towns)
+            {
+                float len = (potential_spot - i).length();
+
+                if(len < faction_radius / 5)
+                {
+                    is_valid = false;
+                    break;
+                }
+            }
+
+            if(!is_valid)
+                continue;
+
+            /*world_transform trans;
+            trans.position = vec2f{potential_spot.x(), potential_spot.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+            sprite_handle handle = get_sprite_handle_of(rng, tiles::HOUSE_1);
+
+            //handle.base_colour *= team::colours.at(idx);
+
+            entt::entity en = create_overworld_building(registry, handle, trans);
+
+            tmap.add(en, {potential_spot.x(), potential_spot.y()});*/
+
+            //all_positions.push_back(potential_spot);
+
+            spawnable_towns.push_back(potential_spot);
+        }
+
+        auto shuffle_param = [&](int i)
+        {
+            return rand_det_s(rng.rng, 0, i);
+        };
+
+        std::random_shuffle(spawnable_towns.begin(), spawnable_towns.end(), shuffle_param);
+
+        spawnable_towns.resize(100);
+
+        for(auto& potential_spot : spawnable_towns)
+        {
+            world_transform trans;
+            trans.position = vec2f{potential_spot.x(), potential_spot.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+            sprite_handle handle = get_sprite_handle_of(rng, tiles::HOUSE_1);
+
+            //handle.base_colour *= team::colours.at(idx);
+
+            entt::entity en = create_overworld_building(registry, handle, trans);
+
+            tmap.add(en, {potential_spot.x(), potential_spot.y()});
         }
     }
 

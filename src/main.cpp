@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
 
     entt::registry registry;
 
-    entt::entity overworld = create_overworld(registry, rng, {200, 200});
+    entt::entity overworld = create_overworld(registry, rng, {150, 150});
     entt::entity focused_tilemap = create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
 
     debug_overworld(registry, overworld, rng);

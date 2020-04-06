@@ -264,7 +264,9 @@ vec4f get_colour_of(tiles::type tile_type, level_info::types level_type)
        tile_type == tiles::DOOR_CLOSED || tile_type == tiles::DOOR_OPEN)
         return wood_col;
 
-    if(tile_type == tiles::CASTLE_1 || tile_type == tiles::CASTLE_2)
+    if(tile_type == tiles::CASTLE_1 || tile_type == tiles::CASTLE_2 ||
+       tile_type == tiles::HOUSE_1 || tile_type == tiles::HOUSE_2 || tile_type == tiles::HOUSE_3 || tile_type == tiles::HOUSE_4 ||
+       tile_type == tiles::TENT || tile_type == tiles::FANCY_TENT || tile_type == tiles::CAPITAL_TENT)
         return building_gray;
 
     throw std::runtime_error("Did not find " + std::to_string(tile_type));
