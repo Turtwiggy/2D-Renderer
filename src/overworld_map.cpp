@@ -592,7 +592,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
         std::shuffle(spawnable_towns.begin(), spawnable_towns.end(), rng.rng);
 
-        spawnable_towns.resize(100);
+        if(spawnable_towns.size() > 100)
+            spawnable_towns.resize(100);
 
         for(auto& potential_spot : spawnable_towns)
         {
