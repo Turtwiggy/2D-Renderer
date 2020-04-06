@@ -64,10 +64,13 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         br_local *= desc.scale;
         bl_local *= desc.scale;
 
-        tl_local = tl_local.rot(desc.angle);
-        tr_local = tr_local.rot(desc.angle);
-        br_local = br_local.rot(desc.angle);
-        bl_local = bl_local.rot(desc.angle);
+        if(desc.angle != 0)
+        {
+            tl_local = tl_local.rot(desc.angle);
+            tr_local = tr_local.rot(desc.angle);
+            br_local = br_local.rot(desc.angle);
+            bl_local = bl_local.rot(desc.angle);
+        }
 
         vertex tl, tr, br, bl;
         tl.position = tl_local + real_pos;
