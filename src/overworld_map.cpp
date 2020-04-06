@@ -310,6 +310,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     tilemap tmap;
     tmap.create(dim);
 
+    vec2i centre = dim/2;
+
     noise_data noise(rng, {100, 100});
 
     for (int y = 0; y < dim.y(); y++)
@@ -370,7 +372,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
                 float move_frac = (faction_radius - len);
 
-                force += (move_frac * diff).norm() * 5.f * (dim.x() / 64.f) / (float)iterations;
+                force += (move_frac * diff).norm();
             }
 
             if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
@@ -414,6 +416,76 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         tmap.add(en, integer);
 
         printf("End %i %i\n", integer.x(), integer.y());
+    }
+
+    // Generate secondary castles
+    {
+        int additional_castles = 3;
+
+        for(int idx = 0; idx < (int)current_pos.size(); idx++)
+        {
+            vec2f ipos = current_pos[idx];
+
+            vec2f diff = {ipos.x() - centre.x(), ipos.y() - centre.y()};
+
+            float angle = diff.angle();
+
+            float angle_full_fraction = 2 * M_PI / (factions-1);
+
+            angle_full_fraction /= 1.5;
+
+            if(diff.length() <= 0.0001)
+            {
+                diff = {0, faction_radius/8};
+                angle_full_fraction = 2 * M_PI * (additional_castles + 1.f) / (additional_castles);
+                angle += (2 * M_PI / (factions * additional_castles))/2;
+            }
+
+            for(int i=0; i < additional_castles; i++)
+            {
+                float ffrac = (float)i / (additional_castles - 1);
+
+                ffrac -= 0.5;
+
+                float angle_offset = ffrac * angle_full_fraction;
+
+                float real_angle = angle_offset + angle;
+
+                float real_length = diff.length();
+
+                if(idx != 0)
+                {
+                    if(i == additional_castles/2)
+                        real_length *= 0.6;
+                    else
+                        real_length *= 0.85;
+                }
+
+                //real_length *= rand_det_s(rng.rng, 0.75, 1);
+
+                vec2f relative_vector = vec2f{cos(real_angle), sin(real_angle)} * real_length;
+
+                vec2f real_pos = relative_vector + vec2f{centre.x(), centre.y()};
+
+                auto adjusted = square_search(registry, tmap, {real_pos.x(), real_pos.y()}, 40, is_valid_castle_spawn);
+
+                if(!adjusted.has_value())
+                    throw std::runtime_error("Could not situate secondary caste");
+
+                {
+                    world_transform trans;
+                    trans.position = vec2f{adjusted.value().x(), adjusted.value().y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+
+                    sprite_handle handle = get_sprite_handle_of(rng, tiles::CASTLE_2);
+
+                    handle.base_colour *= team::colours.at(idx);
+
+                    entt::entity en = create_overworld_building(registry, handle, trans);
+
+                    tmap.add(en, adjusted.value());
+                }
+            }
+        }
     }
 
     registry.assign<tilemap>(res, tmap);
