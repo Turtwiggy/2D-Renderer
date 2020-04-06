@@ -271,7 +271,8 @@ bool is_valid_castle_spawn(entt::registry& registry, tilemap& tmap, vec2f fpos)
             return false;
     }
 
-    return a_star(registry, tmap, tmap.dim/2, vec2i{fpos.x(), fpos.y()}).has_value();
+    return true;
+    //return a_star(registry, tmap, tmap.dim/2, vec2i{fpos.x(), fpos.y()}).has_value();
 
     //return true;
 }
@@ -311,6 +312,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     tmap.create(dim);
 
     vec2i centre = dim/2;
+    vec2f fcentre = vec2f{dim.x(), dim.y()}/2.f;
 
     noise_data noise(rng, {100, 100});
 
@@ -324,9 +326,9 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         }
     }
 
-    int factions = 5;
+    int factions = 6;
 
-    float faction_radius = (dim.x() * 0.6) * 5.f / factions;
+    float faction_radius = (dim.x() * 0.3) * 5.f / factions;
 
     float rwidth = dim.x() * 0.6/2;
 
@@ -344,19 +346,21 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     }
 
 
-    int iterations = 15;
+    int iterations = 2000;
 
     for(int i=0; i < iterations; i++)
     {
-        for(int fid = 0; fid < (int)current_pos.size(); fid++)
+        for(int fid = 1; fid < (int)current_pos.size(); fid++)
         {
-            if(fid == 0)
-                continue;
-
             vec2f force = {0,0};
             vec2f my_pos = current_pos[fid];
 
-            for(int oid = 0; oid < (int)current_pos.size(); oid++)
+            int fin = current_pos.size();
+
+            if(i < 100)
+                fin = 1;
+
+            for(int oid = 0; oid < fin; oid++)
             {
                 if(oid == fid)
                     continue;
@@ -367,12 +371,12 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
                 float len = diff.length();
 
-                //if(len > faction_radius)
-                //    continue;
+                if(oid != 0 && (len > faction_radius))
+                    continue;
 
                 float move_frac = (faction_radius - len);
 
-                force += (move_frac * diff).norm();
+                force += (move_frac * diff).norm() * 0.1;
             }
 
             if(!is_valid_castle_spawn(registry, tmap, current_pos[fid] + force))
@@ -393,6 +397,11 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
             current_pos[fid] = clamp(current_pos[fid], vec2f{0,0}, vec2f{dim.x()-1, dim.y()-1});
         }
     }
+
+    /*for(int i=1; i < (int)current_pos.size(); i++)
+    {
+        current_pos[i] = (current_pos[i] - fcentre).norm() * faction_radius + fcentre;
+    }*/
 
     /*for(int fid = 1; fid < (int)current_pos.size(); fid++)
     {
@@ -460,7 +469,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
             if(diff.length() <= 0.0001)
             {
-                diff = {0, faction_radius/8};
+                diff = {0, faction_radius * 1.f/5.f};
                 angle_full_fraction = 2 * M_PI * (additional_castles + 1.f) / (additional_castles);
                 angle += (2 * M_PI / (factions * additional_castles))/2;
             }
@@ -480,9 +489,9 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
                 if(idx != 0)
                 {
                     if(i == additional_castles/2)
-                        real_length *= 0.6;
+                        real_length *= 0.5;
                     else
-                        real_length *= 0.85;
+                        real_length *= 0.75;
                 }
 
                 //real_length *= rand_det_s(rng.rng, 0.75, 1);
