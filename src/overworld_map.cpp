@@ -346,6 +346,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
     }
 
 
+    // Generate primary castles
     int iterations = 2000;
 
     for(int i=0; i < iterations; i++)
@@ -473,7 +474,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
             if(diff.length() <= 0.0001)
             {
-                diff = {0, faction_radius * 1.f/5.f};
+                diff = {0, faction_radius * 1.f/4.f};
                 angle_full_fraction = 2 * M_PI * (additional_castles + 1.f) / (additional_castles);
                 angle += (2 * M_PI / (factions * additional_castles))/2;
             }
@@ -493,9 +494,9 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
                 if(idx != 0)
                 {
                     if(i == additional_castles/2)
-                        real_length *= 0.5;
+                        real_length *= 0.65;
                     else
-                        real_length *= 0.75;
+                        real_length *= 0.9;
                 }
 
                 //real_length *= rand_det_s(rng.rng, 0.75, 1);
@@ -527,6 +528,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
         }
     }
 
+    // Generate towns
     {
         int towns = 1000;
 
