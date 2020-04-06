@@ -159,7 +159,8 @@ project "DwarfAndBlade"
             -- "GLEW_STATIC",
             -- "GRAPHITE2_STATIC",
             -- "SFML_STATIC",
-            "__WIN32__"
+            "__WIN32__",
+            "ImDrawIdx=unsigned int"
         }
 
         -- postbuildcommands -- copy dll after build
