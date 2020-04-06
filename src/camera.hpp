@@ -18,6 +18,8 @@ struct camera
     vec2f world_to_screen(render_window& win, vec2f world_pos) const;
     vec2f screen_to_world(render_window& win, vec2f screen_pos) const;
 
+    void translate(vec2f amount);
+
     void zoom(float number_of_levels);
 
     float calculate_scale() const;

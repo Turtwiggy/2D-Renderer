@@ -265,8 +265,13 @@ int main(int argc, char* argv[])
         float dx_dt = dx * delta_time * 400;
         float dy_dt = dy * delta_time * 400;
 
-        cam.pos.x() += dx_dt;
-        cam.pos.y() += dy_dt;
+        if(ImGui::IsKeyDown(GLFW_KEY_LEFT_SHIFT))
+        {
+            dx_dt *= 3;
+            dy_dt *= 3;
+        }
+
+        cam.translate({dx_dt, dy_dt});
 
         //UI
         animation_menu(snow);

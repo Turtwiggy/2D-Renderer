@@ -70,6 +70,11 @@ vec2f camera::screen_to_world(render_window& win, vec2f screen_pos) const
     return absolute;
 }
 
+void camera::translate(vec2f amount)
+{
+    pos += amount / calculate_scale();
+}
+
 void camera::zoom(float number_of_levels)
 {
     zoom_level += number_of_levels;
