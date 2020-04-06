@@ -590,12 +590,7 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
             spawnable_towns.push_back(potential_spot);
         }
 
-        auto shuffle_param = [&](int i)
-        {
-            return rand_det_s(rng.rng, 0, i);
-        };
-
-        std::random_shuffle(spawnable_towns.begin(), spawnable_towns.end(), shuffle_param);
+        std::shuffle(spawnable_towns.begin(), spawnable_towns.end(), rng.rng);
 
         spawnable_towns.resize(100);
 
