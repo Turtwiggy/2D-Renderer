@@ -29,6 +29,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "overworld_generation.hpp"
+
 std::optional<entt::entity> scene_selector(entt::registry& registry)
 {
     std::optional<entt::entity> ret;
