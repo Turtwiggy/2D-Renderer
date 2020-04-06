@@ -1,0 +1,88 @@
+# This is a basic workflow to help you get started with Actions
+
+name: DwarfAndBlade Build
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ CI-release-branch ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: windows-latest
+            vcpkg-response-file: vcpkg_x64-windows.txt
+          - os: ubuntu-latest
+            vcpkg-response-file: vcpkg_x64-linux.txt
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+    #Install linux deps for: glfw3, sfml
+    - name: Install Linux dependencies for vcpkg
+      if: "contains( matrix.os, 'ubuntu')"
+      run: | 
+        sudo apt-get install libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev
+        sudo apt-get install libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    # Cache/Restore the vcpkg's build artifacts.
+    - name: Cache vcpkg's artifacts
+      uses: actions/cache@v1
+      with:
+        path: ${{ github.workspace }}/include/vcpkg/
+        # The key will be different each time a different version of vcpkg is used, or different ports are installed.
+        key: ${{ hashFiles( format('{0}/{1}', github.workspace, matrix.vcpkg-response-file )) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
+    
+    # Download, build vcpkg, install requested ports. If content is restored by the previous step,
+    # it is a no-op. 
+    - name: Run vcpkg
+      uses: lukka/run-vcpkg@v1
+      id: runvcpkg
+      with:
+       # Response file stored in source control, it provides the list of ports and triplet(s).
+        vcpkgArguments: '@${{ github.workspace }}/${{ matrix.vcpkg-response-file }}'
+       # Location of the vcpkg as submodule of the repository.
+        vcpkgDirectory: '${{ github.workspace }}/include/vcpkg'
+
+    - name: Integrate VCPKG
+      run: vcpkg integrate install
+
+    #Build with MSVC 
+    - name: (Windows-MSVC) Generate Dwarf and Blade Visual Studio Proj Files 
+      if: "contains( matrix.os, 'windows')"
+      run: '${{ github.workspace }}/build.bat'
+
+    - name: (Windows-MSVC) Add msbuild
+      if: "contains( matrix.os, 'windows')"
+      uses: microsoft/setup-msbuild@v1.0.0
+
+    - name: (Windows-MSVC) Build project
+      if: "contains( matrix.os, 'windows')"
+      run: msbuild .\DwarfAndBladeWorkspace.sln /p:Configuration=Release /p:Platform=x64
+
+    - name: (Windows-MSVC) Copy Resources File
+      if: "contains( matrix.os, 'windows')"
+      run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
+
+    - name: (Windows-MSVC) Upload 64x artifact
+      if: "contains( matrix.os, 'windows')"
+      uses: actions/upload-artifact@v1
+      with:
+        name: DwarfAndBlade-Windows-x64-MSVC
+        path: .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
+              
+    #TODO: actions for linux/gcc
