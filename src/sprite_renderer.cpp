@@ -16,6 +16,21 @@ sprite_renderer::sprite_renderer()
     sf::Image img;
     img.loadFromMemory(spritesheet_data.c_str(), spritesheet_data.size());
 
+    for(int y=0; y < img.getSize().y; y++)
+    {
+        for(int x=0; x < img.getSize().x; x++)
+        {
+            sf::Color col = img.getPixel(x, y);
+
+            if(col.a == 0)
+            {
+                col = sf::Color(255, 255, 255, 0);
+
+                img.setPixel(x, y, col);
+            }
+        }
+    }
+
     texture_settings tex_sett;
     tex_sett.width = img.getSize().x;
     tex_sett.height = img.getSize().y;
@@ -83,12 +98,22 @@ void sprite_renderer::render(render_window& window, const camera& cam)
         br.position = round(br.position);
         bl.position = round(bl.position);
 
+        //printf("Diff %f\n", br.position.x() - tl.position.x());
+
+        //printf("TLP %f %f\n", tl.position.x(), tl.position.y());
+        //printf("BRP %f %f\n", br.position.x(), br.position.y());
+
         vec2i texture_coordinate = handle.offset * (TILE_PIX + TILE_SEP);
 
         vec2f tltx = { texture_coordinate.x(), texture_coordinate.y() };
-        vec2f trtx = { texture_coordinate.x() + TILE_PIX, texture_coordinate.y() };
+        vec2f trtx = { texture_coordinate.x() + TILE_PIX, texture_coordinate.y()};
         vec2f brtx = { texture_coordinate.x() + TILE_PIX, texture_coordinate.y() + TILE_PIX };
         vec2f bltx = { texture_coordinate.x(), texture_coordinate.y() + TILE_PIX };
+
+        /*tltx += vec2f{0.5f, 0.5f};
+        trtx += vec2f{0.5f, 0.5f};
+        brtx += vec2f{0.5f, 0.5f};
+        bltx += vec2f{0.5f, 0.5f};*/
 
         tltx = tltx * uv_scale;
         trtx = trtx * uv_scale;
