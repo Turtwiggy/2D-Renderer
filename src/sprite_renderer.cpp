@@ -20,6 +20,7 @@ sprite_renderer::sprite_renderer()
     tex_sett.width = img.getSize().x;
     tex_sett.height = img.getSize().y;
     tex_sett.is_srgb = true;
+    tex_sett.magnify_linear = false;
 
     sprite_sheet.load_from_memory(tex_sett, img.getPixelsPtr());
 }
@@ -41,13 +42,15 @@ void sprite_renderer::render(render_window& window, const camera& cam)
 
     vec2f uv_scale = { 1.f / sprite_sheet.dim.x(), 1.f / sprite_sheet.dim.y() };
 
+    float camera_scale = cam.calculate_scale();
+
     for (auto [handle, desc] : next_renderables)
     {
         if(desc.pos.x() < tl_visible.x() || desc.pos.y() < tl_visible.y() || desc.pos.x() > br_visible.x() || desc.pos.y() > br_visible.y())
             continue;
 
-        vec2f real_pos = cam.world_to_screen(window, desc.pos);
-        vec2f real_dim = {TILE_PIX, TILE_PIX};
+        vec2f real_pos = cam.world_to_screen(window, round(desc.pos));
+        vec2f real_dim = vec2f{TILE_PIX, TILE_PIX} * camera_scale;
 
         vec2f origin = real_dim / 2.f;
 

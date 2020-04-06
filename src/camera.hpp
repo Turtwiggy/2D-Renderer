@@ -11,11 +11,16 @@ struct render_window;
 struct camera
 {
     vec2f pos;
+    float zoom_level = 0;
 
     vec2f tile_to_screen(render_window& win, vec2f tile_pos) const;
     vec2f screen_to_tile(render_window& win, vec2f screen_pos) const;
     vec2f world_to_screen(render_window& win, vec2f world_pos) const;
     vec2f screen_to_world(render_window& win, vec2f screen_pos) const;
+
+    void zoom(float number_of_levels);
+
+    float calculate_scale() const;
 };
 
 #endif // CAMERA_HPP_INCLUDED

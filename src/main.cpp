@@ -239,6 +239,12 @@ int main(int argc, char* argv[])
         ImGuiIO& io = ImGui::GetIO();
         float delta_time = io.DeltaTime;
 
+        if(io.MouseWheel > 0)
+            cam.zoom(1);
+
+        if(io.MouseWheel < 0)
+            cam.zoom(-1);
+
         //Input
         if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_C)))
         {
