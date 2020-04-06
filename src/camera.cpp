@@ -73,6 +73,8 @@ vec2f camera::screen_to_world(render_window& win, vec2f screen_pos) const
 void camera::zoom(float number_of_levels)
 {
     zoom_level += number_of_levels;
+
+    zoom_level = clamp(zoom_level, -3, 3);
 }
 
 float camera::calculate_scale() const
