@@ -27,6 +27,7 @@ struct render_descriptor
     vec4f colour = {1,1,1,1}; //linear colour, everything's fine
     float angle = 0; //in radians, about the origin, which is currently the centre
     vec2f scale = {1,1};
+    bool depress_on_hover = false;
 };
 
 struct sprite_renderer

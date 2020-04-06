@@ -232,6 +232,15 @@ int main(int argc, char* argv[])
     {
         win.poll();
 
+        vec2f mpos = {ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y};
+
+        if(ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            auto win_pos = win.get_window_position();
+
+            mpos = mpos - vec2f{win_pos.x(), win_pos.y()};
+        }
+
         //hack to hold the console
         if (ImGui::IsKeyDown(GLFW_KEY_C)) {
             win.display();
@@ -292,9 +301,8 @@ int main(int argc, char* argv[])
         //map
         battle_starter(registry);
 
-
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
-        focused.render(registry, sprite_render);
+        focused.render(registry, win, cam, sprite_render, mpos);
 
         //vfx
         snow.update(delta_time, win, rng, particle_sys);

@@ -30,6 +30,7 @@ entt::entity create_basic_unit(entt::registry& registry, const team& t, const sp
 
     render_descriptor desc;
     desc.pos = transform.position;
+    desc.depress_on_hover = true;
 
     registry.assign<team>(res, t);
     registry.assign<sprite_handle>(res, handle);
@@ -47,6 +48,7 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
 
     render_descriptor desc;
     desc.pos = transform.position;
+    desc.depress_on_hover = true;
 
     team t;
     t.type = team::NEUTRAL;
@@ -67,6 +69,7 @@ entt::entity create_unit_group(entt::registry& registry, const team& t, const sp
 
     render_descriptor desc;
     desc.pos = transform.position;
+    desc.depress_on_hover = true;
 
     registry.assign<render_descriptor>(res, desc);
     registry.assign<team>(res, t);

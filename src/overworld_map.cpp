@@ -7,6 +7,7 @@ entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handl
 
     render_descriptor desc;
     desc.pos = transform.position;
+    desc.depress_on_hover = true;
 
     registry.assign<sprite_handle>(res, handle);
     registry.assign<world_transform>(res, transform);
@@ -22,6 +23,7 @@ entt::entity create_overworld_building(entt::registry& registry, const sprite_ha
 
     render_descriptor desc;
     desc.pos = transform.position;
+    desc.depress_on_hover = true;
 
     registry.assign<sprite_handle>(res, handle);
     registry.assign<world_transform>(res, transform);

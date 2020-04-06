@@ -69,12 +69,12 @@ namespace tiles
         EFFECT_1,       //swipe
         EFFECT_2,       //curved swipe
         EFFECT_3,       //slash claws
-        EFFECT_4,       
+        EFFECT_4,
         EFFECT_5,       //fire
         EFFECT_6,       //fireball
         EFFECT_7,       //
         EFFECT_8,       //stationary fire
-        EFFECT_9,       
+        EFFECT_9,
         EFFECT_10,      //snow?
         EFFECT_11,      //snow?
         EFFECT_12,      //snow?
@@ -125,7 +125,7 @@ struct tilemap
 
     void create(vec2i dim);
     void add(entt::entity en, vec2i pos);
-    void render(entt::registry& reg, sprite_renderer& renderer);
+    void render(entt::registry& reg, render_window& win, camera& cam, sprite_renderer& renderer, vec2f mpos);
 };
 
 #endif

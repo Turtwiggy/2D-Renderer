@@ -286,30 +286,53 @@ void tilemap::add(entt::entity en, vec2i pos)
     all_entities[pos.y() * dim.x() + pos.x()].push_back(en);
 }
 
-void tilemap::render(entt::registry& registry, sprite_renderer& renderer)
+void tilemap::render(entt::registry& registry, render_window& win, camera& cam, sprite_renderer& renderer, vec2f mpos)
 {
-    for(const auto& lst : all_entities)
+    vec2f mouse_tile = cam.screen_to_tile(win, mpos);
+
+    vec2i i_tile = {mouse_tile.x(), mouse_tile.y()};
+
+    for(int y=0; y < dim.y(); y++)
     {
-        for(int id = 0; id < (int)lst.size(); id++)
+        for(int x=0; x < dim.x(); x++)
         {
-            auto en = lst[id];
+            const auto& lst = all_entities[y * dim.x() + x];
 
-            sprite_handle& handle = registry.get<sprite_handle>(en);
-            render_descriptor& desc = registry.get<render_descriptor>(en);
-
-            vec4f old_col = handle.base_colour;
-
-            vec4f shaded_col = srgb_to_lin_approx(vec4f{0.02, 0.02, 0.02, 1});
-
-            if(id > 0 && id != (int)lst.size() - 1 && lst.size() > 2)
+            for(int id = 0; id < (int)lst.size(); id++)
             {
-                handle.base_colour = mix(shaded_col, handle.base_colour, 0.1);
-                //handle.base_colour.w() *= 0.3;
+                auto en = lst[id];
+
+                sprite_handle& handle = registry.get<sprite_handle>(en);
+                render_descriptor desc = registry.get<render_descriptor>(en);
+
+                vec4f old_col = handle.base_colour;
+
+                vec4f shaded_col = srgb_to_lin_approx(vec4f{0.02, 0.02, 0.02, 1});
+
+                if(id > 0 && id != (int)lst.size() - 1 && lst.size() > 2)
+                {
+                    handle.base_colour = mix(shaded_col, handle.base_colour, 0.1);
+                    //handle.base_colour.w() *= 0.3;
+                }
+
+                if(desc.depress_on_hover && i_tile == vec2i{x, y})
+                {
+                    if(id > 0)
+                    {
+                        handle.base_colour.w() = 1;
+                        desc.pos.y() -= 3;
+                    }
+
+                    if(id == 0)
+                    {
+                        handle.base_colour = mix(shaded_col, handle.base_colour, 0.5);
+                    }
+                }
+
+                renderer.add(handle, desc);
+
+                handle.base_colour = old_col;
             }
-
-            renderer.add(handle, desc);
-
-            handle.base_colour = old_col;
         }
     }
 }

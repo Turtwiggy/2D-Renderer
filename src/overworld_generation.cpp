@@ -212,8 +212,22 @@ entt::entity create_tile_from_density(entt::registry& registry, random_state& rn
         han.base_colour = srgb_to_lin_approx(vec4f{122, 68, 74, 255} / 255.f);
     }*/
 
+    #define HACKY_BLENDING_FIX
+    #ifdef HACKY_BLENDING_FIX
+
+    float old_w = han.base_colour.w();
+    han.base_colour.w() = 1;
+
+    han.base_colour = lin_to_srgb(han.base_colour);
+    han.base_colour *= old_w;
+    han.base_colour.w() = 1;
+    han.base_colour = srgb_to_lin(han.base_colour);
+
+    #endif // HACKY_BLENDING_FIX
+
     render_descriptor desc;
     desc.pos = vec2f{pos.x(), pos.y()} * TILE_PIX + vec2f{TILE_PIX / 2, TILE_PIX / 2};
+    desc.depress_on_hover = true;
 
     entt::entity base = registry.create();
 
