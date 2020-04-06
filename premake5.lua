@@ -15,10 +15,6 @@ workspace "DwarfAndBladeWorkspace"
         "MultiProcessorCompile",
     }
 
-    filter {"toolset:msc"}
-        buildoptions {"/bigobj", "/permissive-"}
-
-
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
@@ -68,6 +64,9 @@ project "DwarfAndBlade"
     -- pchheader "spkpch.h"
     -- pchsource "SparkEngine/src/spkpch.cpp"
 
+    configuration "vs*"
+        buildoptions {"/bigobj" , "/permissive-"}
+
     files
     {
         "src/**.h",
@@ -112,6 +111,7 @@ project "DwarfAndBlade"
     {
         "opengl32",
     }
+
 
     filter {"toolset:gcc"}
         links
