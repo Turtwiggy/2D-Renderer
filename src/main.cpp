@@ -159,11 +159,14 @@ void battle_starter(entt::registry& registry)
     ImGui::End();
 }
 
-void battle_editor(entt::registry& registry, random_state& rng, float xy[2])
+void battle_editor(entt::registry& registry, random_state& rng, std::array<int, 2>& xy)
 {
     ImGui::Begin("Battle Editor");
 
-    ImGui::SliderFloat2("Battle Size", xy, 0, 500);
+    float xy_c[2] = { xy[0], xy[1] };
+    ImGui::SliderFloat2("Battle Size", xy_c, 0, 500);
+    xy[0] = xy_c[0];
+    xy[1] = xy_c[1];
 
     if (ImGui::Button("Generate Battle"))
     {
@@ -223,7 +226,7 @@ int main(int argc, char* argv[])
     entt::entity& focused_tilemap = overworld;
 
     //battle editor variables
-    float battle_xy[2] = { 50, 50 };
+    std::array<int, 2> battle_xy = { 50, 50 };
 
     debug_overworld(registry, overworld, rng);
 
