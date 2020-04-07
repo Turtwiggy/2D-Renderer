@@ -62,6 +62,7 @@ namespace battle_map {
 
                 render_descriptor desc;
                 desc.pos = vec2f{ x, y } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+                desc.depress_on_hover = true;
                 //desc.angle = rand_det_s(rng.rng, 0.f, 2 * M_PI);
 
                 entt::entity base = registry.create();
