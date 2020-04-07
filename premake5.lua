@@ -116,6 +116,7 @@ project "DwarfAndBlade"
     filter {"toolset:gcc"}
         links
         {
+            "mingw32",
             "ssl",
             "glfw3",
             "glew32",
