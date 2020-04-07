@@ -31,8 +31,8 @@ jobs:
         submodules: 'recursive'
 
     - name: build action
-      shell: bash
-      run: |
+    - shell: bash
+    - run: |
         npm ci
         npm run build
         rm -rf node_modules
