@@ -113,7 +113,7 @@ project "DwarfAndBlade"
     }
 
 
-    filter {"toolset:gcc"}
+    filter {"action:gmake2"}
         links
         {
             "ssl",
@@ -144,6 +144,10 @@ project "DwarfAndBlade"
             "ws2_32",
             "lmdb",
             "winmm"
+        }
+
+        buildoptions {
+            "-std=c++17", "-Wall", "-Wextra", "-Wformat", "-O2", "-s"
         }
 
     filter "system:windows"

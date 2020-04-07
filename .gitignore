@@ -14,6 +14,9 @@
 *.sln.docstates
 .vscode/**
 
+#ignore make as we should use premake to generate the make file
+*.make 
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
