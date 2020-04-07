@@ -49,7 +49,7 @@ jobs:
       run: '${{ github.workspace }}/build-make.bat'
 
     - name: (Windows-GCC) Compile project
-      run: msys2do mingw32-make -d -C D:/a/Dwarf-and-Blade/Dwarf-and-Blade/ config=release 
+      run: msys2do mingw32-make -C D:/a/Dwarf-and-Blade/Dwarf-and-Blade/ config=release 
 
     - name: (Windows-GCC) Copy Resources File
       run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\

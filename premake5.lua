@@ -138,7 +138,7 @@ project "DwarfAndBlade"
             "ole32",
             "dbgeng",
             "crypto",
-            "backtrace",
+            --"backtrace",
             "gdi32",
             "ws2_32",
             "lmdb",
