@@ -3,7 +3,7 @@
 
 namespace battle_map {
 
-    entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_handle handle, world_transform transform, battle_unit_info info)
+    entt::entity create_battle_unit(entt::registry& registry, sprite_handle handle, world_transform transform, battle_unit_info info)
     {
         entt::entity res = registry.create();
 
@@ -19,7 +19,7 @@ namespace battle_map {
         return res;
     }
 
-    void battle_map::distribute_entities(entt::registry& registry, tilemap& tmap, random_state& rng, vec2i dim, level_info::types type, int percentage, const std::vector<tiles::type>& scenery, float path_cost)
+    void distribute_entities(entt::registry& registry, tilemap& tmap, random_state& rng, vec2i dim, level_info::types type, int percentage, const std::vector<tiles::type>& scenery, float path_cost)
     {
         for (int y = 0; y < dim.y(); y++)
         {
@@ -50,7 +50,7 @@ namespace battle_map {
         }
     }
 
-    void battle_map::create_background_tiles(entt::registry& registry, vec2i dim, tilemap& tmap, random_state& rng)
+    void create_background_tiles(entt::registry& registry, vec2i dim, tilemap& tmap, random_state& rng)
     {
         for (int y = 0; y < dim.y(); y++)
         {
@@ -75,7 +75,7 @@ namespace battle_map {
         }
     }
 
-    entt::entity battle_map::create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
+    entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
     {
         entt::entity res = registry.create();
 
