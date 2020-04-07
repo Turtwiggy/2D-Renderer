@@ -29,6 +29,7 @@ jobs:
 
     # Add Msys2 and aquire packages
     - name: Add Msys2
+      shell: bash
       uses: numworks/setup-msys2@v1
       with: 
         update: true
