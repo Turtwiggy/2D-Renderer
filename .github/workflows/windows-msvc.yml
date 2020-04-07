@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: DwarfAndBlade Build
+name: DwarfAndBlade MSVC Build
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [windows-latest]
         include:
           - os: windows-latest
             vcpkg-response-file: vcpkg_x64-windows.txt
