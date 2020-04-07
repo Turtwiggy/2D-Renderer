@@ -43,8 +43,6 @@ jobs:
     -run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-nlohmann-json
     -run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-boost
     -run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
-    #run: msys2do pacman --noconfirm -Syu msys/gcc
-    #run: msys2do pacman --noconfirm -Syu msys/make
 
     #Build project file
     - name: (Windows-GCC) Generate make file 

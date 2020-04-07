@@ -114,6 +114,7 @@ project "DwarfAndBlade"
     configuration {"gmake2"}
         links
         {
+            "mingw32"
             "ssl",
             "glfw3",
             "glew32",
