@@ -44,7 +44,7 @@ jobs:
     -run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-boost
     -run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
 
-    #Build project file
+    # Build project file
     - name: (Windows-GCC) Generate make file 
       run: '${{ github.workspace }}/build-make.bat'
 
