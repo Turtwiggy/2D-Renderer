@@ -29,7 +29,6 @@ jobs:
 
     # Add Msys2 and aquire packages
     - name: Add Msys2
-      shell: bash
       uses: numworks/setup-msys2@v1
       with: 
         update: true
@@ -50,7 +49,6 @@ jobs:
       run: '${{ github.workspace }}/build-make.bat'
 
     - name: (Windows-GCC) Compile project
-      shell: bash
       run: msys2do make -d -C D:/a/Dwarf-and-Blade/Dwarf-and-Blade/ config=release 
 
     - name: (Windows-GCC) Copy Resources File
