@@ -21,8 +21,6 @@ jobs:
         include:
           - os: windows-latest
             vcpkg-response-file: vcpkg_x64-windows.txt
-          - os: ubuntu-latest
-            vcpkg-response-file: vcpkg_x64-linux.txt
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -64,7 +62,7 @@ jobs:
     #Build with MSVC 
     - name: (Windows-MSVC) Generate Dwarf and Blade Visual Studio Proj Files 
       if: "contains( matrix.os, 'windows')"
-      run: '${{ github.workspace }}/build.bat'
+      run: '${{ github.workspace }}/build-vs2019.bat'
 
     - name: (Windows-MSVC) Add msbuild
       if: "contains( matrix.os, 'windows')"
@@ -84,5 +82,3 @@ jobs:
       with:
         name: DwarfAndBlade-Windows-x64-MSVC
         path: .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
-              
-    #TODO: actions for linux/gcc
