@@ -111,7 +111,6 @@ project "DwarfAndBlade"
         "opengl32",
     }
 
-
     configuration {"gmake2"}
         links
         {

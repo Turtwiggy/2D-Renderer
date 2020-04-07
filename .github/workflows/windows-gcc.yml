@@ -32,27 +32,27 @@ jobs:
       uses: numworks/setup-msys2@v1
       with: 
         update: true
-        msystem: MSYS
 
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-gcc
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glfw
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-sfml
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-gdb
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glew
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glm
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-make
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-nlohmann-json
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-boost
-    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
-    - run: msys2do pacman --noconfirm -Sy msys/gcc
-    - run: msys2do pacman --noconfirm -Sy msys/make
+    - name: (Windows-GCC) Get Deps
+      run: msys2do pacman --noconfirm -Syu mingw64/mingw-w64-x86_64-gcc
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glfw
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-sfml
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-gdb
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glew
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glm
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-make
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-nlohmann-json
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-boost
+      run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
+      #run: msys2do pacman --noconfirm -Syu msys/gcc
+      #run: msys2do pacman --noconfirm -Syu msys/make
 
     #Build project file
     - name: (Windows-GCC) Generate make file 
       run: '${{ github.workspace }}/build-make.bat'
 
     - name: (Windows-GCC) Compile project
-      run: msys2do make config=release -C D:/a/Dwarf-and-Blade/Dwarf-and-Blade/ 
+      run: msys2do make -d -C D:/a/Dwarf-and-Blade/Dwarf-and-Blade/ config=release 
 
     - name: (Windows-GCC) Copy Resources File
       run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
