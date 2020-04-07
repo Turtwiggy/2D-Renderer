@@ -20,11 +20,11 @@ jobs:
         os: [windows-latest]
         include:
           - os: windows-latest
-            vcpkg-response-file: vcpkg_x64-windows.txt
+            vcpkg-response-file: deps_vcpkg_x64-windows.txt
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    
+
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
       with:

@@ -41,6 +41,7 @@ jobs:
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glew
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glm
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-make
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-cmake
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-nlohmann-json
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-boost
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
@@ -53,7 +54,7 @@ jobs:
     - name: (Windows-GCC) Compile project
       run: | 
         set MSYSTEM=MINGW64
-        msys2do make 
+        msys2do make -C D:/a/Dwarf-and-Blade/Dwarf-and-Blade/
 
     - name: (Windows-GCC) Copy Resources File
       run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
