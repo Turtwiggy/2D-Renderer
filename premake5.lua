@@ -63,8 +63,10 @@ project "DwarfAndBlade"
     -- pchheader "spkpch.h"
     -- pchsource "SparkEngine/src/spkpch.cpp"
 
-    configuration "vs*"
+    filter {"toolset:vs*"}
         buildoptions {"/bigobj" , "/permissive-"}
+
+    filter{}
 
     files
     {
@@ -172,11 +174,11 @@ project "DwarfAndBlade"
         runtime "Debug"
         symbols "on"
 
-        configuration "gmake2"
-            buildoptions 
-            {
-                "-std=c++17", "-Wall", "-Wextra", "-Wformat", "-O2", "-s"
-            }
+    configuration "gmake2"
+        buildoptions 
+        {
+            "-std=c++17", "-Wall", "-Wextra", "-Wformat", "-O2", "-s"
+        }
 
     configuration "Release"
         defines "ENGINE_RELEASE"
