@@ -46,11 +46,6 @@ jobs:
     - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
     - run: msys2do pacman --noconfirm -Sy msys/gcc
 
-    - name: test gcc works
-      run: | 
-        set MSYSTEM=MINGW64
-        msys2do gcc 
-
     #Build project file
     - name: (Windows-GCC) Generate make file 
       run: '${{ github.workspace }}/build-make.bat'
