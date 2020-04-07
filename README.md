@@ -1,6 +1,7 @@
 Dwarf n blade project!
+
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
-![CI](https://github.com/Turtwiggy/Dwarf-and-Blade/workflows/CI/badge.svg?branch=CI-release-branch)
+![Latest Build](https://github.com/Turtwiggy/Dwarf-and-Blade/workflows/DwarfAndBlade%20Build/badge.svg?branch=CI-release-branch)
 
 Read [COMPILE.md](./COMPILE.md) on how to build
 
