@@ -34,14 +34,37 @@ jobs:
         update: true
         msystem: MSYS
 
-    - run: msys2do pacman -Sy mingw64/mingw-w64-x86_64-gcc
-    - run: msys2do pacman -Sy msys/gcc
-    - run: msys2do pacman -Sy mingw64/mingw-w64-x86_64-glfw
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-gcc
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glfw
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-sfml
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-gdb
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glew
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-glm
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-make
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-nlohmann-json
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-boost
+    - run: msys2do pacman --noconfirm -Sy mingw64/mingw-w64-x86_64-lmdb
+    - run: msys2do pacman --noconfirm -Sy msys/gcc
 
-    #test gcc works
-    - run: msys2do gcc 
+    - name: test gcc works
+      run: | 
+        set MSYSTEM=MINGW64
+        msys2do gcc 
 
-    #test make works
-    - run: msys2do make
+    #Build project file
+    - name: (Windows-GCC) Generate make file 
+      run: '${{ github.workspace }}/build-make.bat'
 
-    
+    - name: (Windows-GCC) Compile project
+      run: | 
+        set MSYSTEM=MINGW64
+        msys2do make 
+
+    - name: (Windows-GCC) Copy Resources File
+      run: cp -r ${{ github.workspace }}/res .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
+
+    - name: (Windows-GCC) Upload 64x artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: DwarfAndBlade-Windows-x64-GCC
+        path: .\builds\bin\Release-windows-x86_64\DwarfAndBlade\
