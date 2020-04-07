@@ -19,7 +19,6 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
-IncludeDir["src"] = "src"
 IncludeDir["include"] = "include"
 IncludeDir["ImGui"] = "include/imgui"
 IncludeDir["entt"]  = "include/entt/single_include"
@@ -113,7 +112,7 @@ project "DwarfAndBlade"
     }
 
 
-    filter {"action:gmake2"}
+    configuration {"gmake2"}
         links
         {
             "ssl",
@@ -146,10 +145,6 @@ project "DwarfAndBlade"
             "winmm"
         }
 
-        buildoptions {
-            "-std=c++17", "-Wall", "-Wextra", "-Wformat", "-O2", "-s"
-        }
-
     filter "system:windows"
         systemversion "latest"
 
@@ -172,17 +167,24 @@ project "DwarfAndBlade"
         -- 	("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
         -- }
 
-    filter "configurations:Debug"
-        defines "ENGINE_DEBUG"
+    configuration "Debug"
+        defines {"ENGINE_DEBUG", "DEBUG"}
         runtime "Debug"
         symbols "on"
 
-    filter "configurations:Release"
+        configuration "gmake2"
+            buildoptions 
+            {
+                "-std=c++17", "-Wall", "-Wextra", "-Wformat", "-O2", "-s"
+            }
+
+    configuration "Release"
         defines "ENGINE_RELEASE"
         runtime "Release"
         optimize "on"
 
-    filter "configurations:Dist"
-        defines "ENGINE_DIST"
-        runtime "Release"
-        optimize "on"
+        configuration "gmake2"
+            buildoptions 
+            {
+                "-std=c++17", "-Wall", "-Wextra", "-Wformat", "-g", "-Og"
+            }
