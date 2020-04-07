@@ -106,6 +106,7 @@ project "DwarfAndBlade"
         "%{IncludeDir.include}",	
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.entt}",
+        "/mingw64/include/freetype2"
     }
 
     links
