@@ -27,24 +27,16 @@ jobs:
       with:
         submodules: 'recursive'
 
-    - name: build action
-      run: |
-        npm ci
-        npm run build
-        rm -rf node_modules
-
     # Add Msys2 and aquire packages
     - name: Add Msys2
-    - uses: numworks/setup-msys2@v1
+      uses: numworks/setup-msys2@v1
       with: 
         update: true
         msystem: MSYS
 
-    - shell: msys2
-      run: |
-        pacman -Sy mingw64/mingw-w64-x86_64-gcc
-        pacman -Sy msys/gcc
-        pacman -Sy mingw64/mingw-w64-x86_64-glfw
+    - run: msys2do pacman -Sy mingw64/mingw-w64-x86_64-gcc
+    - run: msys2do pacman -Sy msys/gcc
+    - run: msys2do pacman -Sy mingw64/mingw-w64-x86_64-glfw
 
     #test gcc works
     - run: msys2do gcc 
