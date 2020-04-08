@@ -1,6 +1,9 @@
 #include "tilemap.hpp"
 #include <vec/vec.hpp>
 
+#include "entity_common.hpp"
+#include <imgui/imgui.h>
+
 template<typename T>
 void add_to(T& in, vec2i loc)
 {
@@ -301,6 +304,23 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
             for(int id = 0; id < (int)lst.size(); id++)
             {
                 auto en = lst[id];
+
+                if(registry.has<mouse_interactable>(en))
+                {
+                    reset_interactable_state(registry, en);
+
+                    mouse_interactable& interact = registry.get<mouse_interactable>(en);
+
+                    if(i_tile == vec2i{x, y} && !ImGui::IsAnyItemHovered())
+                    {
+                        interact.is_hovered = true;
+
+                        if(ImGui::IsMouseClicked(0))
+                        {
+                            interact.just_clicked = true;
+                        }
+                    }
+                }
 
                 sprite_handle& handle = registry.get<sprite_handle>(en);
                 render_descriptor desc = registry.get<render_descriptor>(en);

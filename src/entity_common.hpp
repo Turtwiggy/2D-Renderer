@@ -50,6 +50,14 @@ struct damageable
     void damage_remaining_fraction(float frac);
 };
 
+struct mouse_interactable
+{
+    bool just_clicked = false;
+    bool is_hovered = false;
+};
+
+void reset_interactable_state(entt::registry& registry, entt::entity en);
+
 struct battle_tag{};
 struct overworld_tag{};
 
