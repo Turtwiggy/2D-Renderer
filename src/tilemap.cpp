@@ -2,6 +2,7 @@
 #include <vec/vec.hpp>
 
 #include "entity_common.hpp"
+#include "overworld_building.hpp"
 #include <imgui/imgui.h>
 
 template<typename T>
@@ -379,10 +380,9 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
 
     if(selected.has_value())
     {
-        ImGui::Begin("U've selected a thing innit", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-        ImGui::Text("I am a thing that has been selected");
-
-        ImGui::End();
+        if(registry.has<building_tag>(selected.value()))
+        {
+            do_building_ui(registry, selected.value());
+        }
     }
 }

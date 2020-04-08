@@ -5,6 +5,7 @@
 #include "sprite_renderer.hpp"
 #include "tilemap.hpp"
 #include "overworld_map.hpp"
+#include "overworld_building.hpp"
 
 std::vector<float> generate_noise(random_state& rng, vec2i dim)
 {

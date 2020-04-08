@@ -1,24 +1,8 @@
 #include "overworld_map.hpp"
 #include "entity_common.hpp"
+#include "overworld_building.hpp"
 
 entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handle, world_transform transform)
-{
-    entt::entity res = registry.create();
-
-    render_descriptor desc;
-    desc.pos = transform.position;
-    desc.depress_on_hover = true;
-
-    registry.assign<sprite_handle>(res, handle);
-    registry.assign<world_transform>(res, transform);
-    registry.assign<overworld_tag>(res, overworld_tag());
-    registry.assign<render_descriptor>(res, desc);
-    registry.assign<mouse_interactable>(res, mouse_interactable());
-
-    return res;
-}
-
-entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const world_transform& transform)
 {
     entt::entity res = registry.create();
 
