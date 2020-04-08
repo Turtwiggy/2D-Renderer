@@ -24,6 +24,14 @@ void damageable::damage_remaining_fraction(float frac)
     cur_hp = clamp(cur_hp, 0.f, max_hp);
 }
 
+void reset_interactable_state(entt::registry& registry,entt::entity en)
+{
+    auto& mouse = registry.get<mouse_interactable>(en);
+
+    mouse.is_hovered = false;
+    mouse.just_clicked = false;
+}
+
 entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform, const damageable& damage)
 {
     entt::entity res = registry.create();
@@ -38,6 +46,7 @@ entt::entity create_basic_unit(entt::registry& registry, const team& t, const sp
     registry.assign<damageable>(res, damage);
 
     registry.assign<render_descriptor>(res, desc);
+    registry.assign<mouse_interactable>(res, mouse_interactable());
 
     return res;
 }
@@ -58,6 +67,7 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
     registry.assign<sprite_handle>(res, handle);
     registry.assign<world_transform>(res, transform);
     registry.assign<collidable>(res, coll);
+    registry.assign<mouse_interactable>(res, mouse_interactable());
 
     return res;
 }
@@ -79,6 +89,8 @@ entt::entity create_unit_group(entt::registry& registry, const team& t, const sp
     unit_group ugroup;
 
     registry.assign<unit_group>(res, ugroup);
+
+    registry.assign<mouse_interactable>(res, mouse_interactable());
 
     return res;
 }

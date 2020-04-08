@@ -15,6 +15,7 @@ namespace battle_map {
         registry.assign<battle_unit_info>(res, info);
         registry.assign<battle_tag>(res, battle_tag());
         registry.assign<render_descriptor>(res, desc);
+        registry.assign<mouse_interactable>(res, mouse_interactable());
 
         return res;
     }

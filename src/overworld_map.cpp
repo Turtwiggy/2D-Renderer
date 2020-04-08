@@ -13,6 +13,7 @@ entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handl
     registry.assign<world_transform>(res, transform);
     registry.assign<overworld_tag>(res, overworld_tag());
     registry.assign<render_descriptor>(res, desc);
+    registry.assign<mouse_interactable>(res, mouse_interactable());
 
     return res;
 }
@@ -29,6 +30,7 @@ entt::entity create_overworld_building(entt::registry& registry, const sprite_ha
     registry.assign<world_transform>(res, transform);
     registry.assign<overworld_tag>(res, overworld_tag());
     registry.assign<render_descriptor>(res, desc);
+    registry.assign<mouse_interactable>(res, mouse_interactable());
 
     return res;
 }

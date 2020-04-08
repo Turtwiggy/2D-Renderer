@@ -1,6 +1,9 @@
 #include "tilemap.hpp"
 #include <vec/vec.hpp>
 
+#include "entity_common.hpp"
+#include <imgui/imgui.h>
+
 template<typename T>
 void add_to(T& in, vec2i loc)
 {
@@ -292,6 +295,9 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
 
     vec2i i_tile = {mouse_tile.x(), mouse_tile.y()};
 
+    bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
+    bool mouse_hovering = !ImGui::IsAnyWindowHovered();
+
     for(int y=0; y < dim.y(); y++)
     {
         for(int x=0; x < dim.x(); x++)
@@ -301,6 +307,36 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
             for(int id = 0; id < (int)lst.size(); id++)
             {
                 auto en = lst[id];
+
+                if(registry.has<mouse_interactable>(en))
+                {
+                    reset_interactable_state(registry, en);
+
+                    mouse_interactable& interact = registry.get<mouse_interactable>(en);
+
+                    if(i_tile == vec2i{x, y})
+                    {
+                        if(mouse_hovering)
+                        {
+                            interact.is_hovered = true;
+
+                            if(mouse_clicked)
+                            {
+                                interact.just_clicked = true;
+
+                                selected = en;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    //Clicked something unclickable
+                    if(mouse_clicked && i_tile == vec2i{x, y})
+                    {
+                        selected = std::nullopt;
+                    }
+                }
 
                 sprite_handle& handle = registry.get<sprite_handle>(en);
                 render_descriptor desc = registry.get<render_descriptor>(en);
@@ -315,7 +351,7 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
                     //handle.base_colour.w() *= 0.3;
                 }
 
-                if(desc.depress_on_hover && i_tile == vec2i{x, y})
+                if(mouse_hovering && desc.depress_on_hover && i_tile == vec2i{x, y})
                 {
                     if(id > 0)
                     {
@@ -334,5 +370,19 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
                 handle.base_colour = old_col;
             }
         }
+    }
+
+    if(ImGui::IsMouseClicked(1) && !ImGui::IsAnyWindowHovered())
+    {
+        selected = std::nullopt;
+    }
+
+    if(selected.has_value())
+    {
+        ImGui::Begin("U've selected a thing innit", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::Text("I am a thing that has been selected");
+
+        ImGui::End();
     }
 }
