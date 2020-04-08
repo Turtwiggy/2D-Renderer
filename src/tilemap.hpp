@@ -4,6 +4,7 @@
 #include <vector>
 #include <vec/vec.hpp>
 #include <map>
+#include <optional>
 #include "sprite_renderer.hpp"
 #include "random.hpp"
 
