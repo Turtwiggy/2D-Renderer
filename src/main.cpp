@@ -159,9 +159,9 @@ void battle_starter(entt::registry& registry)
     ImGui::End();
 }
 
-void battle_editor(entt::registry& registry, random_state& rng, std::array<int, 2>& xy)
+void battle_generator(entt::registry& registry, random_state& rng, std::array<int, 2>& xy)
 {
-    ImGui::Begin("Battle Editor");
+    ImGui::Begin("Start a new battle");
 
     float xy_c[2] = { xy[0], xy[1] };
     ImGui::SliderFloat2("Battle Size", xy_c, 0, 500);
@@ -222,11 +222,11 @@ int main(int argc, char* argv[])
     entt::registry registry;
 
     entt::entity overworld = create_overworld(registry, rng, {150, 150});
-    entt::entity default_battle = battle_map::create_battle(registry, rng, { 100, 100 }, level_info::GRASS);
+    entt::entity default_battle = battle_map::create_battle(registry, rng, { 30, 30 }, level_info::GRASS);
     entt::entity& focused_tilemap = overworld;
 
     //battle editor variables
-    std::array<int, 2> battle_xy = { 50, 50 };
+    std::array<int, 2> battle_size = { 50, 50 };
 
     debug_overworld(registry, overworld, rng);
 
@@ -291,16 +291,22 @@ int main(int argc, char* argv[])
         cam.translate({dx_dt, dy_dt});
 
         //UI
-        battle_editor(registry, rng, battle_xy);
+        battle_generator(registry, rng, battle_size);
+        battle_map::debug_combat(registry, default_battle, rng);
 
         //Update systems
         if (auto val = scene_selector(registry); val.has_value())
         {
             focused_tilemap = val.value();
+
+            //centre camera on the new scene
+            tilemap& tmap = registry.get<tilemap>(focused_tilemap);
+            cam.pos = vec2f{ tmap.dim.x()/2, tmap.dim.y()/2 } * TILE_PIX;
         }
 
         //map
         battle_starter(registry);
+
 
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
         focused.render(registry, win, cam, sprite_render, mpos);
