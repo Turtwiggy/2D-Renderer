@@ -119,6 +119,8 @@ vec4f get_colour_of(tiles::type type, level_info::types level_type);
 
 struct tilemap
 {
+    std::optional<entt::entity> selected;
+
     vec2i dim;
     // x * y, back to front rendering
     std::vector<std::vector<entt::entity>> all_entities;

@@ -295,6 +295,9 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
 
     vec2i i_tile = {mouse_tile.x(), mouse_tile.y()};
 
+    bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
+    bool mouse_hovering = !ImGui::IsAnyWindowHovered();
+
     for(int y=0; y < dim.y(); y++)
     {
         for(int x=0; x < dim.x(); x++)
@@ -311,14 +314,27 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
 
                     mouse_interactable& interact = registry.get<mouse_interactable>(en);
 
-                    if(i_tile == vec2i{x, y} && !ImGui::IsAnyItemHovered())
+                    if(i_tile == vec2i{x, y})
                     {
-                        interact.is_hovered = true;
-
-                        if(ImGui::IsMouseClicked(0))
+                        if(mouse_hovering)
                         {
-                            interact.just_clicked = true;
+                            interact.is_hovered = true;
+
+                            if(mouse_clicked)
+                            {
+                                interact.just_clicked = true;
+
+                                selected = en;
+                            }
                         }
+                    }
+                }
+                else
+                {
+                    //Clicked something unclickable
+                    if(mouse_clicked && i_tile == vec2i{x, y})
+                    {
+                        selected = std::nullopt;
                     }
                 }
 
@@ -335,7 +351,7 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
                     //handle.base_colour.w() *= 0.3;
                 }
 
-                if(desc.depress_on_hover && i_tile == vec2i{x, y})
+                if(mouse_hovering && desc.depress_on_hover && i_tile == vec2i{x, y})
                 {
                     if(id > 0)
                     {
@@ -354,5 +370,19 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
                 handle.base_colour = old_col;
             }
         }
+    }
+
+    if(ImGui::IsMouseClicked(1) && !ImGui::IsAnyWindowHovered())
+    {
+        selected = std::nullopt;
+    }
+
+    if(selected.has_value())
+    {
+        ImGui::Begin("U've selected a thing innit", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::Text("I am a thing that has been selected");
+
+        ImGui::End();
     }
 }
