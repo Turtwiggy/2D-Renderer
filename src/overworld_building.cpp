@@ -4,12 +4,40 @@
 #include "tilemap.hpp"
 #include "sprite_renderer.hpp"
 #include <imgui/imgui.h>
+#include <set>
 
 void building_tag::show_build_ui()
 {
     ImGui::Begin("I am a building");
 
     ImGui::Text("Building text");
+
+    ImGui::Text("Built:");
+
+    std::set<int> types_built;
+
+    for(building_feature& i : built)
+    {
+        const std::string& name = building_feature::type_names[(int)i.t];
+
+        ImGui::Text("Name: %s", name.c_str());
+
+        types_built.insert((int)i.t);
+    }
+
+    ImGui::Text("Unbuilt:");
+
+    std::vector<building_feature> buildable_for = get_buildable_for(cat);
+
+    for(auto& i : buildable_for)
+    {
+        if(types_built.count((int)i.t) > 0)
+            continue;
+
+        const std::string& name = building_feature::type_names[(int)i.t];
+
+        ImGui::Text("Name: %s\n", name.c_str());
+    }
 
     ImGui::End();
 }

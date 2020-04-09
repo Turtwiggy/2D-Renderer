@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <vector>
+#include <string>
 
 struct sprite_handle;
 struct world_transform;
@@ -37,6 +38,15 @@ struct building_feature
         STABLE,
         MINE,
         COUNT
+    };
+
+    static inline std::vector<std::string> type_names
+    {
+        "Walls",
+        "Barracks",
+        "Stable",
+        "Mine",
+        "Error"
     };
 
     type t = type::COUNT;
