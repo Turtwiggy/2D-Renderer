@@ -290,6 +290,34 @@ void tilemap::add(entt::entity en, vec2i pos)
     all_entities[pos.y() * dim.x() + pos.x()].push_back(en);
 }
 
+void tilemap::remove(vec2i pos)
+{
+    if (pos.x() < 0 || pos.y() < 0 || pos.x() >= dim.x() || pos.y() >= dim.y())
+        throw std::runtime_error("Remove out of bounds");
+
+    all_entities[pos.y() * dim.x() + pos.x()].pop_back();
+}
+
+void tilemap::move(vec2i from, vec2i to)
+{
+    if (from.x() < 0 || from.y() < 0 || from.x() >= dim.x() || from.y() >= dim.y())
+        throw std::runtime_error("From out of bounds");
+
+    if (to.x() < 0 || to.y() < 0 || to.x() >= dim.x() || to.y() >= dim.y())
+        throw std::runtime_error("To out of bounds");
+
+    int from_size = entities_at_position(from);
+
+    if (from_size == 0)
+        return;
+
+    entt::entity e = all_entities[from.y() * dim.x() + from.x()].back();
+
+    all_entities[from.y() * dim.x() + from.x()].pop_back();
+
+    add(e, to);
+}
+
 void tilemap::render(entt::registry& registry, render_window& win, camera& cam, sprite_renderer& renderer, vec2f mpos)
 {
     vec2f mouse_tile = cam.screen_to_tile(win, mpos);
@@ -385,4 +413,12 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
             do_building_ui(registry, selected.value());
         }
     }
+}
+
+int tilemap::entities_at_position(vec2i pos)
+{
+    if (pos.x() < 0 || pos.y() < 0 || pos.x() >= dim.x() || pos.y() >= dim.y())
+        throw std::runtime_error("Out of bounds");
+
+    return  all_entities[pos.y() * dim.x() + pos.x()].size();
 }

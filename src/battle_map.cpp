@@ -2,6 +2,11 @@
 
 namespace battle_map {
 
+    vec2f convert_xy_to_world(const vec2i pos) 
+    {
+        return vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+    }
+
     entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
     {
         entt::entity res = registry.create();
@@ -105,7 +110,7 @@ namespace battle_map {
 
         registry.assign<damageable>(res, damageable());
         registry.assign<team>(res, t);
-        registry.assign<battle_tag>(res, battle_tag());
+        registry.assign<battle_unit>(res, battle_unit());
 
         return res;
     }
@@ -129,31 +134,81 @@ namespace battle_map {
     }
 
 
-    void debug_combat(entt::registry& registry, entt::entity battle, random_state& rng)
+    void debug_combat(entt::registry& registry, entt::entity map, random_state& rng)
     {
         ImGui::Begin("Battle Editor");
 
         if (ImGui::Button("Add units to map"))
         {
-            tilemap& tmap = registry.get<tilemap>(battle);
+            tilemap& tmap = registry.get<tilemap>(map);
 
             vec2i half = tmap.dim / 2;
 
-            sprite_handle handle = get_sprite_handle_of(rng, tiles::type::SOLDIER_SPEAR);
+            vec2i pos = { half.x(), half.y() - 1 };
+            entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
+            tmap.add(unit, pos);
 
-            battle_unit_info info;
-            info.hp = 100;
+            //add random ai to enemy unit
+            vec2i ai_pos = { half.x() + 4, half.y() - 1 };
+            entt::entity enemy_unit = create_battle_unit_at(registry, rng, ai_pos, 1);
 
-            world_transform transform;
-            transform.position = { half.x(), half.y() - 1 };
+            wandering_ai ai;
+            ai.current_xy = ai_pos;
 
-            entt::entity unit = create_battle_unit_at(registry, rng, { half.x(), half.y() - 1 }, 0);
-            entt::entity enemy_unit = create_battle_unit_at(registry, rng, { half.x() + 4, half.y() - 1 }, 1);
+            registry.assign<wandering_ai>(enemy_unit, ai);
+            tmap.add(enemy_unit, ai_pos);
+        }
 
-            tmap.add(unit, { half.x(), half.y() - 1 });
-            tmap.add(enemy_unit, { half.x() + 4, half.y() - 1 });
+        if (ImGui::Button("Remove units from map"))
+        {
+            tilemap& tmap = registry.get<tilemap>(map);
+
+            auto view = registry.view<battle_unit, world_transform, wandering_ai>();
+
+            for (auto ent : view)
+            {
+                auto& ai = view.get<wandering_ai>(ent);
+
+                //auto& desc = view.get<render_descriptor>(ent);
+
+                ////this does not need to be done every frame
+                //ai.destination_xy = { max_x, max_y };
+
+                //ai.update(delta_time);
+
+                //desc.pos = ai.convert_current_xy_to_pos();
+
+                tmap.move(ai.current_xy, );
+            }
+
         }
 
         ImGui::End();
     }
+
+    void update_ai(entt::registry& registry, entt::entity& map, float delta_time)
+    {
+        auto view = registry.view<battle_tag, world_transform, wandering_ai>();
+
+        tilemap& tmap = registry.get<tilemap>(map);
+
+        int min_x = 0;
+        int max_x = tmap.dim.x();
+        int min_y = 0;
+        int max_y = tmap.dim.y();
+
+        for (auto ent : view)
+        {
+            auto& ai = view.get<wandering_ai>(ent);
+            auto& transform = view.get<world_transform>(ent);
+
+            ////this does not need to be done every frame
+            //ai.destination_xy = { max_x, max_y };
+
+            //ai.update(delta_time);
+
+            //desc.pos = ai.convert_current_xy_to_pos();
+        }
+    }
+
 }
