@@ -22,6 +22,8 @@ struct building_tag
     categories cat = categories::VILLAGE;
     std::vector<building_feature> built;
 
+    void show_build_ui();
+
     //std::vector<building_feature> get_buildable();
 };
 
@@ -49,7 +51,5 @@ building_feature get_feature_info(building_feature::type type);
 std::vector<building_feature> get_buildable_for(building_tag::categories cat);
 
 entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const world_transform& transform);
-
-void do_building_ui(entt::registry& registry, entt::entity en);
 
 #endif // OVERWORLD_BUILDING_HPP_INCLUDED

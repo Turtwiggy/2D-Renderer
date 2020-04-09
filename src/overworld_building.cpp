@@ -5,10 +5,13 @@
 #include "sprite_renderer.hpp"
 #include <imgui/imgui.h>
 
-template<typename T>
-void def(T& in, const building_feature& f)
+void building_tag::show_build_ui()
 {
-    in[(int)f.t] = f;
+    ImGui::Begin("I am a building");
+
+    ImGui::Text("Building text");
+
+    ImGui::End();
 }
 
 bool building_feature::can_build_on(building_tag::categories cat)
@@ -20,6 +23,12 @@ bool building_feature::can_build_on(building_tag::categories cat)
     }
 
     return false;
+}
+
+template<typename T>
+void def(T& in, const building_feature& f)
+{
+    in[(int)f.t] = f;
 }
 
 building_feature get_feature_info(building_feature::type type)
@@ -69,11 +78,3 @@ entt::entity create_overworld_building(entt::registry& registry, const sprite_ha
     return res;
 }
 
-void do_building_ui(entt::registry& registry, entt::entity en)
-{
-    ImGui::Begin("Building UI", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-    ImGui::Text("Building text");
-
-    ImGui::End();
-}
