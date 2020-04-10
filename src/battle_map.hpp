@@ -1,12 +1,12 @@
 #pragma once
 
-#include <entt/entt.hpp>
 #include <stdint.h>
 #include "sprite_renderer.hpp"
 #include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "random.hpp"
 
+#include <entt/entt.hpp>
 #include <imgui/imgui.h>
 
 namespace battle_map {
@@ -21,7 +21,7 @@ namespace battle_map {
         float time_between_move_tiles = 1.;
         float time_left_between_move_tiles = time_between_move_tiles;
 
-        void update(float delta_time, render_descriptor& desc, tilemap& tmap)
+        void update(float delta_time, render_descriptor& desc, tilemap& tmap, entt::entity en)
         {
             time_left_between_move_tiles -= delta_time;
 
@@ -30,25 +30,24 @@ namespace battle_map {
 
             time_left_between_move_tiles = time_between_move_tiles;
 
-            move_ai(desc, tmap);
+            move_ai(desc, tmap, en);
         }
 
-        void move_ai(render_descriptor& desc, tilemap& tmap)
+        void move_ai(render_descriptor& desc, tilemap& tmap, entt::entity en)
         {
             vec2i prev_pos = current_xy;
 
-            //Update pos
+            //update pos
             vec2i new_pos = current_xy;
             new_pos.x() -= 1;
 
-            //Clamp pos
             vec2i clamped_pos = clamp(new_pos, vec2i{ 0, 0 }, tmap.dim );
             current_xy = clamped_pos;
             
-            //update render position
-            desc.pos = convert_xy_to_world(current_xy);
-            //update tmap position
-            tmap.move(prev_pos, current_xy);
+            //update renderer
+            desc.pos = convert_xy_to_world(clamped_pos);    
+            //update map
+            tmap.move(en, prev_pos, current_xy);    
         }
     };
 

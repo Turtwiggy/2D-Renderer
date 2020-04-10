@@ -175,7 +175,7 @@ namespace battle_map {
             auto& ai = view.get<wandering_ai>(ent);
             auto& desc = view.get<render_descriptor>(ent);
 
-            ai.update(delta_time, desc, tmap);
+            ai.update(delta_time, desc, tmap, ent);
         }
     }
 }
