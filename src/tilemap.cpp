@@ -311,7 +311,7 @@ void tilemap::move(vec2i from, vec2i to)
     if (from_size == 0)
         return;
 
-    entt::entity e = all_entities[from.y() * dim.x() + from.x()].back();
+    entt::entity& e = all_entities[from.y() * dim.x() + from.x()].back();
 
     all_entities[from.y() * dim.x() + from.x()].pop_back();
 

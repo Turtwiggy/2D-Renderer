@@ -310,7 +310,6 @@ int main(int argc, char* argv[])
         //map
         battle_starter(registry);
 
-
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
         focused.render(registry, win, cam, sprite_render, mpos);
 

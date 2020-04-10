@@ -15,18 +15,13 @@ namespace battle_map {
 
     struct wandering_ai
     {
-        vec2i current_xy = { 15, 15 };
-        vec2i destination_xy = { 0, 0 };
+        vec2i current_xy;
+        vec2i destination_xy;
 
         float time_between_move_tiles = 1.;
         float time_left_between_move_tiles = time_between_move_tiles;
 
-        vec2f convert_current_xy_to_pos()
-        {
-            return convert_xy_to_world(current_xy);
-        };
-
-        void update(float delta_time)
+        void update(float delta_time, render_descriptor& desc, tilemap& tmap)
         {
             time_left_between_move_tiles -= delta_time;
 
@@ -35,17 +30,25 @@ namespace battle_map {
 
             time_left_between_move_tiles = time_between_move_tiles;
 
-            printf("moving ai");
-            move_ai();
+            move_ai(desc, tmap);
         }
 
-        void move_ai()
+        void move_ai(render_descriptor& desc, tilemap& tmap)
         {
-            vec2i clamped_pos = clamp(current_xy, vec2i{ 0, 0 }, vec2i{ 30, 30 });
+            vec2i prev_pos = current_xy;
 
-            //move left
-            current_xy.x() = clamped_pos.x() - 1;
-            //current_xy.y() = clamped_pos.y() - 1;
+            //Update pos
+            vec2i new_pos = current_xy;
+            new_pos.x() -= 1;
+
+            //Clamp pos
+            vec2i clamped_pos = clamp(new_pos, vec2i{ 0, 0 }, tmap.dim );
+            current_xy = clamped_pos;
+            
+            //update render position
+            desc.pos = convert_xy_to_world(current_xy);
+            //update tmap position
+            tmap.move(prev_pos, current_xy);
         }
     };
 
@@ -62,11 +65,7 @@ namespace battle_map {
     
     void distribute_entities(entt::registry& registry, tilemap& tmap, random_state& rng, vec2i dim, level_info::types type, int percentage, const std::vector<tiles::type>& scenery, float path_cost);
 
-    entt::entity create_battle_unit(
-        entt::registry& registry,
-        sprite_handle handle,
-        world_transform transform,
-        team t);
+    entt::entity create_battle_unit( entt::registry& registry, sprite_handle handle, world_transform transform, team t);
 
     void debug_combat(entt::registry& registry, entt::entity battle, random_state& rng);
 }

@@ -91,11 +91,7 @@ namespace battle_map {
         }
     }
 
-    entt::entity create_battle_unit( 
-        entt::registry& registry, 
-        sprite_handle handle, 
-        world_transform transform,
-        team t)
+    entt::entity create_battle_unit(entt::registry& registry, sprite_handle handle, world_transform transform, team t)
     {
         entt::entity res = registry.create();
 
@@ -104,7 +100,6 @@ namespace battle_map {
         desc.depress_on_hover = true;
 
         registry.assign<sprite_handle>(res, handle);
-        registry.assign<world_transform>(res, transform);
         registry.assign<render_descriptor>(res, desc);
         registry.assign<mouse_interactable>(res, mouse_interactable());
 
@@ -125,7 +120,6 @@ namespace battle_map {
         base_team.t = team_id;
 
         sprite_handle handle = get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR);
-
         handle.base_colour *= team::colours.at(team_id);
 
         entt::entity unit = create_battle_unit(registry, handle, transform, base_team);
@@ -133,12 +127,11 @@ namespace battle_map {
         return unit;
     }
 
-
     void debug_combat(entt::registry& registry, entt::entity map, random_state& rng)
     {
         ImGui::Begin("Battle Editor");
 
-        if (ImGui::Button("Add units to map"))
+        if (ImGui::Button("Add player unit"))
         {
             tilemap& tmap = registry.get<tilemap>(map);
 
@@ -146,41 +139,26 @@ namespace battle_map {
 
             vec2i pos = { half.x(), half.y() - 1 };
             entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
+
             tmap.add(unit, pos);
-
-            //add random ai to enemy unit
-            vec2i ai_pos = { half.x() + 4, half.y() - 1 };
-            entt::entity enemy_unit = create_battle_unit_at(registry, rng, ai_pos, 1);
-
-            wandering_ai ai;
-            ai.current_xy = ai_pos;
-
-            registry.assign<wandering_ai>(enemy_unit, ai);
-            tmap.add(enemy_unit, ai_pos);
         }
 
-        if (ImGui::Button("Remove units from map"))
+        if (ImGui::Button("Add enemy unit"))
         {
             tilemap& tmap = registry.get<tilemap>(map);
 
-            auto view = registry.view<battle_unit, world_transform, wandering_ai>();
+            vec2i half = tmap.dim / 2;
 
-            for (auto ent : view)
-            {
-                auto& ai = view.get<wandering_ai>(ent);
+            vec2i ai_pos = { half.x() + 4, half.y() - 1 };
+            entt::entity enemy_unit = create_battle_unit_at(registry, rng, ai_pos, 1);
 
-                //auto& desc = view.get<render_descriptor>(ent);
+            //add ai to enemy unit
+            wandering_ai ai;
+            ai.current_xy = ai_pos;
+            ai.destination_xy = { tmap.dim.x(), tmap.dim.y() };
+            registry.assign<wandering_ai>(enemy_unit, ai);
 
-                ////this does not need to be done every frame
-                //ai.destination_xy = { max_x, max_y };
-
-                //ai.update(delta_time);
-
-                //desc.pos = ai.convert_current_xy_to_pos();
-
-                tmap.move(ai.current_xy, );
-            }
-
+            tmap.add(enemy_unit, ai_pos);
         }
 
         ImGui::End();
@@ -188,27 +166,16 @@ namespace battle_map {
 
     void update_ai(entt::registry& registry, entt::entity& map, float delta_time)
     {
-        auto view = registry.view<battle_tag, world_transform, wandering_ai>();
+        auto view = registry.view<battle_unit, render_descriptor, wandering_ai>();
 
         tilemap& tmap = registry.get<tilemap>(map);
-
-        int min_x = 0;
-        int max_x = tmap.dim.x();
-        int min_y = 0;
-        int max_y = tmap.dim.y();
 
         for (auto ent : view)
         {
             auto& ai = view.get<wandering_ai>(ent);
-            auto& transform = view.get<world_transform>(ent);
+            auto& desc = view.get<render_descriptor>(ent);
 
-            ////this does not need to be done every frame
-            //ai.destination_xy = { max_x, max_y };
-
-            //ai.update(delta_time);
-
-            //desc.pos = ai.convert_current_xy_to_pos();
+            ai.update(delta_time, desc, tmap);
         }
     }
-
 }
