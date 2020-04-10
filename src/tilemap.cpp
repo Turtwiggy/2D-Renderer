@@ -410,7 +410,9 @@ void tilemap::render(entt::registry& registry, render_window& win, camera& cam, 
     {
         if(registry.has<building_tag>(selected.value()))
         {
-            do_building_ui(registry, selected.value());
+            building_tag& tag = registry.get<building_tag>(selected.value());
+
+            tag.show_build_ui();
         }
     }
 }
