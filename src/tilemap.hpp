@@ -7,6 +7,7 @@
 #include <optional>
 #include "sprite_renderer.hpp"
 #include "random.hpp"
+#include <networking/serialisable_fwd.hpp>
 
 namespace ai_info
 {
@@ -118,7 +119,7 @@ std::map<tiles::type, std::vector<vec2i>>& get_locations();
 sprite_handle get_sprite_handle_of(random_state& rng, tiles::type type);
 vec4f get_colour_of(tiles::type type, level_info::types level_type);
 
-struct tilemap
+struct tilemap : serialisable, free_function
 {
     std::optional<entt::entity> selected;
 
