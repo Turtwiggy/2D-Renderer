@@ -30,6 +30,7 @@
 #include <GLFW/glfw3.h>
 
 #include "overworld_generation.hpp"
+#include <networking/serialisable_fwd.hpp>
 
 std::optional<entt::entity> scene_selector(entt::registry& registry)
 {
@@ -219,7 +220,7 @@ int main(int argc, char* argv[])
     vfx::particle_system particle_sys;
     vfx::snow_effect snow;
 
-    entt::registry registry;
+    entt::registry& registry = get_thread_local_registry();
 
     entt::entity overworld = create_overworld(registry, rng, {150, 150});
     entt::entity default_battle = battle_map::create_battle(registry, rng, { 30, 30 }, level_info::GRASS);
