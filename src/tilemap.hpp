@@ -129,7 +129,11 @@ struct tilemap : serialisable, free_function
 
     void create(vec2i dim);
     void add(entt::entity en, vec2i pos);
+    void remove(entt::entity en, vec2i pos);
+    void move(entt::entity en, vec2i from, vec2i to);
     void render(entt::registry& reg, render_window& win, camera& cam, sprite_renderer& renderer, vec2f mpos);
+
+    int entities_at_position(vec2i pos);
 };
 
 #endif

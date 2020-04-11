@@ -2,6 +2,11 @@
 
 namespace battle_map {
 
+    vec2f convert_xy_to_world(const vec2i pos) 
+    {
+        return vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+    }
+
     entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
     {
         entt::entity res = registry.create();
@@ -86,11 +91,7 @@ namespace battle_map {
         }
     }
 
-    entt::entity create_battle_unit( 
-        entt::registry& registry, 
-        sprite_handle handle, 
-        world_transform transform,
-        team t)
+    entt::entity create_battle_unit(entt::registry& registry, sprite_handle handle, world_transform transform, team t)
     {
         entt::entity res = registry.create();
 
@@ -99,13 +100,12 @@ namespace battle_map {
         desc.depress_on_hover = true;
 
         registry.assign<sprite_handle>(res, handle);
-        registry.assign<world_transform>(res, transform);
         registry.assign<render_descriptor>(res, desc);
         registry.assign<mouse_interactable>(res, mouse_interactable());
 
         registry.assign<damageable>(res, damageable());
         registry.assign<team>(res, t);
-        registry.assign<battle_tag>(res, battle_tag());
+        registry.assign<battle_unit>(res, battle_unit());
 
         return res;
     }
@@ -120,7 +120,6 @@ namespace battle_map {
         base_team.t = team_id;
 
         sprite_handle handle = get_sprite_handle_of(rng, tiles::SOLDIER_SPEAR);
-
         handle.base_colour *= team::colours.at(team_id);
 
         entt::entity unit = create_battle_unit(registry, handle, transform, base_team);
@@ -128,32 +127,55 @@ namespace battle_map {
         return unit;
     }
 
-
-    void debug_combat(entt::registry& registry, entt::entity battle, random_state& rng)
+    void debug_combat(entt::registry& registry, entt::entity map, random_state& rng)
     {
         ImGui::Begin("Battle Editor");
 
-        if (ImGui::Button("Add units to map"))
+        if (ImGui::Button("Add player unit"))
         {
-            tilemap& tmap = registry.get<tilemap>(battle);
+            tilemap& tmap = registry.get<tilemap>(map);
 
             vec2i half = tmap.dim / 2;
 
-            sprite_handle handle = get_sprite_handle_of(rng, tiles::type::SOLDIER_SPEAR);
+            vec2i pos = { half.x(), half.y() - 1 };
+            entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
 
-            battle_unit_info info;
-            info.hp = 100;
+            tmap.add(unit, pos);
+        }
 
-            world_transform transform;
-            transform.position = { half.x(), half.y() - 1 };
+        if (ImGui::Button("Add enemy unit"))
+        {
+            tilemap& tmap = registry.get<tilemap>(map);
 
-            entt::entity unit = create_battle_unit_at(registry, rng, { half.x(), half.y() - 1 }, 0);
-            entt::entity enemy_unit = create_battle_unit_at(registry, rng, { half.x() + 4, half.y() - 1 }, 1);
+            vec2i half = tmap.dim / 2;
 
-            tmap.add(unit, { half.x(), half.y() - 1 });
-            tmap.add(enemy_unit, { half.x() + 4, half.y() - 1 });
+            vec2i ai_pos = { half.x() + 4, half.y() - 1 };
+            entt::entity enemy_unit = create_battle_unit_at(registry, rng, ai_pos, 1);
+
+            //add ai to enemy unit
+            wandering_ai ai;
+            ai.current_xy = ai_pos;
+            ai.destination_xy = { tmap.dim.x(), tmap.dim.y() };
+            registry.assign<wandering_ai>(enemy_unit, ai);
+
+            tmap.add(enemy_unit, ai_pos);
         }
 
         ImGui::End();
+    }
+
+    void update_ai(entt::registry& registry, entt::entity& map, float delta_time)
+    {
+        auto view = registry.view<battle_unit, render_descriptor, wandering_ai>();
+
+        tilemap& tmap = registry.get<tilemap>(map);
+
+        for (auto ent : view)
+        {
+            auto& ai = view.get<wandering_ai>(ent);
+            auto& desc = view.get<render_descriptor>(ent);
+
+            ai.update(delta_time, desc, tmap, ent);
+        }
     }
 }

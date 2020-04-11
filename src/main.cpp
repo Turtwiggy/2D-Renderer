@@ -304,9 +304,11 @@ int main(int argc, char* argv[])
             cam.pos = vec2f{ tmap.dim.x()/2, tmap.dim.y()/2 } * TILE_PIX;
         }
 
+        //ai
+        battle_map::update_ai(registry, focused_tilemap, delta_time);
+
         //map
         battle_starter(registry);
-
 
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
         focused.render(registry, win, cam, sprite_render, mpos);
