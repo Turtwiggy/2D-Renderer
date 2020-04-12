@@ -46,6 +46,7 @@ namespace battle_map {
             tiles::GRASS
         };
         //distribute_entities(registry, tmap, rng, dim, type, 20, decoration, 0);
+        distribute_entities(registry, tmap, rng, dim, type, 20, decoration, 1);
 
         //Scenery
         std::vector<tiles::type> scenery =
@@ -53,6 +54,7 @@ namespace battle_map {
             tiles::TREE_1, tiles::TREE_2, tiles::TREE_ROUND, tiles::ROCKS, tiles::BRAMBLE
         };
         //distribute_entities(registry, tmap, rng, dim, type, 1, scenery, -1);
+        distribute_entities(registry, tmap, rng, dim, type, 1, scenery, 1);
 
         registry.assign<tilemap>(res, tmap);
         registry.assign<battle_tag>(res, battle_tag());
@@ -127,6 +129,38 @@ namespace battle_map {
         return unit;
     }
 
+    entt::entity create_obstacle(entt::registry& registry, sprite_handle handle, world_transform transform)
+    {
+        entt::entity res = registry.create();
+
+        render_descriptor desc;
+        desc.pos = transform.position;
+        desc.depress_on_hover = true;
+
+        registry.assign<sprite_handle>(res, handle);
+        registry.assign<render_descriptor>(res, desc);
+        registry.assign<mouse_interactable>(res, mouse_interactable());
+
+        collidable c = collidable();
+        c.cost = 1;
+        registry.assign<collidable>(res, c);
+        // registry.assign<battle_unit>(res, battle_unit());
+
+        return res;
+    }
+
+    entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec2i pos, tilemap& map)
+    {
+        world_transform transform;
+        transform.position = vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+
+        sprite_handle handle = get_sprite_handle_of(rng, tiles::type::EFFECT_1);
+
+        entt::entity obstacle = create_obstacle(registry, handle, transform);
+
+        map.add(obstacle, pos);
+    }
+
     void debug_combat(entt::registry& registry, entt::entity map, random_state& rng)
     {
         ImGui::Begin("Battle Editor");
@@ -149,7 +183,7 @@ namespace battle_map {
 
             vec2i half = tmap.dim / 2;
 
-            //vec2i ai_pos = { half.x() + 4, half.y() - 1 };
+            //add enemy
             vec2i start_pos = { 0, 0 };
             vec2i dest_pos = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
 

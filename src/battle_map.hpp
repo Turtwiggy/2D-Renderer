@@ -45,9 +45,6 @@ namespace battle_map {
 
             std::optional<std::vector<vec2i>> path = a_star(registry, tmap, current_xy, destination_xy);
 
-            //printf("start dest value: %d %d \n", current_xy.x(), current_xy.y());
-            //printf("end dest value: %d %d \n", destination_xy.x(), destination_xy.y());
-
             if (path.has_value())
             {
                 printf("moving ai");
@@ -56,7 +53,6 @@ namespace battle_map {
                 std::vector p = path.value();
                 p.erase(p.begin());
                 vec2i next_p = p.front();
-                //printf("next_pos: %d %d \n", next_p.x(), next_p.y() );
 
                 //update renderer
                 desc.pos = convert_xy_to_world(next_p);
