@@ -290,7 +290,7 @@ void tilemap::add(entt::entity en, vec2i pos)
         throw std::runtime_error("Add out of bounds");
 
     all_entities[pos.y() * dim.x() + pos.x()].push_back(en);
-}
+} 
 
 void tilemap::remove(entt::entity en, vec2i pos)
 {

@@ -149,16 +149,18 @@ namespace battle_map {
 
             vec2i half = tmap.dim / 2;
 
-            vec2i ai_pos = { half.x() + 4, half.y() - 1 };
-            entt::entity enemy_unit = create_battle_unit_at(registry, rng, ai_pos, 1);
+            //vec2i ai_pos = { half.x() + 4, half.y() - 1 };
+            vec2i start_pos = { 0, 0 };
+            vec2i dest_pos = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
 
-            //add ai to enemy unit
+            entt::entity enemy_unit = create_battle_unit_at(registry, rng, start_pos, 1);
+
             wandering_ai ai;
-            ai.current_xy = ai_pos;
-            ai.destination_xy = { tmap.dim.x(), tmap.dim.y() };
+            ai.current_xy = start_pos;
+            ai.destination_xy = dest_pos;
             registry.assign<wandering_ai>(enemy_unit, ai);
 
-            tmap.add(enemy_unit, ai_pos);
+            tmap.add(enemy_unit, start_pos);
         }
 
         ImGui::End();
@@ -175,7 +177,7 @@ namespace battle_map {
             auto& ai = view.get<wandering_ai>(ent);
             auto& desc = view.get<render_descriptor>(ent);
 
-            ai.update(delta_time, desc, tmap, ent);
+            ai.update(registry, delta_time, desc, tmap, ent);
         }
     }
 }

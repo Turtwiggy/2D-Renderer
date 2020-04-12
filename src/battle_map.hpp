@@ -5,6 +5,7 @@
 #include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "random.hpp"
+#include "pathfinding.hpp"
 
 #include <entt/entt.hpp>
 #include <imgui/imgui.h>
@@ -21,7 +22,12 @@ namespace battle_map {
         float time_between_move_tiles = 1.;
         float time_left_between_move_tiles = time_between_move_tiles;
 
-        void update(float delta_time, render_descriptor& desc, tilemap& tmap, entt::entity en)
+        void update(
+            entt::registry& registry, 
+            float delta_time, 
+            render_descriptor& desc, 
+            tilemap& tmap, 
+            entt::entity en)
         {
             time_left_between_move_tiles -= delta_time;
 
@@ -30,24 +36,35 @@ namespace battle_map {
 
             time_left_between_move_tiles = time_between_move_tiles;
 
-            move_ai(desc, tmap, en);
+            move_ai(registry, desc, tmap, en);
         }
 
-        void move_ai(render_descriptor& desc, tilemap& tmap, entt::entity en)
+        void move_ai(entt::registry& registry, render_descriptor& desc, tilemap& tmap, entt::entity en)
         {
-            vec2i prev_pos = current_xy;
+            vec2i prev = current_xy;
 
-            //update pos
-            vec2i new_pos = current_xy;
-            new_pos.x() -= 1;
+            std::optional<std::vector<vec2i>> path = a_star(registry, tmap, current_xy, destination_xy);
 
-            vec2i clamped_pos = clamp(new_pos, vec2i{ 0, 0 }, tmap.dim );
-            current_xy = clamped_pos;
-            
-            //update renderer
-            desc.pos = convert_xy_to_world(clamped_pos);    
-            //update map
-            tmap.move(en, prev_pos, current_xy);    
+            //printf("start dest value: %d %d \n", current_xy.x(), current_xy.y());
+            //printf("end dest value: %d %d \n", destination_xy.x(), destination_xy.y());
+
+            if (path.has_value())
+            {
+                printf("moving ai");
+
+                //next step
+                std::vector p = path.value();
+                p.erase(p.begin());
+                vec2i next_p = p.front();
+                //printf("next_pos: %d %d \n", next_p.x(), next_p.y() );
+
+                //update renderer
+                desc.pos = convert_xy_to_world(next_p);
+                //update map
+                tmap.move(en, current_xy, next_p);
+                //update position
+                current_xy = next_p;
+            } 
         }
     };
 
