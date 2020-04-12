@@ -6,22 +6,23 @@
 #include <toolkit/texture.hpp>
 #include "camera.hpp"
 #include <entt/entt.hpp>
+#include <networking/serialisable_fwd.hpp>
 
 struct render_window;
 struct camera;
 
-struct sprite_handle
+struct sprite_handle : serialisable, free_function
 {
     vec2i offset;
     vec4f base_colour = {1,1,1,1};
 };
 
-struct world_transform
+struct world_transform : serialisable, free_function
 {
     vec2f position;
 };
 
-struct render_descriptor
+struct render_descriptor : serialisable, free_function
 {
     vec2f pos; //in pixels, centered
     vec4f colour = {1,1,1,1}; //linear colour, everything's fine
