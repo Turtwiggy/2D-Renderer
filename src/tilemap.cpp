@@ -448,3 +448,8 @@ int tilemap::entities_at_position(vec2i pos)
 
     return all_entities[pos.y() * dim.x() + pos.x()].size();
 }
+
+vec2f convert_xy_to_world(const vec2i pos)
+{
+    return vec2f{ pos.x(), pos.y() } * TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+}

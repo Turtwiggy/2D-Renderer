@@ -71,4 +71,6 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
 
 entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform);
 
+vec2f convert_xy_to_world(const vec2i pos);
+
 #endif // ENTITY_COMMON_HPP_INCLUDED

@@ -3,11 +3,13 @@
 #include <vector>
 #include <optional>
 
-#include <imgui/imgui.h>
-
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <imgui/imgui.h>
+#include <entt/entt.hpp>
+#include <GLFW/glfw3.h>
 
 #include "core.hpp"
 #include "random.hpp"
@@ -15,22 +17,19 @@
 #include <toolkit/texture.hpp>
 #include <toolkit/vertex.hpp>
 #include <toolkit/fs_helpers.hpp>
-#include "sprite_renderer.hpp"
+#include <networking/serialisable_fwd.hpp>
 
-#include <entt/entt.hpp>
+#include "sprite_renderer.hpp"
 #include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "battle_map.hpp"
+#include "battle_map_ai.hpp"
 #include "overworld_map.hpp"
+#include "overworld_generation.hpp"
 
 #include "Editor/imgui_bezier.hpp"
 #include "vfx/particle_system.hpp"
 #include "vfx/effects/snow_effect.hpp"
-
-#include <GLFW/glfw3.h>
-
-#include "overworld_generation.hpp"
-#include <networking/serialisable_fwd.hpp>
 
 std::optional<entt::entity> scene_selector(entt::registry& registry)
 {
