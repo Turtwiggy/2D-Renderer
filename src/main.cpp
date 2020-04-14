@@ -292,9 +292,8 @@ int main(int argc, char* argv[])
 
         //UI
         battle_generator(registry, rng, battle_size);
-        battle_map::debug_combat(registry, default_battle, rng);
 
-        //Update systems
+        //Update renderer
         if (auto val = scene_selector(registry); val.has_value())
         {
             focused_tilemap = val.value();
@@ -304,8 +303,20 @@ int main(int argc, char* argv[])
             cam.pos = vec2f{ tmap.dim.x()/2, tmap.dim.y()/2 } * TILE_PIX;
         }
 
-        //ai
-        battle_map::update_ai(registry, focused_tilemap, delta_time);
+        //Update battle maps
+        auto battle_maps = registry.view<tilemap, battle_map::battle_map_state>();
+        for (auto ent : battle_maps)
+        {
+            tilemap& battle_map_tilemap = battle_maps.get<tilemap>(ent);
+            auto& battle_map_state = battle_maps.get<battle_map::battle_map_state>(ent);
+
+            //only updates ai and debugs active combat... may want to change
+            if (ent != focused_tilemap) 
+                continue;
+
+            battle_map_state.update_ai(registry, ent, delta_time);
+            battle_map_state.debug_combat(registry, ent, rng, win, cam, mpos);
+        }
 
         //map
         battle_starter(registry);

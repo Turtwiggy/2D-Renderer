@@ -2,6 +2,12 @@
 
 #include "battle_map_ai.hpp"
 
+
+//std::string battle_map::unit_placing_state_to_string(unit_placing_state& state)
+//{
+//    return unit_states[state];
+//}
+
 entt::entity battle_map::create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
 {
     entt::entity res = registry.create();
@@ -29,6 +35,7 @@ entt::entity battle_map::create_battle(entt::registry& registry, random_state& r
                 registry.assign<sprite_handle>(base, handle);
                 registry.assign<render_descriptor>(base, desc);
                 registry.assign<battle_tag>(base, battle_tag());
+                //registry.assign<mouse_interactable>(base, mouse_interactable());
 
                 tmap.add(base, { x, y });
             }
@@ -158,7 +165,7 @@ entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec
 }
 
 
-void battle_map::update_ai(entt::registry& registry, entt::entity& map, float delta_time)
+void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, float delta_time)
 {
     auto view = registry.view<battle_unit, render_descriptor, wandering_ai>();
 
@@ -174,28 +181,54 @@ void battle_map::update_ai(entt::registry& registry, entt::entity& map, float de
 }
 
 
-void battle_map::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng)
+void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos )
 {
     battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
 
-    ImGui::Begin("Battle Editor");
+    bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
+    bool mouse_hovering = !ImGui::IsAnyWindowHovered();
 
-    if (ImGui::Button("Add player unit"))
+    if (mouse_clicked)
     {
         tilemap& tmap = registry.get<tilemap>(map);
 
-        vec2i half = tmap.dim / 2;
+        vec2f mouse_tile = cam.screen_to_tile(win, mpos);
+        vec2i i_tile = { mouse_tile.x(), mouse_tile.y() };
+        vec2i min = { 0, 0 };
+        vec2i max = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
+        vec2i clamped_i_tile = clamp(i_tile, min, max);
+        printf(" clicked tile: %d %d \n", clamped_i_tile.x(), clamped_i_tile.y());
 
-        vec2i pos = { half.x(), half.y() - 1 };
-        entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
-
-        tmap.add(unit, pos);
+        create_obstacle_at(registry, rng, clamped_i_tile, tmap);
     }
+
+    ImGui::Begin("Battle Editor");
+
+    //if (ImGui::BeginCombo("##combo", state.current_item.c_str() )) // The second parameter is the label previewed before opening the combo.
+    //{
+    //    for (int n = 0; n < state.items.size(); n++)
+    //    {
+    //        bool is_selected = (state.current_item == state.items[n]); // You can store your selection however you want, outside or inside your objects
+    //        if (ImGui::Selectable(state.items[n].c_str(), is_selected))
+    //            state.current_item = state.items[n];
+    //        if (is_selected)
+    //            ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+    //    }
+    //    ImGui::EndCombo();
+    //}
+
+    //if (ImGui::Button("Add player unit"))
+    //{
+    //    tilemap& tmap = registry.get<tilemap>(map);
+    //    vec2i half = tmap.dim / 2;
+    //    vec2i pos = { half.x(), half.y() - 1 };
+    //    entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
+    //    tmap.add(unit, pos);
+    //}
 
     if (ImGui::Button("Add enemy unit"))
     {
         tilemap& tmap = registry.get<tilemap>(map);
-
         vec2i half = tmap.dim / 2;
 
         //add enemy
@@ -210,14 +243,12 @@ void battle_map::debug_combat(entt::registry& registry, entt::entity& map, rando
         registry.assign<wandering_ai>(enemy_unit, ai);
 
         tmap.add(enemy_unit, start_pos);
-
-        state.show = true;
     }
+    ImGui::Separator();
+    ImGui::Separator();
 
-    if (state.show)
-    {
-        ImGui::Button("You clicked add enemy");
-    }
+    //std::string state_str = battle_map::unit_placing_state_to_string(state.place_state);
+    //ImGui::Text(state_str.c_str());
 
     ImGui::End();
 }
