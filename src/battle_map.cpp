@@ -180,10 +180,9 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     }
 }
 
-
 void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos )
 {
-    battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
+    battle_map_state state = registry.get<battle_map::battle_map_state>(map);
 
     bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
     bool mouse_hovering = !ImGui::IsAnyWindowHovered();

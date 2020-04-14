@@ -50,6 +50,4 @@ namespace battle_map {
     entt::entity create_battle_unit( entt::registry& registry, sprite_handle handle, world_transform transform, team t);
     entt::entity create_obstacle(entt::registry& registry, sprite_handle handle, world_transform transform);
 
-
-
 }

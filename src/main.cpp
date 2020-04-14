@@ -308,14 +308,14 @@ int main(int argc, char* argv[])
         for (auto ent : battle_maps)
         {
             tilemap& battle_map_tilemap = battle_maps.get<tilemap>(ent);
-            auto& battle_map_state = battle_maps.get<battle_map::battle_map_state>(ent);
+            battle_map::battle_map_state bms = battle_maps.get<battle_map::battle_map_state>(ent);
 
             //only updates ai and debugs active combat... may want to change
             if (ent != focused_tilemap) 
                 continue;
 
-            battle_map_state.update_ai(registry, ent, delta_time);
-            battle_map_state.debug_combat(registry, ent, rng, win, cam, mpos);
+            bms.update_ai(registry, ent, delta_time);
+            bms.debug_combat(registry, ent, rng, win, cam, mpos);
         }
 
         //map
