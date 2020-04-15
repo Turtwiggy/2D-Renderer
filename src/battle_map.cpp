@@ -3,11 +3,6 @@
 #include "battle_map_ai.hpp"
 
 
-//std::string battle_map::unit_placing_state_to_string(unit_placing_state& state)
-//{
-//    return unit_states[state];
-//}
-
 entt::entity battle_map::create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
 {
     entt::entity res = registry.create();
@@ -22,8 +17,8 @@ entt::entity battle_map::create_battle(entt::registry& registry, random_state& r
             for (int x = 0; x < dim.x(); x++)
             {
                 sprite_handle handle = get_sprite_handle_of(rng, tiles::BASE);
-                handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.1, 0, 1);
-                handle.base_colour.w() = 1;
+                //handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.1, 0, 1);
+                //handle.base_colour.w() = 1;
 
                 render_descriptor desc;
                 desc.pos = vec2f{ x, y } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
@@ -132,7 +127,7 @@ entt::entity create_battle_unit_at(entt::registry& registry, random_state& rng, 
 }
 
 
-entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle handle, world_transform transform)
+entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle handle, world_transform transform, int path_cost)
 {
     entt::entity res = registry.create();
 
@@ -145,21 +140,19 @@ entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle
     registry.assign<mouse_interactable>(res, mouse_interactable());
 
     collidable c;
-    c.cost = -1;
+    c.cost = path_cost;
     registry.assign<collidable>(res, c);
     // registry.assign<battle_unit>(res, battle_unit());
 
     return res;
 }
 
-entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec2i pos, tilemap& map)
+entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec2i pos, tilemap& map, sprite_handle handle, int path_cost)
 {
     world_transform transform;
     transform.position = vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
 
-    sprite_handle handle = get_sprite_handle_of(rng, tiles::type::CACTUS);
-
-    entt::entity obstacle = battle_map::create_obstacle(registry, handle, transform);
+    entt::entity obstacle = battle_map::create_obstacle(registry, handle, transform, path_cost);
 
     map.add(obstacle, pos);
 }
@@ -200,9 +193,11 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
 
         if (state.current_item == "Obstacles")
         {
-            create_obstacle_at(registry, rng, clamped_i_tile, tmap);
+            sprite_handle handle = get_sprite_handle_of(rng, tiles::type::CACTUS);
+            create_obstacle_at(registry, rng, clamped_i_tile, tmap, handle, -1);
         }
-        else if (state.current_item == "Units")
+        
+        if (state.current_item == "Enemies")
         {
             vec2i half = tmap.dim / 2;
 
@@ -218,13 +213,27 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
             registry.assign<wandering_ai>(enemy_unit, ai);
 
             collidable coll;
-            coll.cost = -1;
+            coll.cost = 10;
             registry.assign<collidable>(enemy_unit, coll);
 
             tmap.add(enemy_unit, start_pos);
         }
-    }
 
+        if (state.current_item == "Player")
+        {
+            entt::entity unit = create_battle_unit_at(registry, rng, clamped_i_tile, 0);
+
+            ai_destination_tag dest_tag;
+            dest_tag.destination = clamped_i_tile;
+            registry.assign<ai_destination_tag>(unit, dest_tag);
+
+            collidable coll;
+            coll.cost = 0;
+            registry.assign<collidable>(unit, coll);
+
+            tmap.add(unit, clamped_i_tile);
+        }
+    }
 
     ImGui::Begin("Battle Editor");
 
@@ -243,18 +252,6 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         }
         ImGui::EndCombo();
     }
-
-    //if (ImGui::Button("Add player unit"))
-    //{
-    //    tilemap& tmap = registry.get<tilemap>(map);
-    //    vec2i half = tmap.dim / 2;
-    //    vec2i pos = { half.x(), half.y() - 1 };
-    //    entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
-    //    tmap.add(unit, pos);
-    //}
-
-    //std::string state_str = battle_map::unit_placing_state_to_string(state.place_state);
-    //ImGui::Text(state_str.c_str());
 
     ImGui::End();
 }

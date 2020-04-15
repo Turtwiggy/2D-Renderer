@@ -6,6 +6,11 @@
 #include "random.hpp"
 #include "pathfinding.hpp"
 
+struct ai_destination_tag
+{
+    vec2i destination;
+};
+
 struct wandering_ai
 {
     vec2i current_xy;
@@ -16,4 +21,7 @@ struct wandering_ai
 
     void update_ai(entt::registry& registry, float delta_time, render_descriptor& desc, tilemap& tmap, entt::entity en);
     void move_ai(entt::registry& registry, render_descriptor& desc, tilemap& tmap, entt::entity en);
+   
+    void reset_tilemap_colours(tilemap& tmap, entt::registry& registry);
+    void show_path_colours_on_tilemap(tilemap& tmap, entt::registry& registry, std::vector<vec2i> points, vec2i destination);
 };

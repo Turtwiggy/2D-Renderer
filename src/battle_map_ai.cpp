@@ -16,14 +16,30 @@ void wandering_ai::move_ai( entt::registry& registry, render_descriptor& desc, t
 {
     vec2i prev = current_xy;
 
+
+    //TODO only update ai destination to closest target
+    auto view = registry.view<ai_destination_tag>();
+    for (auto entity : view)
+    {
+        ai_destination_tag& dest_tag = view.get<ai_destination_tag>(entity);
+
+        //just replaces the destination with any old destination tag object
+        destination_xy = dest_tag.destination;
+    }
+
     std::optional<std::vector<vec2i>> path = a_star(registry, tmap, current_xy, destination_xy);
 
     if (path.has_value())
     {
+        std::vector<vec2i> points = path.value();
+
+        // debugging colours
+        reset_tilemap_colours(tmap, registry);
+        show_path_colours_on_tilemap(tmap, registry, points, destination_xy);
+
         //next step
-        std::vector p = path.value();
-        p.erase(p.begin());
-        vec2i next_p = p.front();
+        points.erase(points.begin());
+        vec2i next_p = points.front();
 
         //update renderer
         desc.pos = convert_xy_to_world(next_p);
@@ -31,5 +47,43 @@ void wandering_ai::move_ai( entt::registry& registry, render_descriptor& desc, t
         tmap.move(en, current_xy, next_p);
         //update position
         current_xy = next_p;
+    }
+}
+
+void wandering_ai::show_path_colours_on_tilemap(tilemap& tmap, entt::registry& registry, std::vector<vec2i> points, vec2i destination)
+{
+    for (int i = 0; i < points.size(); i++)
+    {
+        vec2i pos = points[i];
+
+        std::vector<entt::entity> es =
+            tmap.all_entities[pos.y() * tmap.dim.x() + pos.x()];
+
+        //get the top entity, which is the tile at this debugging moment
+        render_descriptor& desc = registry.get<render_descriptor>(es[0]);
+
+        if (pos == destination)
+            desc.colour = { 0, 0, 1, 1 };   //blue
+        else
+            desc.colour = { 1, 0, 0, 1 };   //red
+    }
+}
+
+void wandering_ai::reset_tilemap_colours(tilemap& tmap, entt::registry& registry)
+{
+    //Change all the colours of all the tiles for the path!
+    for (int y = 0; y < tmap.dim.y(); y++)
+    {
+        for (int x = 0; x < tmap.dim.x(); x++)
+        {
+            std::vector<entt::entity> es =
+                tmap.all_entities[y * tmap.dim.x() + x];
+
+            //get the top entity, which is the tile at this debugging moment
+            render_descriptor& desc = registry.get<render_descriptor>(es[0]);
+
+            //reset tile look
+            desc.colour = { 1, 1, 1, 1 };
+        }
     }
 }
