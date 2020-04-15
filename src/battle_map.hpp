@@ -18,11 +18,6 @@ namespace battle_map {
     };
     struct battle_unit {};
 
-    //enum unit_placing_state
-    //{
-    //    POSITION_NEW_UNIT,
-    //    SET_UNIT_DESTINATION
-    //};
     //inline std::vector<std::string> unit_states {
     //    "Positining new unit",
     //    "Setting unit destination"
@@ -31,15 +26,11 @@ namespace battle_map {
 
     struct battle_map_state
     {
-        //unit_placing_state place_state = unit_placing_state::POSITION_NEW_UNIT;
-
-        //std::optional<entt::entity> last_placed_unit;
-
         //Combobox options
-        //std::vector<std::string> items = {
-        //    "Units", "Obstacles"
-        //};
-        //std::string current_item = items[0];
+        std::vector<std::string> items = {
+            "Units", "Obstacles"
+        };
+        std::string current_item = "Units";
 
         void update_ai(entt::registry& registry, entt::entity& map, float delta_time);
         void debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos);

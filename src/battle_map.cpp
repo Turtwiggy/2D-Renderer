@@ -180,9 +180,9 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     }
 }
 
-void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos )
+void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
 {
-    battle_map_state state = registry.get<battle_map::battle_map_state>(map);
+    battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
 
     bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
     bool mouse_hovering = !ImGui::IsAnyWindowHovered();
@@ -198,23 +198,51 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         vec2i clamped_i_tile = clamp(i_tile, min, max);
         printf(" clicked tile: %d %d \n", clamped_i_tile.x(), clamped_i_tile.y());
 
-        create_obstacle_at(registry, rng, clamped_i_tile, tmap);
+        if (state.current_item == "Obstacles")
+        {
+            create_obstacle_at(registry, rng, clamped_i_tile, tmap);
+        }
+        else if (state.current_item == "Units")
+        {
+            vec2i half = tmap.dim / 2;
+
+            //add enemy
+            vec2i start_pos = clamped_i_tile;
+            vec2i dest_pos = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
+
+            entt::entity enemy_unit = create_battle_unit_at(registry, rng, start_pos, 1);
+
+            wandering_ai ai;
+            ai.current_xy = start_pos;
+            ai.destination_xy = dest_pos;
+            registry.assign<wandering_ai>(enemy_unit, ai);
+
+            collidable coll;
+            coll.cost = -1;
+            registry.assign<collidable>(enemy_unit, coll);
+
+            tmap.add(enemy_unit, start_pos);
+        }
     }
+
 
     ImGui::Begin("Battle Editor");
 
-    //if (ImGui::BeginCombo("##combo", state.current_item.c_str() )) // The second parameter is the label previewed before opening the combo.
-    //{
-    //    for (int n = 0; n < state.items.size(); n++)
-    //    {
-    //        bool is_selected = (state.current_item == state.items[n]); // You can store your selection however you want, outside or inside your objects
-    //        if (ImGui::Selectable(state.items[n].c_str(), is_selected))
-    //            state.current_item = state.items[n];
-    //        if (is_selected)
-    //            ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-    //    }
-    //    ImGui::EndCombo();
-    //}
+    if (ImGui::BeginCombo("##combo", state.current_item.c_str() )) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < state.items.size(); n++)
+        {
+            bool is_selected = (state.current_item == state.items[n]); // You can store your selection however you want, outside or inside your objects
+            if (ImGui::Selectable(state.items[n].c_str(), is_selected)) 
+            {
+                printf("Selected! \n");
+                state.current_item = state.items[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
 
     //if (ImGui::Button("Add player unit"))
     //{
@@ -224,27 +252,6 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     //    entt::entity unit = create_battle_unit_at(registry, rng, pos, 0);
     //    tmap.add(unit, pos);
     //}
-
-    if (ImGui::Button("Add enemy unit"))
-    {
-        tilemap& tmap = registry.get<tilemap>(map);
-        vec2i half = tmap.dim / 2;
-
-        //add enemy
-        vec2i start_pos = { 0, 0 };
-        vec2i dest_pos = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
-
-        entt::entity enemy_unit = create_battle_unit_at(registry, rng, start_pos, 1);
-
-        wandering_ai ai;
-        ai.current_xy = start_pos;
-        ai.destination_xy = dest_pos;
-        registry.assign<wandering_ai>(enemy_unit, ai);
-
-        tmap.add(enemy_unit, start_pos);
-    }
-    ImGui::Separator();
-    ImGui::Separator();
 
     //std::string state_str = battle_map::unit_placing_state_to_string(state.place_state);
     //ImGui::Text(state_str.c_str());
