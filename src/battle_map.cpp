@@ -104,7 +104,7 @@ entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_han
 
     registry.assign<damageable>(res, damageable());
     registry.assign<team>(res, t);
-    registry.assign<battle_unit>(res, battle_unit());
+    registry.assign<battle_tag>(res, battle_tag());
 
     return res;
 }
@@ -158,9 +158,9 @@ entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec
 }
 
 
-void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, float delta_time)
+void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time)
 {
-    auto view = registry.view<battle_unit, render_descriptor, wandering_ai>();
+    auto view = registry.view < battle_tag, render_descriptor, sprite_handle, wandering_ai> ();
 
     tilemap& tmap = registry.get<tilemap>(map);
 
@@ -168,8 +168,10 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     {
         auto& ai = view.get<wandering_ai>(ent);
         auto& desc = view.get<render_descriptor>(ent);
+        auto& handle = view.get<sprite_handle>(ent);
 
-        ai.update_ai(registry, delta_time, desc, tmap, ent);
+        ai.tick_ai(registry, delta_time, desc, handle, rng, tmap, ent);
+        ai.tick_animation(registry, delta_time, desc, handle, rng, tmap, ent);
     }
 }
 

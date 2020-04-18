@@ -16,7 +16,6 @@ namespace battle_map {
     {
         float hp = 1;
     };
-    struct battle_unit {};
 
     //inline std::vector<std::string> unit_states {
     //    "Positining new unit",
@@ -32,7 +31,7 @@ namespace battle_map {
         };
         std::string current_item = "Enemies";
 
-        void update_ai(entt::registry& registry, entt::entity& map, float delta_time);
+        void update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time);
         void debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos);
     
         void reset_tilemap_colours(tilemap& tmap, entt::registry& registry);    

@@ -1,22 +1,68 @@
 #include "battle_map_ai.hpp"
 
-void wandering_ai::update_ai(entt::registry& registry, float delta_time, render_descriptor& desc, tilemap& tmap,  entt::entity en)
+void wandering_ai::tick_ai(
+    entt::registry& registry, 
+    float delta_time, 
+    render_descriptor& desc, 
+    sprite_handle& handle, 
+    random_state& rng,
+    tilemap& tmap,  
+    entt::entity en)
 {
-    time_left_between_move_tiles -= delta_time;
+    time_left_before_move_tiles -= delta_time;
 
-    if (time_left_between_move_tiles > 0.)
+    if (time_left_before_move_tiles > 0.)
         return;
 
-    time_left_between_move_tiles = time_between_move_tiles;
+    time_left_before_move_tiles = time_between_move_tiles;
 
-    move_ai(registry, desc, tmap, en);
+    move_ai(registry, desc, handle, rng, tmap, en);
 }
 
-void wandering_ai::move_ai( entt::registry& registry, render_descriptor& desc, tilemap& tmap, entt::entity en)
+void wandering_ai::tick_animation(
+    entt::registry& registry,
+    float delta_time,
+    render_descriptor& desc,
+    sprite_handle& handle,
+    random_state& rng,
+    tilemap& tmap,
+    entt::entity en )
 {
-    vec2i prev = current_xy;
+    time_left_before_animation_update -= delta_time;
 
+    if (time_left_before_animation_update > 0.)
+        return;
 
+    time_left_before_animation_update = time_between_animation_updates;
+
+    update_animation(registry, delta_time, desc, handle, rng, tmap, en);
+}
+
+void wandering_ai::update_animation(
+    entt::registry& registry,
+    float delta_time,
+    render_descriptor& desc,
+    sprite_handle& handle,
+    random_state& rng,
+    tilemap& tmap,
+    entt::entity e )
+{
+    if (on_max_scale)
+        desc.scale = min_scale;
+    else
+        desc.scale = max_scale;
+
+    on_max_scale = !on_max_scale;
+}
+
+void wandering_ai::move_ai( 
+    entt::registry& registry,
+    render_descriptor& desc, 
+    sprite_handle& handle, 
+    random_state& rng,
+    tilemap& tmap, 
+    entt::entity en)
+{
     //TODO only update ai destination to closest target
     auto view = registry.view<ai_destination_tag>();
     for (auto entity : view)
@@ -33,22 +79,27 @@ void wandering_ai::move_ai( entt::registry& registry, render_descriptor& desc, t
     {
         std::vector<vec2i> points = path.value();
 
-        // debugging colours
-        reset_tilemap_colours(tmap, registry);
-        show_path_colours_on_tilemap(tmap, registry, points, destination_xy);
-
         //next step
         points.erase(points.begin());
         vec2i next_p = points.front();
 
+        next_p = clamp(next_p, vec2i{ 0, 0 }, tmap.dim);
+
+        // debugging colours
+        //reset_tilemap_colours(tmap, registry);
+        //show_path_colours_on_tilemap(tmap, registry, points, destination_xy);
+
         //update renderer
         desc.pos = convert_xy_to_world(next_p);
+
         //update map
         tmap.move(en, current_xy, next_p);
         //update position
         current_xy = next_p;
     }
 }
+
+
 
 void wandering_ai::show_path_colours_on_tilemap(tilemap& tmap, entt::registry& registry, std::vector<vec2i> points, vec2i destination)
 {
