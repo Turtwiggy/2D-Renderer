@@ -94,3 +94,18 @@ entt::entity create_unit_group(entt::registry& registry, const team& t, const sp
 
     return res;
 }
+
+
+vec2f convert_xy_to_world(const vec2i pos)
+{
+    return vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+}
+
+vec2i convert_world_to_xy(vec2f pos, camera& cam, render_window& win)
+{
+    vec2f mouse_tile = cam.screen_to_tile(win, pos);
+
+    vec2i i_tile = { mouse_tile.x(), mouse_tile.y() };
+
+    return i_tile;
+}

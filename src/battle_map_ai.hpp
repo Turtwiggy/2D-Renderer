@@ -1,15 +1,9 @@
 #pragma once
 
 #include "sprite_renderer.hpp"
-#include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "random.hpp"
 #include "pathfinding.hpp"
-
-struct ai_destination_tag
-{
-    vec2i destination;
-};
 
 struct wandering_ai
 {
@@ -31,44 +25,34 @@ struct wandering_ai
         entt::registry&     registry, 
         float               delta_time, 
         render_descriptor&  desc, 
-        sprite_handle&      handle, 
-        random_state&       rng,
         tilemap&            tmap, 
-        entt::entity        en 
+        entt::entity        en,
+        camera& cam,
+        render_window& win
     );
 
     void move_ai
     (
         entt::registry&     registry,
         render_descriptor&  desc,
-        sprite_handle&      handle,
-        random_state&       rng,
         tilemap&            tmap,
-        entt::entity        en
+        entt::entity        en,
+        camera&             cam, 
+        render_window&      win
     );
 
     void tick_animation
     (
-        entt::registry&     registry,
         float               delta_time,
-        render_descriptor&  desc,
-        sprite_handle&      handle,
-        random_state&       rng,
-        tilemap&            tmap,
-        entt::entity        en
+        render_descriptor&  desc
     );
 
-    void wandering_ai::update_animation
+    void update_animation
     (
-        entt::registry&     registry,
-        float               delta_time,
-        render_descriptor&  desc,
-        sprite_handle&      handle,
-        random_state&       rng,
-        tilemap&            tmap,
-        entt::entity        e
+        render_descriptor&  desc
     );
    
     void reset_tilemap_colours(tilemap& tmap, entt::registry& registry);
     void show_path_colours_on_tilemap(tilemap& tmap, entt::registry& registry, std::vector<vec2i> points, vec2i destination);
 };
+

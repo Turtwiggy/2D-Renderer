@@ -112,7 +112,7 @@ entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_han
 entt::entity create_battle_unit_at(entt::registry& registry, random_state& rng, vec2i pos, int team_id)
 {
     world_transform transform;
-    transform.position = vec2f{pos.x(), pos.y()} *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+    transform.position = convert_xy_to_world(pos);
 
     team base_team;
     base_team.type = team::NUMERIC;
@@ -150,7 +150,7 @@ entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle
 entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec2i pos, tilemap& map, sprite_handle handle, int path_cost)
 {
     world_transform transform;
-    transform.position = vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+    transform.position = convert_xy_to_world(pos);
 
     entt::entity obstacle = battle_map::create_obstacle(registry, handle, transform, path_cost);
 
@@ -158,7 +158,7 @@ entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec
 }
 
 
-void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time)
+void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time, camera& cam, render_window& win)
 {
     auto view = registry.view < battle_tag, render_descriptor, sprite_handle, wandering_ai> ();
 
@@ -168,10 +168,9 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     {
         auto& ai = view.get<wandering_ai>(ent);
         auto& desc = view.get<render_descriptor>(ent);
-        auto& handle = view.get<sprite_handle>(ent);
 
-        ai.tick_ai(registry, delta_time, desc, handle, rng, tmap, ent);
-        ai.tick_animation(registry, delta_time, desc, handle, rng, tmap, ent);
+        ai.tick_ai(registry, delta_time, desc, tmap, ent, cam, win);
+        ai.tick_animation(delta_time, desc);
     }
 }
 
@@ -225,10 +224,6 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         {
             entt::entity unit = create_battle_unit_at(registry, rng, clamped_i_tile, 0);
 
-            ai_destination_tag dest_tag;
-            dest_tag.destination = clamped_i_tile;
-            registry.assign<ai_destination_tag>(unit, dest_tag);
-
             collidable coll;
             coll.cost = 0;
             registry.assign<collidable>(unit, coll);
@@ -257,3 +252,5 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
 
     ImGui::End();
 }
+
+

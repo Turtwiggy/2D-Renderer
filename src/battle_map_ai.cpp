@@ -1,13 +1,15 @@
 #include "battle_map_ai.hpp"
 
+#include "entity_common.hpp"
+
 void wandering_ai::tick_ai(
     entt::registry& registry, 
     float delta_time, 
     render_descriptor& desc, 
-    sprite_handle& handle, 
-    random_state& rng,
     tilemap& tmap,  
-    entt::entity en)
+    entt::entity en,
+    camera& cam,
+    render_window& win )
 {
     time_left_before_move_tiles -= delta_time;
 
@@ -16,62 +18,48 @@ void wandering_ai::tick_ai(
 
     time_left_before_move_tiles = time_between_move_tiles;
 
-    move_ai(registry, desc, handle, rng, tmap, en);
+    move_ai(registry, desc, tmap, en, cam, win);
 }
 
-void wandering_ai::tick_animation(
-    entt::registry& registry,
-    float delta_time,
-    render_descriptor& desc,
-    sprite_handle& handle,
-    random_state& rng,
-    tilemap& tmap,
-    entt::entity en )
+void wandering_ai::move_ai
+(
+    entt::registry&     registry,
+    render_descriptor&  desc,
+    tilemap&            tmap,
+    entt::entity        en,
+    camera&             cam,
+    render_window&      win
+)
 {
-    time_left_before_animation_update -= delta_time;
+    //Gets the closest target by looping over all entities
+    //this could probably be optimized
+    vec2i closest_entity = { -1, -1 };
+    int max_dist = std::numeric_limits<int>::max();
 
-    if (time_left_before_animation_update > 0.)
-        return;
+    auto view = registry.view<team, battle_tag, damageable, wandering_ai>();
 
-    time_left_before_animation_update = time_between_animation_updates;
-
-    update_animation(registry, delta_time, desc, handle, rng, tmap, en);
-}
-
-void wandering_ai::update_animation(
-    entt::registry& registry,
-    float delta_time,
-    render_descriptor& desc,
-    sprite_handle& handle,
-    random_state& rng,
-    tilemap& tmap,
-    entt::entity e )
-{
-    if (on_max_scale)
-        desc.scale = min_scale;
-    else
-        desc.scale = max_scale;
-
-    on_max_scale = !on_max_scale;
-}
-
-void wandering_ai::move_ai( 
-    entt::registry& registry,
-    render_descriptor& desc, 
-    sprite_handle& handle, 
-    random_state& rng,
-    tilemap& tmap, 
-    entt::entity en)
-{
-    //TODO only update ai destination to closest target
-    auto view = registry.view<ai_destination_tag>();
-    for (auto entity : view)
+    for (auto ent : view)
     {
-        ai_destination_tag& dest_tag = view.get<ai_destination_tag>(entity);
+        if (ent == en)
+            continue;
 
-        //just replaces the destination with any old destination tag object
-        destination_xy = dest_tag.destination;
+        wandering_ai ai = view.get<wandering_ai>(ent);
+
+        vec2i tile_xy = ai.current_xy;
+
+        int distance_from_current_squared = abs(current_xy.squared_length() - tile_xy.squared_length());
+
+        if (closest_entity == vec2i{-1, -1} || distance_from_current_squared < max_dist)
+        {
+            closest_entity = tile_xy;
+            max_dist = distance_from_current_squared;
+        }
     }
+
+    if (closest_entity == vec2i{ -1, -1 })
+        closest_entity = current_xy;
+
+    destination_xy = closest_entity;
 
     std::optional<std::vector<vec2i>> path = a_star(registry, tmap, current_xy, destination_xy);
 
@@ -83,7 +71,7 @@ void wandering_ai::move_ai(
         points.erase(points.begin());
         vec2i next_p = points.front();
 
-        next_p = clamp(next_p, vec2i{ 0, 0 }, tmap.dim);
+        next_p = clamp(next_p, vec2i{ 0, 0 }, tmap.dim - 1);
 
         // debugging colours
         //reset_tilemap_colours(tmap, registry);
@@ -91,7 +79,6 @@ void wandering_ai::move_ai(
 
         //update renderer
         desc.pos = convert_xy_to_world(next_p);
-
         //update map
         tmap.move(en, current_xy, next_p);
         //update position
@@ -100,6 +87,31 @@ void wandering_ai::move_ai(
 }
 
 
+void wandering_ai::tick_animation
+(
+    float delta_time,
+    render_descriptor& desc
+ )
+{
+    time_left_before_animation_update -= delta_time;
+
+    if (time_left_before_animation_update > 0.)
+        return;
+
+    time_left_before_animation_update = time_between_animation_updates;
+
+    update_animation(desc);
+}
+
+void wandering_ai::update_animation( render_descriptor& desc )
+{
+    if (on_max_scale)
+        desc.scale = min_scale;
+    else
+        desc.scale = max_scale;
+
+    on_max_scale = !on_max_scale;
+}
 
 void wandering_ai::show_path_colours_on_tilemap(tilemap& tmap, entt::registry& registry, std::vector<vec2i> points, vec2i destination)
 {

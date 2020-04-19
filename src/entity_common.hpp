@@ -5,6 +5,8 @@
 #include <vector>
 #include <vec/vec.hpp>
 
+#include "camera.hpp"
+
 struct sprite_handle;
 struct world_transform;
 
@@ -72,5 +74,6 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
 entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform);
 
 vec2f convert_xy_to_world(const vec2i pos);
+vec2i convert_world_to_xy(vec2f pos, camera& cam, render_window& win);
 
 #endif // ENTITY_COMMON_HPP_INCLUDED
