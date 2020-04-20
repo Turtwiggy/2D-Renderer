@@ -14,7 +14,7 @@ struct wandering_ai
     float time_left_before_move_tiles = time_between_move_tiles;
 
     //animation
-    float time_between_animation_updates = 0.3f;
+    float time_between_animation_updates = 0.25f;
     float time_left_before_animation_update = time_between_animation_updates;
     bool on_max_scale = true;
     vec2f max_scale = { 1., 1. };

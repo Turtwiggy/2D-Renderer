@@ -84,7 +84,7 @@ namespace vfx {
             if (p.time_left < 0.0f)
             {
                 reg.destroy(ent);
-                return;
+                continue;
             }
 
             //goes from 1 to 0

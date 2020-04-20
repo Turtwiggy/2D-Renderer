@@ -43,21 +43,25 @@ void wandering_ai::move_ai
         if (ent == en)
             continue;
 
-        wandering_ai ai = view.get<wandering_ai>(ent);
+        wandering_ai other_ai = view.get<wandering_ai>(ent);
+        damageable other_ai_health = view.get<damageable>(ent);
+        
+        if (other_ai_health.cur_hp <= 0)
+            continue;
 
-        vec2i tile_xy = ai.current_xy;
+        int distance_from_current_squared = abs(current_xy.squared_length() - other_ai.current_xy.squared_length());
 
-        int distance_from_current_squared = abs(current_xy.squared_length() - tile_xy.squared_length());
-
-        if (closest_entity == vec2i{-1, -1} || distance_from_current_squared < max_dist)
+        if (distance_from_current_squared < max_dist)
         {
-            closest_entity = tile_xy;
+            closest_entity = other_ai.current_xy;
             max_dist = distance_from_current_squared;
         }
     }
 
     if (closest_entity == vec2i{ -1, -1 })
-        closest_entity = current_xy;
+    {
+        return; //no other entities
+    }
 
     destination_xy = closest_entity;
 
@@ -85,7 +89,6 @@ void wandering_ai::move_ai
         current_xy = next_p;
     }
 }
-
 
 void wandering_ai::tick_animation
 (

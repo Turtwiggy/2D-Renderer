@@ -299,7 +299,12 @@ void tilemap::remove(entt::entity en, vec2i pos)
 
     std::vector<entt::entity>& lst = all_entities[pos.y() * dim.x() + pos.x()];
 
-    for (int id = 0; id < (int)lst.size(); id++)
+    int size = (int)lst.size();
+
+    if (size == 0)
+        return;
+
+    for (int id = 0; id < size; id++)
     {
         entt::entity& ent = lst[id];
 

@@ -185,11 +185,12 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     {
         tilemap& tmap = registry.get<tilemap>(map);
 
-        vec2f mouse_tile = cam.screen_to_tile(win, mpos);
-        vec2i i_tile = { mouse_tile.x(), mouse_tile.y() };
-        vec2i min = { 0, 0 };
-        vec2i max = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
-        vec2i clamped_i_tile = clamp(i_tile, min, max);
+        vec2i clamped_i_tile = clamp
+        (
+            convert_world_to_xy(mpos, cam, win), 
+            vec2i{ 0, 0 }, 
+            tmap.dim - 1
+        );
         printf(" clicked tile: %d %d \n", clamped_i_tile.x(), clamped_i_tile.y());
 
         if (state.current_item == "Obstacles")
@@ -204,7 +205,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
 
             //add enemy
             vec2i start_pos = clamped_i_tile;
-            vec2i dest_pos = { tmap.dim.x() - 1, tmap.dim.y() - 1 };
+            vec2i dest_pos = tmap.dim - 1;
 
             entt::entity enemy_unit = create_battle_unit_at(registry, rng, start_pos, 1);
 
@@ -248,6 +249,38 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
                 ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
+    }
+
+    ImGui::End();
+
+    ImGui::Begin("Unit Editor");
+
+    auto view = registry.view<battle_tag, render_descriptor, sprite_handle, damageable, wandering_ai>();
+
+    for (auto ent : view)
+    {
+        auto& ai = view.get<wandering_ai>(ent);
+        auto& health = view.get<damageable>(ent);
+
+        if (health.cur_hp <= 0)
+            continue;
+
+        std::string name = "Unit name: STEVE";
+        ImGui::Text(name.c_str());
+
+        std::string hp = "Unit hp: " + std::to_string(health.cur_hp);
+        ImGui::Text(hp.c_str());
+
+        std::string attack = "Unit attack: " + std::to_string(1);
+        ImGui::Text(attack.c_str());;
+
+        if (ImGui::Button("Destroy unit!"))
+        {
+            tilemap& tmap = registry.get<tilemap>(map);
+            tmap.remove( ent, ai.current_xy );
+
+            health.damage_amount(health.max_hp);
+        };
     }
 
     ImGui::End();
