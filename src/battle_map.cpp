@@ -102,7 +102,11 @@ entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_han
     registry.assign<render_descriptor>(res, desc);
     registry.assign<mouse_interactable>(res, mouse_interactable());
 
-    registry.assign<damageable>(res, damageable());
+    damageable d;
+    d.max_hp = 10;
+    d.cur_hp = d.max_hp;
+    registry.assign<damageable>(res, d);
+
     registry.assign<team>(res, t);
     registry.assign<battle_tag>(res, battle_tag());
 
@@ -177,14 +181,13 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
 void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
 {
     battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
+    tilemap& tmap = registry.get<tilemap>(map);
 
     bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
     bool mouse_hovering = !ImGui::IsAnyWindowHovered();
 
     if (mouse_clicked)
     {
-        tilemap& tmap = registry.get<tilemap>(map);
-
         vec2i clamped_i_tile = clamp
         (
             convert_world_to_xy(mpos, cam, win), 
@@ -257,6 +260,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
 
     auto view = registry.view<battle_tag, render_descriptor, sprite_handle, damageable, wandering_ai>();
 
+    int id = 0;
     for (auto ent : view)
     {
         auto& ai = view.get<wandering_ai>(ent);
@@ -272,13 +276,19 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         ImGui::Text(hp.c_str());
 
         std::string attack = "Unit attack: " + std::to_string(1);
-        ImGui::Text(attack.c_str());;
+        ImGui::Text(attack.c_str());
 
-        if (ImGui::Button("Destroy unit!"))
+        std::string position = "Unit position (x): " 
+            + std::to_string(ai.current_xy.x()) 
+            + " (y): " + std::to_string(ai.current_xy.y());
+        ImGui::Text(position.c_str());
+
+        std::string button_label = "Destroy unit!" + std::to_string(id);
+        id += 1;
+
+        if (ImGui::Button(button_label.c_str()))
         {
-            tilemap& tmap = registry.get<tilemap>(map);
             tmap.remove( ent, ai.current_xy );
-
             health.damage_amount(health.max_hp);
         };
     }
