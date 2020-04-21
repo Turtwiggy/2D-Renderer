@@ -4,11 +4,11 @@
 #include <entt/entt.hpp>
 #include <vector>
 #include <vec/vec.hpp>
-
 #include "camera.hpp"
+#include <networking/serialisable_fwd.hpp>
 
 struct sprite_handle;
-struct world_transform;
+struct tilemap_position;
 
 struct collidable
 {
@@ -68,12 +68,9 @@ struct unit_group
     std::vector<entt::entity> entities;
 };
 
-entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform, const damageable& damage);
-entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform, const collidable& coll);
+entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const tilemap_position& transform, const damageable& damage);
+entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const tilemap_position& transform, const collidable& coll);
 
-entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform);
-
-vec2f convert_xy_to_world(const vec2i pos);
-vec2i convert_world_to_xy(vec2f pos, camera& cam, render_window& win);
+entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const tilemap_position& transform);
 
 #endif // ENTITY_COMMON_HPP_INCLUDED

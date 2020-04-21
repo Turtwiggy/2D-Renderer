@@ -31,7 +31,7 @@ namespace battle_map {
         };
         std::string current_item = "Enemies";
 
-        void update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time, camera& cam, render_window& win);
+        void update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time);
         void debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos);
     
         //void reset_tilemap_colours(tilemap& tmap, entt::registry& registry);    
@@ -39,7 +39,7 @@ namespace battle_map {
     
     entt::entity create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type);
     void distribute_entities(entt::registry& registry, tilemap& tmap, random_state& rng, vec2i dim, level_info::types type, int percentage, const std::vector<tiles::type>& scenery, float path_cost);
-    entt::entity create_battle_unit( entt::registry& registry, sprite_handle handle, world_transform transform, team t);
-    entt::entity create_obstacle(entt::registry& registry, sprite_handle handle, world_transform transform, int path_cost);
+    entt::entity create_battle_unit( entt::registry& registry, sprite_handle handle, tilemap_position transform, team t);
+    entt::entity create_obstacle(entt::registry& registry, sprite_handle handle, tilemap_position transform, int path_cost);
 
 }

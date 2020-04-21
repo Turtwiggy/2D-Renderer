@@ -17,6 +17,8 @@ struct camera
     vec2f screen_to_tile(render_window& win, vec2f screen_pos) const;
     vec2f world_to_screen(render_window& win, vec2f world_pos) const;
     vec2f screen_to_world(render_window& win, vec2f screen_pos) const;
+    static vec2f tile_to_world(vec2f pos);
+    //static vec2f world_to_tile(vec2f pos);
 
     void translate(vec2f amount);
 

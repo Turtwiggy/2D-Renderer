@@ -32,17 +32,17 @@ void reset_interactable_state(entt::registry& registry,entt::entity en)
     mouse.just_clicked = false;
 }
 
-entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform, const damageable& damage)
+entt::entity create_basic_unit(entt::registry& registry, const team& t, const sprite_handle& handle, const tilemap_position& transform, const damageable& damage)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     registry.assign<team>(res, t);
     registry.assign<sprite_handle>(res, handle);
-    registry.assign<world_transform>(res, transform);
+    registry.assign<tilemap_position>(res, transform);
     registry.assign<damageable>(res, damage);
 
     registry.assign<render_descriptor>(res, desc);
@@ -51,12 +51,12 @@ entt::entity create_basic_unit(entt::registry& registry, const team& t, const sp
     return res;
 }
 
-entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const world_transform& transform, const collidable& coll)
+entt::entity create_scenery(entt::registry& registry, const sprite_handle& handle, const tilemap_position& transform, const collidable& coll)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     team t;
@@ -65,7 +65,7 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
     registry.assign<render_descriptor>(res, desc);
     registry.assign<team>(res, t);
     registry.assign<sprite_handle>(res, handle);
-    registry.assign<world_transform>(res, transform);
+    registry.assign<tilemap_position>(res, transform);
     registry.assign<collidable>(res, coll);
     registry.assign<mouse_interactable>(res, mouse_interactable());
 
@@ -73,18 +73,18 @@ entt::entity create_scenery(entt::registry& registry, const sprite_handle& handl
 }
 
 
-entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const world_transform& transform)
+entt::entity create_unit_group(entt::registry& registry, const team& t, const sprite_handle& handle, const tilemap_position& transform)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     registry.assign<render_descriptor>(res, desc);
     registry.assign<team>(res, t);
     registry.assign<sprite_handle>(res, handle);
-    registry.assign<world_transform>(res, transform);
+    registry.assign<tilemap_position>(res, transform);
 
     unit_group ugroup;
 
@@ -93,19 +93,4 @@ entt::entity create_unit_group(entt::registry& registry, const team& t, const sp
     registry.assign<mouse_interactable>(res, mouse_interactable());
 
     return res;
-}
-
-
-vec2f convert_xy_to_world(const vec2i pos)
-{
-    return vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
-}
-
-vec2i convert_world_to_xy(vec2f pos, camera& cam, render_window& win)
-{
-    vec2f mouse_tile = cam.screen_to_tile(win, pos);
-
-    vec2i i_tile = { mouse_tile.x(), mouse_tile.y() };
-
-    return i_tile;
 }

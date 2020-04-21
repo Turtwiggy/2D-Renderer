@@ -2,7 +2,6 @@
 
 #include "battle_map_ai.hpp"
 
-
 entt::entity battle_map::create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
 {
     entt::entity res = registry.create();
@@ -20,14 +19,18 @@ entt::entity battle_map::create_battle(entt::registry& registry, random_state& r
                 //handle.base_colour = clamp(rand_det_s(rng.rng, 0.7, 1.3) * handle.base_colour * 0.1, 0, 1);
                 //handle.base_colour.w() = 1;
 
+                tilemap_position tmap_pos;
+                tmap_pos.pos = vec2i{ x, y };
+
                 render_descriptor desc;
-                desc.pos = vec2f{ x, y } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+                desc.pos = camera::tile_to_world(vec2f{ tmap_pos.pos.x(), tmap_pos.pos.y() });
                 desc.depress_on_hover = true;
                 //desc.angle = rand_det_s(rng.rng, 0.f, 2 * M_PI);
 
                 entt::entity base = registry.create();
 
                 registry.assign<sprite_handle>(base, handle);
+                registry.assign<tilemap_position>(base, tmap_pos);
                 registry.assign<render_descriptor>(base, desc);
                 registry.assign<battle_tag>(base, battle_tag());
                 //registry.assign<mouse_interactable>(base, mouse_interactable());
@@ -76,8 +79,8 @@ void battle_map::distribute_entities(entt::registry& registry, tilemap& tmap, ra
             sprite_handle handle = get_sprite_handle_of(rng, type);
             handle.base_colour.w() = 1;
 
-            world_transform trans;
-            trans.position = vec2f{ x, y } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+            tilemap_position trans;
+            trans.pos = vec2i{ x, y };
 
             collidable coll;
             coll.cost = path_cost;
@@ -90,16 +93,17 @@ void battle_map::distribute_entities(entt::registry& registry, tilemap& tmap, ra
 }
 
 
-entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_handle handle, world_transform transform, team t)
+entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_handle handle, tilemap_position transform, team t)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     registry.assign<sprite_handle>(res, handle);
     registry.assign<render_descriptor>(res, desc);
+    registry.assign<tilemap_position>(res, transform);
     registry.assign<mouse_interactable>(res, mouse_interactable());
 
     damageable d;
@@ -115,8 +119,8 @@ entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_han
 
 entt::entity create_battle_unit_at(entt::registry& registry, random_state& rng, vec2i pos, int team_id)
 {
-    world_transform transform;
-    transform.position = convert_xy_to_world(pos);
+    tilemap_position transform;
+    transform.pos = pos;
 
     team base_team;
     base_team.type = team::NUMERIC;
@@ -131,12 +135,12 @@ entt::entity create_battle_unit_at(entt::registry& registry, random_state& rng, 
 }
 
 
-entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle handle, world_transform transform, int path_cost)
+entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle handle, tilemap_position transform, int path_cost)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     registry.assign<sprite_handle>(res, handle);
@@ -153,8 +157,8 @@ entt::entity battle_map::create_obstacle(entt::registry& registry, sprite_handle
 
 entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec2i pos, tilemap& map, sprite_handle handle, int path_cost)
 {
-    world_transform transform;
-    transform.position = convert_xy_to_world(pos);
+    tilemap_position transform;
+    transform.pos = pos;
 
     entt::entity obstacle = battle_map::create_obstacle(registry, handle, transform, path_cost);
 
@@ -162,18 +166,19 @@ entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec
 }
 
 
-void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time, camera& cam, render_window& win)
+void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time)
 {
-    auto view = registry.view < battle_tag, render_descriptor, sprite_handle, wandering_ai> ();
+    auto view = registry.view<battle_tag, tilemap_position, render_descriptor, sprite_handle, wandering_ai> ();
 
     tilemap& tmap = registry.get<tilemap>(map);
 
     for (auto ent : view)
     {
         auto& ai = view.get<wandering_ai>(ent);
+        auto& ai_pos = view.get<tilemap_position>(ent);
         auto& desc = view.get<render_descriptor>(ent);
 
-        ai.tick_ai(registry, delta_time, desc, tmap, ent, cam, win);
+        ai.tick_ai(registry, delta_time, desc, ai_pos, tmap, ent);
         ai.tick_animation(delta_time, desc);
     }
 }
@@ -183,17 +188,17 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
     tilemap& tmap = registry.get<tilemap>(map);
 
-    bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered();
+    bool mouse_clicked = ImGui::IsMouseClicked(0) && !ImGui::IsAnyWindowHovered() && !ImGui::GetIO().WantCaptureMouse;
     bool mouse_hovering = !ImGui::IsAnyWindowHovered();
 
     if (mouse_clicked)
     {
-        vec2i clamped_i_tile = clamp
-        (
-            convert_world_to_xy(mpos, cam, win), 
-            vec2i{ 0, 0 }, 
-            tmap.dim - 1
-        );
+        vec2f clamped_tile = clamp(
+            cam.screen_to_tile(win, mpos),
+            vec2f{0, 0}, 
+            vec2f{tmap.dim.x() - 1, tmap.dim.y() - 1 });
+        vec2i clamped_i_tile = vec2i{ (int)clamped_tile.x(), (int)clamped_tile.y() };
+
         printf(" clicked tile: %d %d \n", clamped_i_tile.x(), clamped_i_tile.y());
 
         if (state.current_item == "Obstacles")
@@ -213,7 +218,6 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
             entt::entity enemy_unit = create_battle_unit_at(registry, rng, start_pos, 1);
 
             wandering_ai ai;
-            ai.current_xy = start_pos;
             ai.destination_xy = dest_pos;
             registry.assign<wandering_ai>(enemy_unit, ai);
 
@@ -236,7 +240,8 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         }
     }
 
-    ImGui::Begin("Battle Editor");
+    std::string battle_editor_label = "Battle Editor " + std::to_string((int)map);
+    ImGui::Begin(battle_editor_label.c_str());
 
     if (ImGui::BeginCombo("##combo", state.current_item.c_str() )) // The second parameter is the label previewed before opening the combo.
     {
@@ -256,15 +261,20 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
 
     ImGui::End();
 
-    ImGui::Begin("Unit Editor");
+    //iterate over everything tilemap
+    //check if entities have required components
 
-    auto view = registry.view<battle_tag, render_descriptor, sprite_handle, damageable, wandering_ai>();
+    std::string unit_editor_label = "Unit Editor " + std::to_string((int)map);
+    ImGui::Begin(unit_editor_label.c_str());
+
+    auto view = registry.view<battle_tag, render_descriptor, sprite_handle, damageable, wandering_ai, tilemap_position>();
 
     int id = 0;
     for (auto ent : view)
     {
         auto& ai = view.get<wandering_ai>(ent);
         auto& health = view.get<damageable>(ent);
+        auto& tmap_pos = view.get< tilemap_position>(ent);
 
         if (health.cur_hp <= 0)
             continue;
@@ -279,16 +289,15 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         ImGui::Text(attack.c_str());
 
         std::string position = "Unit position (x): " 
-            + std::to_string(ai.current_xy.x()) 
-            + " (y): " + std::to_string(ai.current_xy.y());
+            + std::to_string(tmap_pos.pos.x())
+            + " (y): " + std::to_string(tmap_pos.pos.y());
         ImGui::Text(position.c_str());
 
-        std::string button_label = "Destroy unit!" + std::to_string(id);
+        std::string button_label = "Destroy unit!##" + std::to_string(id);
         id += 1;
-
         if (ImGui::Button(button_label.c_str()))
         {
-            tmap.remove( ent, ai.current_xy );
+            tmap.remove( ent, tmap_pos.pos );
             health.damage_amount(health.max_hp);
         };
     }

@@ -294,8 +294,14 @@ void tilemap::add(entt::entity en, vec2i pos)
 
 void tilemap::remove(entt::entity en, vec2i pos)
 {
-    if (pos.x() < 0 || pos.y() < 0 || pos.x() >= dim.x() || pos.y() >= dim.y())
-        throw std::runtime_error("Remove out of bounds");
+    if (pos.x() < 0 || pos.y() < 0 || pos.x() >= dim.x() || pos.y() >= dim.y()) 
+    {
+        std::string err = "Remove out of bounds: pos.x(): " + std::to_string(pos.x()) +
+            " pos.y(): " + std::to_string(pos.y()) +
+            " dim.x(): " + std::to_string(dim.x()) +
+            " dim.y(): " + std::to_string(dim.y());
+        throw std::runtime_error(err);
+    }
 
     std::vector<entt::entity>& lst = all_entities[pos.y() * dim.x() + pos.x()];
 

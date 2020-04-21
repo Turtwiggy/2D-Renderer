@@ -17,9 +17,9 @@ struct sprite_handle : serialisable, free_function
     vec4f base_colour = {1,1,1,1};
 };
 
-struct world_transform : serialisable, free_function
+struct tilemap_position : serialisable, free_function
 {
-    vec2f position;
+    vec2i pos;
 };
 
 struct render_descriptor : serialisable, free_function

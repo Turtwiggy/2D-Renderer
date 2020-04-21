@@ -305,19 +305,17 @@ int main(int argc, char* argv[])
         }
 
         //Update battle maps
+        auto battle_maps = registry.view<tilemap, battle_map::battle_map_state>();
+        for (auto ent : battle_maps)
         {
-            auto battle_maps = registry.view<tilemap, battle_map::battle_map_state>();
-            for (auto ent : battle_maps)
-            {
-                battle_map::battle_map_state bms = battle_maps.get<battle_map::battle_map_state>(ent);
+            battle_map::battle_map_state bms = battle_maps.get<battle_map::battle_map_state>(ent);
 
-                //only updates ai and debugs active combat... may want to change
-                if (ent != focused_tilemap)
-                    continue;
+            //only updates ai and debugs active combat... may want to change
+            if (ent != focused_tilemap)
+                continue;
 
-                bms.update_ai(registry, ent, rng, delta_time, cam, win);
-                bms.debug_combat(registry, ent, rng, win, cam, mpos);
-            }
+            bms.update_ai(registry, ent, rng, delta_time);
+            bms.debug_combat(registry, ent, rng, win, cam, mpos);
         }
 
         //map

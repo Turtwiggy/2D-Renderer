@@ -88,16 +88,16 @@ std::vector<building_feature> get_buildable_for(building_tag::categories cat)
     return vec;
 }
 
-entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const world_transform& transform)
+entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const tilemap_position& transform)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     registry.assign<sprite_handle>(res, handle);
-    registry.assign<world_transform>(res, transform);
+    registry.assign<tilemap_position>(res, transform);
     registry.assign<overworld_tag>(res, overworld_tag());
     registry.assign<render_descriptor>(res, desc);
     registry.assign<mouse_interactable>(res, mouse_interactable());

@@ -428,10 +428,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
         vec2f rounded = round(ipos);
 
-        vec2i integer = {rounded.x(), rounded.y()};
-
-        world_transform trans;
-        trans.position = rounded * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+        tilemap_position trans;
+        trans.pos = { rounded.x(), rounded.y() };
 
         sprite_handle handle = get_sprite_handle_of(rng, tiles::CASTLE_1);
 
@@ -444,9 +442,9 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
         registry.assign<team>(en, t);
 
-        tmap.add(en, integer);
+        tmap.add(en, trans.pos);
 
-        printf("End %i %i\n", integer.x(), integer.y());
+        printf("End %i %i\n", trans.pos.x(), trans.pos.y());
 
         all_positions.push_back(rounded);
         all_teams.push_back(idx);
@@ -510,8 +508,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
                     all_positions.push_back({adjusted.value().x(), adjusted.value().y()});
                     all_teams.push_back(idx);
 
-                    world_transform trans;
-                    trans.position = vec2f{adjusted.value().x(), adjusted.value().y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+                    tilemap_position trans;
+                    trans.pos = vec2i{ adjusted.value().x(), adjusted.value().y() };
 
                     sprite_handle handle = get_sprite_handle_of(rng, tiles::CASTLE_2);
 
@@ -612,8 +610,8 @@ entt::entity create_overworld(entt::registry& registry, random_state& rng, vec2i
 
             int fteam = min_team;
 
-            world_transform trans;
-            trans.position = vec2f{potential_spot.x(), potential_spot.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+            tilemap_position trans;
+            trans.pos = vec2i{ (int)potential_spot.x(), (int)potential_spot.y() };
 
             sprite_handle handle = get_sprite_handle_of(rng, tiles::HOUSE_1);
 

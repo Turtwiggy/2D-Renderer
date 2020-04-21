@@ -6,7 +6,7 @@
 #include <string>
 
 struct sprite_handle;
-struct world_transform;
+struct tilemap_position;
 
 struct building_feature;
 
@@ -60,6 +60,6 @@ struct building_feature
 building_feature get_feature_info(building_feature::type type);
 std::vector<building_feature> get_buildable_for(building_tag::categories cat);
 
-entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const world_transform& transform);
+entt::entity create_overworld_building(entt::registry& registry, const sprite_handle& handle, const tilemap_position& transform);
 
 #endif // OVERWORLD_BUILDING_HPP_INCLUDED

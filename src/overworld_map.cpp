@@ -2,16 +2,16 @@
 #include "entity_common.hpp"
 #include "overworld_building.hpp"
 
-entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handle, world_transform transform)
+entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handle, tilemap_position transform)
 {
     entt::entity res = registry.create();
 
     render_descriptor desc;
-    desc.pos = transform.position;
+    desc.pos = camera::tile_to_world(vec2f{ transform.pos.x(), transform.pos.y() });
     desc.depress_on_hover = true;
 
     registry.assign<sprite_handle>(res, handle);
-    registry.assign<world_transform>(res, transform);
+    registry.assign<tilemap_position>(res, transform);
     registry.assign<overworld_tag>(res, overworld_tag());
     registry.assign<render_descriptor>(res, desc);
     registry.assign<mouse_interactable>(res, mouse_interactable());
@@ -21,8 +21,8 @@ entt::entity create_overworld_unit(entt::registry& registry, sprite_handle handl
 
 entt::entity create_dummy_army_at(entt::registry& registry, random_state& rng, vec2i pos, int team_id)
 {
-    world_transform transform;
-    transform.position = vec2f{pos.x(), pos.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+    tilemap_position transform;
+    transform.pos = vec2i{ pos.x(), pos.y() };
 
     team base_team;
     base_team.type = team::NUMERIC;
@@ -38,8 +38,8 @@ entt::entity create_dummy_army_at(entt::registry& registry, random_state& rng, v
 
     for(int i=0; i < unit_count; i++)
     {
-        world_transform trans;
-        trans.position = vec2f{pos.x(), pos.y()} * TILE_PIX + vec2f{TILE_PIX/2, TILE_PIX/2};
+        tilemap_position trans;
+        trans.pos = vec2i{ pos.x(), pos.y() };
 
         damageable damage;
 

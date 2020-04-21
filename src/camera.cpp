@@ -70,6 +70,16 @@ vec2f camera::screen_to_world(render_window& win, vec2f screen_pos) const
     return absolute;
 }
 
+vec2f camera::tile_to_world(vec2f pos)
+{
+    return vec2f{ pos.x(), pos.y() } *TILE_PIX + vec2f{ TILE_PIX / 2, TILE_PIX / 2 };
+}
+
+//vec2f camera::world_to_tile(vec2f pos)
+//{
+//    return (pos - vec2f{ TILE_PIX / 2, TILE_PIX / 2 }) / (float)TILE_PIX ;
+//}
+
 void camera::translate(vec2f amount)
 {
     pos += amount / calculate_scale();

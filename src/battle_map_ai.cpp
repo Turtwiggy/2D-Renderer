@@ -1,15 +1,15 @@
 #include "battle_map_ai.hpp"
 
-#include "entity_common.hpp"
+#include "camera.hpp"
 
-void wandering_ai::tick_ai(
-    entt::registry& registry, 
-    float delta_time, 
-    render_descriptor& desc, 
-    tilemap& tmap,  
-    entt::entity en,
-    camera& cam,
-    render_window& win )
+void wandering_ai::tick_ai
+(
+    entt::registry&     registry,
+    float               delta_time,
+    render_descriptor&  desc,
+    tilemap_position&   pos,
+    tilemap&            tmap,
+    entt::entity        en )
 {
     time_left_before_move_tiles -= delta_time;
 
@@ -18,25 +18,23 @@ void wandering_ai::tick_ai(
 
     time_left_before_move_tiles = time_between_move_tiles;
 
-    move_ai(registry, desc, tmap, en, cam, win);
+    move_ai(registry, desc, pos, tmap, en);
 }
 
 void wandering_ai::move_ai
 (
     entt::registry&     registry,
     render_descriptor&  desc,
+    tilemap_position&   my_pos,
     tilemap&            tmap,
-    entt::entity        en,
-    camera&             cam,
-    render_window&      win
-)
+    entt::entity        en )
 {
     //Gets the closest target by looping over all entities
     //this could probably be optimized
     vec2i closest_entity = { -1, -1 };
     int max_dist = std::numeric_limits<int>::max();
 
-    auto view = registry.view<team, battle_tag, damageable, wandering_ai>();
+    auto view = registry.view<team, battle_tag, damageable, wandering_ai, tilemap_position>();
 
     for (auto ent : view)
     {
@@ -44,16 +42,17 @@ void wandering_ai::move_ai
             continue;
 
         wandering_ai other_ai = view.get<wandering_ai>(ent);
-        damageable other_ai_health = view.get<damageable>(ent);
+        damageable other_ai_health = view.get<damageable>(ent); 
+        tilemap_position other_ai_pos = view.get<tilemap_position>(ent);
         
         if (other_ai_health.cur_hp <= 0)
             continue;
 
-        int distance_from_current_squared = abs(current_xy.squared_length() - other_ai.current_xy.squared_length());
+        int distance_from_current_squared = abs(my_pos.pos.squared_length() - other_ai_pos.pos.squared_length());
 
         if (distance_from_current_squared < max_dist)
         {
-            closest_entity = other_ai.current_xy;
+            closest_entity = other_ai_pos.pos;
             max_dist = distance_from_current_squared;
         }
     }
@@ -65,7 +64,7 @@ void wandering_ai::move_ai
 
     destination_xy = closest_entity;
 
-    std::optional<std::vector<vec2i>> path = a_star(registry, tmap, current_xy, destination_xy);
+    std::optional<std::vector<vec2i>> path = a_star(registry, tmap, my_pos.pos, destination_xy);
 
     if (path.has_value())
     {
@@ -82,11 +81,11 @@ void wandering_ai::move_ai
         //show_path_colours_on_tilemap(tmap, registry, points, destination_xy);
 
         //update renderer
-        desc.pos = convert_xy_to_world(next_p);
+        desc.pos = camera::tile_to_world(vec2f{ next_p.x(), next_p.y() });
         //update map
-        tmap.move(en, current_xy, next_p);
+        tmap.move(en, my_pos.pos, next_p);
         //update position
-        current_xy = next_p;
+        my_pos.pos = next_p;
     }
 }
 

@@ -21,11 +21,11 @@ DEFINE_SERIALISE_FUNCTION(sprite_handle)
     DO_FSERIALISE(base_colour);
 }
 
-DEFINE_SERIALISE_FUNCTION(world_transform)
+DEFINE_SERIALISE_FUNCTION(tilemap_position)
 {
     SERIALISE_SETUP();
 
-    DO_FSERIALISE(position);
+    DO_FSERIALISE(pos);
 }
 
 DEFINE_SERIALISE_FUNCTION(render_descriptor)
@@ -39,6 +39,6 @@ DEFINE_SERIALISE_FUNCTION(render_descriptor)
     DO_FSERIALISE(depress_on_hover);
 }
 
-DEFINE_ENTT_TYPES(tilemap, sprite_handle, world_transform, render_descriptor);
+DEFINE_ENTT_TYPES(tilemap, sprite_handle, tilemap_position, render_descriptor);
 
 DEFINE_ENTT_SERIALISE();

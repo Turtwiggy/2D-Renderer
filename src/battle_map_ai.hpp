@@ -4,11 +4,11 @@
 #include "tilemap.hpp"
 #include "random.hpp"
 #include "pathfinding.hpp"
+#include "entity_common.hpp"
 
 struct wandering_ai
 {
     //pathfinding
-    vec2i current_xy;
     vec2i destination_xy;
     float time_between_move_tiles = 1.;
     float time_left_before_move_tiles = time_between_move_tiles;
@@ -25,20 +25,18 @@ struct wandering_ai
         entt::registry&     registry, 
         float               delta_time, 
         render_descriptor&  desc, 
+        tilemap_position&   pos,
         tilemap&            tmap, 
-        entt::entity        en,
-        camera& cam,
-        render_window& win
+        entt::entity        en
     );
 
     void move_ai
     (
         entt::registry&     registry,
         render_descriptor&  desc,
+        tilemap_position&   pos,
         tilemap&            tmap,
-        entt::entity        en,
-        camera&             cam, 
-        render_window&      win
+        entt::entity        en
     );
 
     void tick_animation
