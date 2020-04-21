@@ -112,6 +112,11 @@ entt::entity battle_map::create_battle_unit(entt::registry& registry, sprite_han
     registry.assign<damageable>(res, d);
 
     registry.assign<team>(res, t);
+
+    battle_unit_info info;
+    info.damage = 10;
+    registry.assign<battle_unit_info>(res, info);
+
     registry.assign<battle_tag>(res, battle_tag());
 
     return res;
@@ -166,7 +171,7 @@ entt::entity create_obstacle_at(entt::registry& registry, random_state& rng, vec
 }
 
 
-void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, random_state& rng, float delta_time)
+void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::entity& map, float delta_time, random_state& rng)
 {
     auto view = registry.view<battle_tag, tilemap_position, render_descriptor, sprite_handle, wandering_ai> ();
 
@@ -175,10 +180,9 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     for (auto ent : view)
     {
         auto& ai = view.get<wandering_ai>(ent);
-        auto& ai_pos = view.get<tilemap_position>(ent);
         auto& desc = view.get<render_descriptor>(ent);
 
-        ai.tick_ai(registry, delta_time, desc, ai_pos, tmap, ent);
+        ai.tick_ai(registry, delta_time, tmap, ent, rng);
         ai.tick_animation(delta_time, desc);
     }
 }
@@ -240,7 +244,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         }
     }
 
-    std::string battle_editor_label = "Battle Editor " + std::to_string((int)map);
+    std::string battle_editor_label = "Battle Editor ##" + std::to_string((int)map);
     ImGui::Begin(battle_editor_label.c_str());
 
     if (ImGui::BeginCombo("##combo", state.current_item.c_str() )) // The second parameter is the label previewed before opening the combo.
@@ -264,7 +268,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     //iterate over everything tilemap
     //check if entities have required components
 
-    std::string unit_editor_label = "Unit Editor " + std::to_string((int)map);
+    std::string unit_editor_label = "Unit Editor ##" + std::to_string((int)map);
     ImGui::Begin(unit_editor_label.c_str());
 
     auto view = registry.view<battle_tag, render_descriptor, sprite_handle, damageable, wandering_ai, tilemap_position>();
@@ -274,7 +278,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     {
         auto& ai = view.get<wandering_ai>(ent);
         auto& health = view.get<damageable>(ent);
-        auto& tmap_pos = view.get< tilemap_position>(ent);
+        auto& tmap_pos = view.get<tilemap_position>(ent);
 
         if (health.cur_hp <= 0)
             continue;

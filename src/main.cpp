@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
             if (ent != focused_tilemap)
                 continue;
 
-            bms.update_ai(registry, ent, rng, delta_time);
+            bms.update_ai(registry, ent, delta_time, rng);
             bms.debug_combat(registry, ent, rng, win, cam, mpos);
         }
 

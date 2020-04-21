@@ -6,6 +6,8 @@
 #include "pathfinding.hpp"
 #include "entity_common.hpp"
 
+std::optional<entt::entity> closest_alive_entity(entt::registry& registry, entt::entity en);
+
 struct wandering_ai
 {
     //pathfinding
@@ -24,19 +26,17 @@ struct wandering_ai
     (
         entt::registry&     registry, 
         float               delta_time, 
-        render_descriptor&  desc, 
-        tilemap_position&   pos,
         tilemap&            tmap, 
-        entt::entity        en
+        entt::entity        en,
+        random_state&       rng
     );
 
     void move_ai
     (
         entt::registry&     registry,
-        render_descriptor&  desc,
-        tilemap_position&   pos,
         tilemap&            tmap,
-        entt::entity        en
+        entt::entity        en,
+        random_state&       rng
     );
 
     void tick_animation
