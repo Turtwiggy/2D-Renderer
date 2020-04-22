@@ -271,7 +271,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     std::string unit_editor_label = "Unit Editor ##" + std::to_string((int)map);
     ImGui::Begin(unit_editor_label.c_str());
 
-    auto view = registry.view<battle_tag, render_descriptor, sprite_handle, damageable, wandering_ai, tilemap_position>();
+    auto view = registry.view<battle_tag, battle_unit_info, render_descriptor, sprite_handle, damageable, wandering_ai, tilemap_position>();
 
     int id = 0;
     for (auto ent : view)
@@ -279,6 +279,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         auto& ai = view.get<wandering_ai>(ent);
         auto& health = view.get<damageable>(ent);
         auto& tmap_pos = view.get<tilemap_position>(ent);
+        auto& info = view.get<battle_unit_info>(ent);
 
         if (health.cur_hp <= 0)
             continue;
@@ -296,6 +297,9 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
             + std::to_string(tmap_pos.pos.x())
             + " (y): " + std::to_string(tmap_pos.pos.y());
         ImGui::Text(position.c_str());
+
+        std::string kills = "Unit kills: " + std::to_string(info.kills);
+        ImGui::Text(kills.c_str());
 
         std::string button_label = "Destroy unit!##" + std::to_string(id);
         id += 1;

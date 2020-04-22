@@ -15,6 +15,8 @@ namespace battle_map {
     struct battle_unit_info
     {
         float damage = 1;
+
+        int kills = 0;
     };
 
     struct battle_map_state

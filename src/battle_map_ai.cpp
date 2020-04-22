@@ -37,9 +37,6 @@ void wandering_ai::move_ai
 
     if (my_health.cur_hp <= 0) 
     {
-        //printf("I am dead! \n");
-        sprite_handle& my_sprite = registry.get<sprite_handle>(en);
-        my_sprite = get_sprite_handle_of(rng, tiles::CACTUS);
         return;
     }
 
@@ -51,18 +48,33 @@ void wandering_ai::move_ai
     vec2i nearest_entity_pos = registry.get<tilemap_position>(nearest.value()).pos;
     destination_xy = nearest_entity_pos;
 
-    int dist = abs(my_pos.pos.x() - destination_xy.x()) + abs(my_pos.pos.y() - destination_xy.y());
-    printf("distance from other entity: %i ", dist);
+    int x_dist = abs(my_pos.pos.x() - destination_xy.x());
+    int y_dist = abs(my_pos.pos.y() - destination_xy.y());
+    int total_dist = x_dist + y_dist;
+    printf("distance from other entity: total %i x %i y %i \n", total_dist, x_dist, y_dist);
 
-    if (dist < 2)
+    //In horiz or vert, or diagonal
+    if (total_dist == 1 || (total_dist == 2 && x_dist == 1 && y_dist == 1))
     {
         damageable& your_health = registry.get<damageable>(nearest.value());
         float my_damage = my_info.damage;
 
         your_health.damage_amount(my_damage);
 
-        printf("gonna attack u bro for %f! \n", my_damage);
-        printf("your new health is %f!", your_health.cur_hp);
+        printf("gonna attack %i for %f! ", (int)nearest.value(), my_damage);
+        printf(" your new health is %f! \n", your_health.cur_hp);
+
+        //dont pathfind to dead enemies
+        if (your_health.cur_hp <= 0)
+        {
+            //i killed you!
+            my_info.kills += 1;
+
+            //update the other thing's sprite
+            sprite_handle& your_sprite = registry.get<sprite_handle>(nearest.value());
+            your_sprite = get_sprite_handle_of(rng, tiles::CACTUS);
+            return;
+        }
     }
 
     std::optional<std::vector<vec2i>> path = a_star(registry, tmap, my_pos.pos, destination_xy);
