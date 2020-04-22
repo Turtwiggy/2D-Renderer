@@ -21,11 +21,25 @@ namespace battle_map {
 
     struct battle_map_state
     {
-        //Combobox options
-        std::vector<std::string> items = {
-            "Enemies", "Obstacles", "Player"
+
+        enum combobox_items
+        {
+            ENEMY_UNITS,
+            PLAYER_UNITS,
+            OBSTACLES
         };
-        std::string current_item = "Enemies";
+        combobox_items convert_string_to_item(std::string str)
+        {
+            if (str == items[0]) return combobox_items::ENEMY_UNITS;
+            if (str == items[1]) return combobox_items::PLAYER_UNITS;
+            if (str == items[2]) return combobox_items::OBSTACLES;
+            return combobox_items::ENEMY_UNITS;
+        }
+        std::vector<std::string> items = {
+            "ENEMY_UNITS", "PLAYER_UNITS", "OBSTACLES"
+        };
+        std::string current_item_str = "ENEMY_UNITS";
+        combobox_items current_item = combobox_items::ENEMY_UNITS;
 
         void update_ai(entt::registry& registry, entt::entity& map, float delta_time, random_state& rng);
         void debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos);

@@ -7,6 +7,7 @@
 #include "entity_common.hpp"
 
 std::optional<entt::entity> closest_alive_entity(entt::registry& registry, entt::entity en);
+std::optional<entt::entity> closest_alive_enemy_entity(entt::registry& registry, entt::entity en);
 
 struct wandering_ai
 {

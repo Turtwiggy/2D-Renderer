@@ -36,11 +36,9 @@ void wandering_ai::move_ai
     battle_map::battle_unit_info& my_info = registry.get<battle_map::battle_unit_info>(en);
 
     if (my_health.cur_hp <= 0) 
-    {
         return;
-    }
 
-    std::optional<entt::entity> nearest = closest_alive_entity(registry, en);
+    std::optional<entt::entity> nearest = closest_alive_enemy_entity(registry, en);
 
     if (!nearest.has_value())
         return;
@@ -72,7 +70,7 @@ void wandering_ai::move_ai
 
             //update the other thing's sprite
             sprite_handle& your_sprite = registry.get<sprite_handle>(nearest.value());
-            your_sprite = get_sprite_handle_of(rng, tiles::CACTUS);
+            your_sprite = get_sprite_handle_of(rng, tiles::GRAVE);
             return;
         }
     }
@@ -175,7 +173,7 @@ std::optional<entt::entity> closest_alive_entity(entt::registry& registry, entt:
     std::optional<entt::entity> closest_entity = std::nullopt;
     int max_dist = std::numeric_limits<int>::max();
 
-    auto view = registry.view<team, battle_tag, damageable, wandering_ai, tilemap_position>();
+    auto view = registry.view<team, battle_map::battle_unit_info, battle_tag, damageable, tilemap_position>();
 
     for (auto ent : view)
     {
@@ -201,3 +199,42 @@ std::optional<entt::entity> closest_alive_entity(entt::registry& registry, entt:
     return closest_entity;
 }
 
+std::optional<entt::entity> closest_alive_enemy_entity(entt::registry & registry, entt::entity en)
+{
+    tilemap_position& my_pos = registry.get<tilemap_position>(en);
+    team& my_team = registry.get<team>(en);
+
+    //Gets the closest target by looping over all entities
+    //this could probably be optimized
+    std::optional<entt::entity> closest_entity = std::nullopt;
+    int max_dist = std::numeric_limits<int>::max();
+
+    auto view = registry.view<team, battle_map::battle_unit_info, battle_tag, damageable, tilemap_position>();
+
+    for (auto ent : view)
+    {
+        if (ent == en)
+            continue;
+
+        damageable other_ai_health = view.get<damageable>(ent);
+        team other_ai_team = view.get<team>(ent);
+
+        if (other_ai_health.cur_hp <= 0)
+            continue;
+
+        if (other_ai_team.t == my_team.t)
+            continue;
+
+        tilemap_position other_ai_pos = view.get<tilemap_position>(ent);
+
+        int distance_from_current_squared = abs(my_pos.pos.squared_length() - other_ai_pos.pos.squared_length());
+
+        if (distance_from_current_squared < max_dist)
+        {
+            closest_entity = ent;
+            max_dist = distance_from_current_squared;
+        }
+    }
+
+    return closest_entity;
+}
