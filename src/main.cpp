@@ -315,6 +315,8 @@ int main(int argc, char* argv[])
                 continue;
 
             bms.update_ai(registry, ent, delta_time, rng);
+            bms.battle_editor(registry, ent, rng, win, cam, mpos);
+            bms.unit_editor(registry, ent, rng, win, cam, mpos);
             bms.debug_combat(registry, ent, rng, win, cam, mpos);
         }
 

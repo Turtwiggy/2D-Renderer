@@ -187,7 +187,7 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     }
 }
 
-void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
+void battle_map::battle_map_state::battle_editor(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
 {
     battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
     tilemap& tmap = registry.get<tilemap>(map);
@@ -199,8 +199,8 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     {
         vec2f clamped_tile = clamp(
             cam.screen_to_tile(win, mpos),
-            vec2f{0, 0}, 
-            vec2f{tmap.dim.x() - 1, tmap.dim.y() - 1 });
+            vec2f{ 0, 0 },
+            vec2f{ tmap.dim.x() - 1, tmap.dim.y() - 1 });
         vec2i clamped_i_tile = vec2i{ (int)clamped_tile.x(), (int)clamped_tile.y() };
 
         printf(" clicked tile: %d %d \n", clamped_i_tile.x(), clamped_i_tile.y());
@@ -210,7 +210,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
             sprite_handle handle = get_sprite_handle_of(rng, tiles::type::CACTUS);
             create_obstacle_at(registry, rng, clamped_i_tile, tmap, handle, -1);
         }
-        
+
         if (state.current_item == combobox_items::ENEMY_UNITS)
         {
             vec2i half = tmap.dim / 2;
@@ -257,16 +257,16 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
     std::string battle_editor_label = "Battle Editor ##" + std::to_string((int)map);
     ImGui::Begin(battle_editor_label.c_str());
 
-    if (ImGui::BeginCombo("##combo", state.current_item_str.c_str() )) // The second parameter is the label previewed before opening the combo.
+    if (ImGui::BeginCombo("##combo", state.current_item_str.c_str())) // The second parameter is the label previewed before opening the combo.
     {
         for (int n = 0; n < state.items.size(); n++)
         {
             bool is_selected = (state.current_item_str == state.items[n]); // You can store your selection however you want, outside or inside your objects
-            if (ImGui::Selectable(state.items[n].c_str(), is_selected)) 
+            if (ImGui::Selectable(state.items[n].c_str(), is_selected))
             {
                 printf("Selected! \n");
                 state.current_item_str = state.items[n];
-                state.current_item = convert_string_to_item(state.current_item_str);
+                state.current_item = combobox_str_to_item(state.current_item_str);
             }
             if (is_selected)
                 ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
@@ -274,6 +274,12 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         ImGui::EndCombo();
     }
     ImGui::End();
+}
+
+void battle_map::battle_map_state::unit_editor(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
+{
+    battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
+    tilemap& tmap = registry.get<tilemap>(map);
 
     //iterate over everything tilemap
     //check if entities have required components
@@ -303,7 +309,7 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         std::string attack = "Unit attack: " + std::to_string(info.damage);
         ImGui::Text(attack.c_str());
 
-        std::string position = "Unit position (x): " 
+        std::string position = "Unit position (x): "
             + std::to_string(tmap_pos.pos.x())
             + " (y): " + std::to_string(tmap_pos.pos.y());
         ImGui::Text(position.c_str());
@@ -314,10 +320,40 @@ void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::
         std::string button_label = "Destroy unit!##" + std::to_string(id);
         if (ImGui::Button(button_label.c_str()))
         {
-            tmap.remove( ent, tmap_pos.pos );
+            tmap.remove(ent, tmap_pos.pos);
             health.damage_amount(health.max_hp);
         };
         id += 1;
+    }
+
+    ImGui::End();
+
+
+}
+
+void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
+{
+    battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
+    tilemap& tmap = registry.get<tilemap>(map);
+
+    std::string gamemode_editor_label = "Gamemode Editor ##" + std::to_string((int)map);
+    ImGui::Begin(gamemode_editor_label.c_str());
+
+    if (ImGui::BeginCombo("##combo", state.current_gamemode_str.c_str())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < state.gamemodes.size(); n++)
+        {
+            bool is_selected = (state.current_gamemode_str == state.gamemodes[n]); // You can store your selection however you want, outside or inside your objects
+            if (ImGui::Selectable(state.gamemodes[n].c_str(), is_selected))
+            {
+                printf("Selected! \n");
+                state.current_gamemode_str = state.gamemodes[n];
+                state.current_gamemode = combobox_str_to_gamemode(state.current_gamemode_str);
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
     }
 
     ImGui::End();
