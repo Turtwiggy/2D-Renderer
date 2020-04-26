@@ -6,6 +6,7 @@
 #include "entity_common.hpp"
 #include "tilemap.hpp"
 #include "random.hpp"
+#include "audio/audio_player.h"
 
 #include <entt/entt.hpp>
 #include <imgui/imgui.h>
@@ -42,26 +43,31 @@ namespace battle_map {
 
         enum combobox_gamemode
         {
-            GAMEMODE_RTS,
             GAMEMODE_RHYTHM,
             GAMEMODE_HERO_CONTROL
         };
         combobox_gamemode combobox_str_to_gamemode(std::string str)
         {
-            if (str == gamemodes[0]) return combobox_gamemode::GAMEMODE_RTS;
             if (str == gamemodes[1]) return combobox_gamemode::GAMEMODE_RHYTHM;
             if (str == gamemodes[2]) return combobox_gamemode::GAMEMODE_HERO_CONTROL;
-            return combobox_gamemode::GAMEMODE_RTS;
+            return combobox_gamemode::GAMEMODE_RHYTHM;
         }
         std::vector<std::string> gamemodes = {
-            "GAMEMODE_RTS", "GAMEMODE_RYTHEM", "GAMEMODE_HERO_CONTROL"
+            "GAMEMODE_RYTHEM", "GAMEMODE_HERO_CONTROL"
         };
-        std::string current_gamemode_str = "GAMEMODE_RTS";
-        combobox_gamemode current_gamemode = combobox_gamemode::GAMEMODE_RTS;
+        std::string current_gamemode_str = "GAMEMODE_RYTHEM";
+        combobox_gamemode current_gamemode = combobox_gamemode::GAMEMODE_RHYTHM;
 
 
         void update_ai(entt::registry& registry, entt::entity& map, float delta_time, random_state& rng);
-        
+
+        void update_gamemode (
+            entt::registry& registry,
+            entt::entity& map,
+            float delta_time,
+            random_state& rng,
+            audio_player& audio );
+
         void debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos);
         
         void battle_editor(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos);

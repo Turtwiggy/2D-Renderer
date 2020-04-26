@@ -1,5 +1,6 @@
 #include "battle_map.hpp"
 
+#include "battle_map_gamemodes.h"
 #include "battle_map_ai.hpp"
 
 entt::entity battle_map::create_battle(entt::registry& registry, random_state& rng, vec2i dim, level_info::types type)
@@ -187,6 +188,50 @@ void battle_map::battle_map_state::update_ai(entt::registry& registry, entt::ent
     }
 }
 
+void battle_map::battle_map_state::update_gamemode(
+    entt::registry& registry,
+    entt::entity& map,
+    float delta_time,
+    random_state& rng,
+    audio_player& audio )
+{
+    battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
+    tilemap& tmap = registry.get<tilemap>(map);
+
+    std::string gamemode_editor_label = "Gamemode Editor ##" + std::to_string((int)map);
+    ImGui::Begin(gamemode_editor_label.c_str());
+
+    if (ImGui::BeginCombo("##combo", state.current_gamemode_str.c_str())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < state.gamemodes.size(); n++)
+        {
+            bool is_selected = (state.current_gamemode_str == state.gamemodes[n]); // You can store your selection however you want, outside or inside your objects
+            if (ImGui::Selectable(state.gamemodes[n].c_str(), is_selected))
+            {
+                printf("Selected! \n");
+                state.current_gamemode_str = state.gamemodes[n];
+                state.current_gamemode = combobox_str_to_gamemode(state.current_gamemode_str);
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::End();
+
+    if (state.current_gamemode == combobox_gamemode::GAMEMODE_RHYTHM)
+    {
+        rhythm_loop(delta_time, audio);
+    }
+
+    if (state.current_gamemode == combobox_gamemode::GAMEMODE_HERO_CONTROL)
+    {
+        hero_loop(delta_time);
+    }
+}
+
+
 void battle_map::battle_map_state::battle_editor(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
 {
     battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
@@ -333,30 +378,7 @@ void battle_map::battle_map_state::unit_editor(entt::registry& registry, entt::e
 
 void battle_map::battle_map_state::debug_combat(entt::registry& registry, entt::entity& map, random_state& rng, render_window& win, camera& cam, vec2f mpos)
 {
-    battle_map_state& state = registry.get<battle_map::battle_map_state>(map);
-    tilemap& tmap = registry.get<tilemap>(map);
 
-    std::string gamemode_editor_label = "Gamemode Editor ##" + std::to_string((int)map);
-    ImGui::Begin(gamemode_editor_label.c_str());
-
-    if (ImGui::BeginCombo("##combo", state.current_gamemode_str.c_str())) // The second parameter is the label previewed before opening the combo.
-    {
-        for (int n = 0; n < state.gamemodes.size(); n++)
-        {
-            bool is_selected = (state.current_gamemode_str == state.gamemodes[n]); // You can store your selection however you want, outside or inside your objects
-            if (ImGui::Selectable(state.gamemodes[n].c_str(), is_selected))
-            {
-                printf("Selected! \n");
-                state.current_gamemode_str = state.gamemodes[n];
-                state.current_gamemode = combobox_str_to_gamemode(state.current_gamemode_str);
-            }
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-        }
-        ImGui::EndCombo();
-    }
-
-    ImGui::End();
 }
 
 

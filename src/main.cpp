@@ -27,6 +27,8 @@
 #include "overworld_map.hpp"
 #include "overworld_generation.hpp"
 
+#include "audio/audio_player.h"
+
 #include "Editor/imgui_bezier.hpp"
 #include "vfx/particle_system.hpp"
 #include "vfx/effects/snow_effect.hpp"
@@ -210,6 +212,9 @@ int main(int argc, char* argv[])
 
     random_state rng;
 
+    audio_player audio;
+    audio.play_oneoff_sound();
+
     /*sprite_handle dummy;
     dummy = get_sprite_handle_of(rng, tiles::TREE_1);
     render_descriptor desc;
@@ -315,9 +320,10 @@ int main(int argc, char* argv[])
                 continue;
 
             bms.update_ai(registry, ent, delta_time, rng);
+            bms.update_gamemode(registry, ent, delta_time, rng, audio);
             bms.battle_editor(registry, ent, rng, win, cam, mpos);
             bms.unit_editor(registry, ent, rng, win, cam, mpos);
-            bms.debug_combat(registry, ent, rng, win, cam, mpos);
+            //bms.debug_combat(registry, ent, rng, win, cam, mpos);
         }
 
         //map
@@ -325,6 +331,12 @@ int main(int argc, char* argv[])
 
         tilemap& focused = registry.get<tilemap>(focused_tilemap);
         focused.render(registry, win, cam, sprite_render, mpos);
+
+        //audio debugging
+        if (ImGui::IsKeyDown(GLFW_KEY_ENTER))
+        {
+            audio.play_oneoff_sound();
+        }
 
         //vfx
         snow.editor();
